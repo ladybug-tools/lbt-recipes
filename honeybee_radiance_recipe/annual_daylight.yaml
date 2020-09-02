@@ -1,6 +1,6 @@
 metadata:
   name: annual-daylight
-  tag: 0.1.0
+  tag: 0.1.2
   keywords:
   - ladybug-tools
   - radiance
@@ -26,18 +26,12 @@ dependencies:
   name: honeybee-radiance
   hash: null
   alias: null
-  tag: 0.3.1
+  tag: 0.3.4
   source: https://api.pollination.cloud/registries/ladybug-tools
 flow:
-- name: ecaa6fdb7040d95c6aa11795e8330b3ac20515e95594d8c80312d436a08c3439/annual-daylight-entry
+- name: a99fe012a53d7259168e7c4183a7e479621b4a5010de050c0bd95bcb771333e8/annual-daylight-entry
   inputs:
     parameters:
-    - annotations:
-        type: number
-      name: north
-      default: null
-      description: A number for rotation from north.
-      required: true
     - annotations:
         type: string
       name: radiance-parameters
@@ -100,9 +94,12 @@ flow:
   fail_fast: true
   tasks:
   - name: direct-sky
-    template: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/daylight-coefficient
+    template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/daylight-coefficient
     arguments:
       parameters:
+      - name: fixed-radiance-parameters
+        from: null
+        value: -aa 0.0 -I -ab 1 -c 1 -fad
       - name: radiance-parameters
         from:
           type: inputs
@@ -141,8 +138,6 @@ flow:
         name: split-grid
         variable: grid-list
       value: null
-      control:
-        key: '{{item}}'
     sub_folder: direct_sky
     outputs:
       parameters: []
@@ -150,12 +145,12 @@ flow:
       - name: results-file
         path: '{{item.name}}.ill'
   - name: direct-sunlight
-    template: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/daylight-contribution
+    template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/daylight-contribution
     arguments:
       parameters:
-      - name: multiply-values
+      - name: fixed-radiance-parameters
         from: null
-        value: +
+        value: -aa 0.0 -I -fad -ab 0 -dc 1.0 -dt 0.0 -dj 0.0 -dr 0
       - name: radiance-parameters
         from:
           type: inputs
@@ -189,8 +184,6 @@ flow:
         name: split-grid
         variable: grid-list
       value: null
-      control:
-        key: '{{item}}'
     sub_folder: direct_sunlight
     outputs:
       parameters: []
@@ -198,7 +191,7 @@ flow:
       - name: results-file
         path: '{{item.name}}.ill'
   - name: output-matrix-math
-    template: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/add-remove-matrix
+    template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/add-remove-matrix
     arguments:
       parameters: []
       artifacts:
@@ -228,8 +221,6 @@ flow:
         name: split-grid
         variable: grid-list
       value: null
-      control:
-        key: '{{item}}'
     sub_folder: final
     outputs:
       parameters: []
@@ -237,7 +228,7 @@ flow:
       - name: results-file
         path: '{{item.name}}.ill'
   - name: split-grid
-    template: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/split-grid
+    template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/split-grid
     arguments:
       parameters:
       - name: sensor-count
@@ -261,9 +252,12 @@ flow:
       - name: output-grids-folder
         path: sub_grids
   - name: total-sky
-    template: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/daylight-coefficient
+    template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/daylight-coefficient
     arguments:
       parameters:
+      - name: fixed-radiance-parameters
+        from: null
+        value: -aa 0.0 -I -c 1 -fad
       - name: radiance-parameters
         from:
           type: inputs
@@ -302,8 +296,6 @@ flow:
         name: split-grid
         variable: grid-list
       value: null
-      control:
-        key: '{{item}}'
     sub_folder: total_sky
     outputs:
       parameters: []
@@ -312,21 +304,26 @@ flow:
         path: '{{item.name}}.ill'
   outputs:
     parameters: []
-    artifacts: []
-- name: ecaa6fdb7040d95c6aa11795e8330b3ac20515e95594d8c80312d436a08c3439/main
+    artifacts:
+    - name: results
+      from:
+        type: folder
+        path: final
+- name: a99fe012a53d7259168e7c4183a7e479621b4a5010de050c0bd95bcb771333e8/main
   inputs:
     parameters:
     - annotations:
         type: number
       name: north
-      default: null
+      default: '0'
       description: A number for rotation from north.
-      required: true
+      required: null
     - annotations:
         type: string
       name: radiance-parameters
-      default: ' '
-      description: The radiance parameters for ray tracing
+      default: -ab 2
+      description: The radiance parameters for ray tracing. The value for ambient
+        bounces will be set to 0 and 1 for direct sunlight and direct sky steps.
       required: null
     - annotations:
         type: integer
@@ -355,6 +352,7 @@ flow:
       required: true
     - annotations:
         type: file
+        extension: wea
       name: wea
       description: Wea file.
       default: null
@@ -362,7 +360,7 @@ flow:
   fail_fast: true
   tasks:
   - name: aggregate-results
-    template: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/merge-files
+    template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/merge-files
     arguments:
       parameters:
       - name: extension
@@ -384,8 +382,6 @@ flow:
         type: inputs
         variable: sensor-grids
       value: null
-      control:
-        key: '{{item}}'
     sub_folder: null
     outputs:
       parameters: []
@@ -393,14 +389,9 @@ flow:
       - name: result-file
         path: results/{{item}}.ill
   - name: annual-daylight-simulation
-    template: ecaa6fdb7040d95c6aa11795e8330b3ac20515e95594d8c80312d436a08c3439/annual-daylight-entry
+    template: a99fe012a53d7259168e7c4183a7e479621b4a5010de050c0bd95bcb771333e8/annual-daylight-entry
     arguments:
       parameters:
-      - name: north
-        from:
-          type: inputs
-          variable: north
-        value: null
       - name: radiance-parameters
         from:
           type: inputs
@@ -467,14 +458,12 @@ flow:
         type: inputs
         variable: sensor-grids
       value: null
-      control:
-        key: '{{item}}'
     sub_folder: initial_results/{{item}}
     outputs:
       parameters: []
       artifacts: []
   - name: create-direct-sky
-    template: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/create-sky-matrix
+    template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/create-sky-matrix
     arguments:
       parameters:
       - name: north
@@ -500,7 +489,7 @@ flow:
       - name: sky-matrix
         path: resources/sky_direct.mtx
   - name: create-octree
-    template: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/create-octree
+    template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/create-octree-with-sky
     arguments:
       parameters: []
       artifacts:
@@ -509,7 +498,14 @@ flow:
           type: inputs
           variable: model
         subpath: null
-    dependencies: null
+      - name: sky
+        from:
+          type: tasks
+          name: create-sunpath
+          variable: sunpath
+        subpath: null
+    dependencies:
+    - create-sunpath
     loop: null
     sub_folder: null
     outputs:
@@ -518,7 +514,7 @@ flow:
       - name: scene-file
         path: resources/scene.oct
   - name: create-sky-dome
-    template: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/create-sky-dome
+    template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/create-sky-dome
     arguments:
       parameters: []
       artifacts: []
@@ -531,7 +527,7 @@ flow:
       - name: sky-dome
         path: resources/sky.dome
   - name: create-sunpath
-    template: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/create-sun-matrix
+    template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/create-sun-matrix
     arguments:
       parameters:
       - name: north
@@ -556,7 +552,7 @@ flow:
       - name: sunpath
         path: resources/sunpath.mtx
   - name: create-total-sky
-    template: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/create-sky-matrix
+    template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/create-sky-matrix
     arguments:
       parameters:
       - name: north
@@ -579,7 +575,7 @@ flow:
       - name: sky-matrix
         path: resources/sky.mtx
   - name: parse-sun-up-hours
-    template: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/parse-sun-up-hours
+    template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/parse-sun-up-hours
     arguments:
       parameters: []
       artifacts:
@@ -600,10 +596,14 @@ flow:
         path: results/sun-up-hours.txt
   outputs:
     parameters: []
-    artifacts: []
-digest: ecaa6fdb7040d95c6aa11795e8330b3ac20515e95594d8c80312d436a08c3439
+    artifacts:
+    - name: results
+      from:
+        type: folder
+        path: results
+digest: a99fe012a53d7259168e7c4183a7e479621b4a5010de050c0bd95bcb771333e8
 templates:
-- name: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/100000-lux-sky
+- name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/100000-lux-sky
   description: Generates a 100000 lux sky
   inputs:
     parameters: []
@@ -617,11 +617,11 @@ templates:
       path: 100000_lux.sky
   config:
     docker:
-      image: ladybugtools/honeybee-radiance:1.24.0
+      image: ladybugtools/honeybee-radiance:1.26.1
       registry: null
       workdir: /home/ladybugbot/run
     local: null
-- name: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/add-remove-matrix
+- name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/add-remove-matrix
   description: Remove direct sky from total sky and add direct sun.
   inputs:
     parameters: []
@@ -644,11 +644,11 @@ templates:
       path: final.ill
   config:
     docker:
-      image: ladybugtools/honeybee-radiance:1.24.0
+      image: ladybugtools/honeybee-radiance:1.26.1
       registry: null
       workdir: /home/ladybugbot/run
     local: null
-- name: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/create-octree
+- name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/create-octree
   description: Generate an octree from a Radiance folder
   inputs:
     parameters:
@@ -686,11 +686,11 @@ templates:
       path: scene.oct
   config:
     docker:
-      image: ladybugtools/honeybee-radiance:1.24.0
+      image: ladybugtools/honeybee-radiance:1.26.1
       registry: null
       workdir: /home/ladybugbot/run
     local: null
-- name: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/create-octree-with-sky
+- name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/create-octree-with-sky
   description: Generate an octree from a Radiance folder and sky
   inputs:
     parameters:
@@ -731,11 +731,11 @@ templates:
       path: scene.oct
   config:
     docker:
-      image: ladybugtools/honeybee-radiance:1.24.0
+      image: ladybugtools/honeybee-radiance:1.26.1
       registry: null
       workdir: /home/ladybugbot/run
     local: null
-- name: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/create-sky-dome
+- name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/create-sky-dome
   description: create a skydome for daylight coefficient studies
   inputs:
     parameters: []
@@ -749,11 +749,11 @@ templates:
       path: rflux_sky.sky
   config:
     docker:
-      image: ladybugtools/honeybee-radiance:1.24.0
+      image: ladybugtools/honeybee-radiance:1.26.1
       registry: null
       workdir: /home/ladybugbot/run
     local: null
-- name: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/create-sky-matrix
+- name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/create-sky-matrix
   description: Generate a sun-up sky matrix.
   inputs:
     parameters:
@@ -784,11 +784,11 @@ templates:
       path: sky.mtx
   config:
     docker:
-      image: ladybugtools/honeybee-radiance:1.24.0
+      image: ladybugtools/honeybee-radiance:1.26.1
       registry: null
       workdir: /home/ladybugbot/run
     local: null
-- name: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/create-sun-matrix
+- name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/create-sun-matrix
   description: Generate a Radiance sun matrix (AKA sun-path).
   inputs:
     parameters:
@@ -813,19 +813,23 @@ templates:
       path: sunpath.mtx
   config:
     docker:
-      image: ladybugtools/honeybee-radiance:1.24.0
+      image: ladybugtools/honeybee-radiance:1.26.1
       registry: null
       workdir: /home/ladybugbot/run
     local: null
-- name: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/daylight-coefficient
+- name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/daylight-coefficient
   description: 'Calculate daylight coefficient for a grid of sensors from a sky matrix.
 
     '
   inputs:
     parameters:
+    - name: fixed-radiance-parameters
+      default: -aa 0
+      description: Radiance parameters. -I, -c 1 and -aa 0 are already included in
+        the command.
+      required: false
     - name: radiance-parameters
-      default: -ab 1 -ad 5000 -lw 2e-06 -as 128 -dc 0.25 -dj 0.0 -dp 64 -ds 0.5 -dr
-        0 -dt 0.5 -lr 4
+      default: ''
       description: Radiance parameters. -I, -c 1 and -aa 0 are already included in
         the command.
       required: false
@@ -846,10 +850,9 @@ templates:
     - name: sky-matrix
       description: Path to a sky matrix.
       path: sky.mtx
-  command: 'rfluxmtx -aa 0.0 -ss 0.0 -st 0.85 -I -fad -y {{inputs.parameters.sensor-count}}
-    {{inputs.parameters.radiance-parameters}} - sky.dome -i scene.oct < grid.pts >
-    flux.dc && dctimestep -of flux.dc sky.mtx | rmtxop -c 47.4 119.9 11.6 -fa - >
-    results.ill
+  command: 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count
+    {{inputs.parameters.sensor-count}} --output results.ill --rad-params "{{inputs.parameters.radiance-parameters}}"
+    --rad-params-locked "{{inputs.parameters.fixed-radiance-parameters}}"
 
     '
   outputs:
@@ -860,11 +863,11 @@ templates:
       path: results.ill
   config:
     docker:
-      image: ladybugtools/honeybee-radiance:1.24.0
+      image: ladybugtools/honeybee-radiance:1.26.1
       registry: null
       workdir: /home/ladybugbot/run
     local: null
-- name: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/daylight-contribution
+- name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/daylight-contribution
   description: 'Calculate daylight contribution for a grid of sensors from a series
     of modifiers using
 
@@ -873,18 +876,21 @@ templates:
     '
   inputs:
     parameters:
-    - name: multiply-values
-      default: +
-      description: 'A + or - to indicate if the values should be multiplied. Otherwise
+    - name: calculate-values
+      default: value
+      description: 'A switch to indicate if the values should be multiplied. Otherwise
         the contribution
 
-        is calculated as a coefficient. Default is set to  +.
+        is calculated as a coefficient. Default is set to value. Use coeff for contribution
 
         '
       required: false
+    - name: fixed-radiance-parameters
+      default: -aa 0.0
+      description: Fixed Radiance parameters for this function.
+      required: false
     - name: radiance-parameters
-      default: -ab 0 -as 128 -dc 1.0 -dj 0.0 -dp 64 -ds 0.5 -dr 0 -dt 0.0 -lr 4 -lw
-        0.05
+      default: ''
       description: Radiance parameters. -I and -aa 0 are already included in the command.
       required: false
     - name: sensor-count
@@ -901,9 +907,10 @@ templates:
     - name: sensor-grid
       description: Path to sensor grid files.
       path: grid.pts
-  command: 'rcontrib -aa 0.0 -I -fad -V{{inputs.parameters.multiply-values}} -y {{inputs.parameters.sensor-count}}
-    {{inputs.parameters.radiance-parameters}} -M ./suns.mod -ss 0.0 -st 0.85 scene.oct
-    < grid.pts | rmtxop -c 47.4 119.9 11.6 -fa - > results.ill
+  command: 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{{inputs.parameters.calculate-values}}
+    --sensor-count {{inputs.parameters.sensor-count}} --rad-params "{{inputs.parameters.radiance-parameters}}"
+    --rad-params-locked "{{inputs.parameters.fixed-radiance-parameters}}" --output
+    results.ill
 
     '
   outputs:
@@ -914,11 +921,11 @@ templates:
       path: results.ill
   config:
     docker:
-      image: ladybugtools/honeybee-radiance:1.24.0
+      image: ladybugtools/honeybee-radiance:1.26.1
       registry: null
       workdir: /home/ladybugbot/run
     local: null
-- name: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/merge-files
+- name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/merge-files
   description: Merge several files into a single file.
   inputs:
     parameters:
@@ -944,11 +951,11 @@ templates:
       path: grid{{inputs.parameters.extension}}
   config:
     docker:
-      image: ladybugtools/honeybee-radiance:1.24.0
+      image: ladybugtools/honeybee-radiance:1.26.1
       registry: null
       workdir: /home/ladybugbot/run
     local: null
-- name: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/parse-sun-up-hours
+- name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/parse-sun-up-hours
   description: Parse sun up hours from sun modifiers file.
   inputs:
     parameters: []
@@ -967,17 +974,21 @@ templates:
       path: sun-up-hours.txt
   config:
     docker:
-      image: ladybugtools/honeybee-radiance:1.24.0
+      image: ladybugtools/honeybee-radiance:1.26.1
       registry: null
       workdir: /home/ladybugbot/run
     local: null
-- name: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/ray-tracing-daylight-factor
+- name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/ray-tracing-daylight-factor
   description: 'Run ray-tracing and post-process the results and divide them by sky
     illuminance.
 
     '
   inputs:
     parameters:
+    - name: fixed-radiance-parameters
+      default: -I -h
+      description: null
+      required: false
     - name: radiance-parameters
       default: -ab 2
       description: Radiance parameters. -I and -h are already included in the command.
@@ -993,9 +1004,11 @@ templates:
     - name: scene-file
       description: null
       path: scene.oct
-  command: rtrace -I -h {{inputs.parameters.radiance-parameters}} scene.oct < grid.pts
-    | rcalc -e '$1=(0.265*$1+0.67*$2+0.065*$3)*17900/{{inputs.parameters.sky-illum}}'
-    > grid.res
+  command: 'honeybee-radiance raytrace daylight-factor scene.oct grid.pts --rad-params
+    "{{inputs.parameters.radiance-parameters}}" --rad-params-locked "{{inputs.parameters.fixed-radiance-parameters}}"
+    --sky-illum {{inputs.parameters.sky-illum}} --output grid.res
+
+    '
   outputs:
     parameters: []
     artifacts:
@@ -1004,11 +1017,11 @@ templates:
       path: grid.res
   config:
     docker:
-      image: ladybugtools/honeybee-radiance:1.24.0
+      image: ladybugtools/honeybee-radiance:1.26.1
       registry: null
       workdir: /home/ladybugbot/run
     local: null
-- name: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/split-grid
+- name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/split-grid
   description: Split a single grid into multiple grids based on maximum number of
     sensors.
   inputs:
@@ -1034,11 +1047,11 @@ templates:
       path: output
   config:
     docker:
-      image: ladybugtools/honeybee-radiance:1.24.0
+      image: ladybugtools/honeybee-radiance:1.26.1
       registry: null
       workdir: /home/ladybugbot/run
     local: null
-- name: 097b05febe73d7562252a29ec198bc86d90161f30d14c5f65de17a241ed32be6/split-grid-from-folder
+- name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/split-grid-from-folder
   description: 'Split a single sensor grid file into multiple grids based on maximum
     number of sensors.
 
@@ -1074,7 +1087,7 @@ templates:
       path: output
   config:
     docker:
-      image: ladybugtools/honeybee-radiance:1.24.0
+      image: ladybugtools/honeybee-radiance:1.26.1
       registry: null
       workdir: /home/ladybugbot/run
     local: null
