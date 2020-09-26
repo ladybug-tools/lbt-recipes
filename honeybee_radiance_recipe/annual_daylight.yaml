@@ -1,6 +1,6 @@
 metadata:
   name: annual-daylight
-  tag: 0.1.2
+  tag: 0.1.3
   keywords:
   - ladybug-tools
   - radiance
@@ -29,7 +29,7 @@ dependencies:
   tag: 0.3.4
   source: https://api.pollination.cloud/registries/ladybug-tools
 flow:
-- name: a99fe012a53d7259168e7c4183a7e479621b4a5010de050c0bd95bcb771333e8/annual-daylight-entry
+- name: 0ce27c64d8b605a80dd25f37d06f611323eb02691561505cad895f43075a6107/annual-daylight-entry
   inputs:
     parameters:
     - annotations:
@@ -44,16 +44,22 @@ flow:
       default: '200'
       description: The maximum number of grid points per parallel execution
       required: null
-    - annotations: {}
-      name: sensor-grid-name
-      default: null
-      description: Input grid name (e.g. room)
-      required: true
     artifacts:
     - annotations:
         type: file
       name: octree-file
       description: Scene file as an octree file.
+      default: null
+      required: true
+    - annotations:
+        type: file
+      name: octree-file-with-suns
+      description: 'Scene file as an octree file that includes suns. This octree will
+        be used for
+
+        direct sunlight calculation.
+
+        '
       default: null
       required: true
     - annotations: {}
@@ -83,12 +89,6 @@ flow:
         type: file
       name: sun-modifiers
       description: A file with sun modifiers.
-      default: null
-      required: true
-    - annotations:
-        type: file
-      name: sunpath
-      description: Sunpath file.
       default: null
       required: true
   fail_fast: true
@@ -168,7 +168,7 @@ flow:
       - name: scene-file
         from:
           type: inputs
-          variable: octree-file
+          variable: octree-file-with-suns
         subpath: null
       - name: sensor-grid
         from:
@@ -309,7 +309,7 @@ flow:
       from:
         type: folder
         path: final
-- name: a99fe012a53d7259168e7c4183a7e479621b4a5010de050c0bd95bcb771333e8/main
+- name: 0ce27c64d8b605a80dd25f37d06f611323eb02691561505cad895f43075a6107/main
   inputs:
     parameters:
     - annotations:
@@ -389,7 +389,7 @@ flow:
       - name: result-file
         path: results/{{item}}.ill
   - name: annual-daylight-simulation
-    template: a99fe012a53d7259168e7c4183a7e479621b4a5010de050c0bd95bcb771333e8/annual-daylight-entry
+    template: 0ce27c64d8b605a80dd25f37d06f611323eb02691561505cad895f43075a6107/annual-daylight-entry
     arguments:
       parameters:
       - name: radiance-parameters
@@ -402,14 +402,17 @@ flow:
           type: inputs
           variable: sensor-count
         value: null
-      - name: sensor-grid-name
-        from: null
-        value: '{{item}}'
       artifacts:
       - name: octree-file
         from:
           type: tasks
           name: create-octree
+          variable: scene-file
+        subpath: null
+      - name: octree-file-with-suns
+        from:
+          type: tasks
+          name: create-octree-with-suns
           variable: scene-file
         subpath: null
       - name: sensor-grid
@@ -449,6 +452,7 @@ flow:
         subpath: null
     dependencies:
     - create-sky-dome
+    - create-octree-with-suns
     - create-octree
     - create-sunpath
     - create-total-sky
@@ -489,6 +493,24 @@ flow:
       - name: sky-matrix
         path: resources/sky_direct.mtx
   - name: create-octree
+    template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/create-octree
+    arguments:
+      parameters: []
+      artifacts:
+      - name: model
+        from:
+          type: inputs
+          variable: model
+        subpath: null
+    dependencies: null
+    loop: null
+    sub_folder: null
+    outputs:
+      parameters: []
+      artifacts:
+      - name: scene-file
+        path: resources/scene.oct
+  - name: create-octree-with-suns
     template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/create-octree-with-sky
     arguments:
       parameters: []
@@ -512,7 +534,7 @@ flow:
       parameters: []
       artifacts:
       - name: scene-file
-        path: resources/scene.oct
+        path: resources/scene_with_sun.oct
   - name: create-sky-dome
     template: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/create-sky-dome
     arguments:
@@ -601,7 +623,7 @@ flow:
       from:
         type: folder
         path: results
-digest: a99fe012a53d7259168e7c4183a7e479621b4a5010de050c0bd95bcb771333e8
+digest: 0ce27c64d8b605a80dd25f37d06f611323eb02691561505cad895f43075a6107
 templates:
 - name: ea7b556f9e84c84b2801ac2898debf6d5c758cefeab98b5c1c88916174571964/100000-lux-sky
   description: Generates a 100000 lux sky
