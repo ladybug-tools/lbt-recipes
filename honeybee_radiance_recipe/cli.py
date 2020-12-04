@@ -6,7 +6,9 @@ except ImportError:
         'click module is not installed. Try `pip install queenbee[cli]` command.'
     )
 
+import json
 import os
+import time
 import pathlib
 import sys
 import sysconfig
@@ -43,7 +45,15 @@ def recipe():
     '-e', '--env', multiple=True, help='An option to pass environmental variables to '
     'commands. Use = to separate key and value. RAYPATH=/usr/local/lib/ray'
 )
-def run_recipe(recipe_name, project_folder, inputs, workers, env):
+@click.option('-n', '--name', help='Simulation name for this run.')
+@click.option(
+    '-d', '--debug',
+    type=click.Path(exists=False, file_okay=False, resolve_path=True, dir_okay=True),
+    help='Optional path to a debug folder. If debug folder is provided all the steps '
+    'of the simulation will be executed inside the debug folder which can be used for '
+    'furthur inspection.'
+)
+def run_recipe(recipe_name, project_folder, inputs, workers, env, name, debug):
     """Run a honeybee recipe.
     \n
     Args:\n
@@ -58,7 +68,6 @@ def run_recipe(recipe_name, project_folder, inputs, workers, env):
     recipe_path = pathlib.Path(cli_dir, f'./{recipe_name}/{recipe_name}.py').as_posix()
 
     if not os.path.isfile(recipe_path):
-        assert False, recipe_path
         raise ValueError(f'Failed to find {recipe_name} recipe.')
 
     env_vars = {}
@@ -90,6 +99,35 @@ def run_recipe(recipe_name, project_folder, inputs, workers, env):
             # overwrite env variable
             genv[k.strip()] = v.strip()
 
+    if inputs:
+        # try to load the results
+        with open(inputs) as user_input:
+            input_values = json.load(user_input)
+    else:
+        input_values = {}
+
+    # add simulation folder based on simulation name
+    if not name:
+        name = f'{recipe_name.replace("-", "_")}_{int(round(time.time(), 2) * 100)}'
+
+    simulation_folder = pathlib.Path(project_folder, name)
+    input_values['simulation_folder'] = simulation_folder.as_posix()
+    simulation_folder.mkdir(exist_ok=True)
+
+    if debug:
+        debug_folder = pathlib.Path(debug)
+        if not debug_folder.exists():
+            debug_folder.mkdir(0o777)
+        input_values['__debug__'] = debug_folder.as_posix()
+
+    # write updated inputs to project folder
+    inputs_file = pathlib.Path(
+        input_values['simulation_folder'], '__inputs__.json'
+    ).as_posix()
+
+    with open(inputs_file, 'w') as inpf:
+        json.dump(input_values, inpf)
+
     python_executable_path = sys.executable
 
     # add path to scripts folder to env
@@ -99,7 +137,7 @@ def run_recipe(recipe_name, project_folder, inputs, workers, env):
     # put all the paths in quotes - this should address the issue for paths with
     # white space
     command = f'"{python_executable_path}" "{recipe_path}" ' \
-        f'"{project_folder}" "{inputs}" {workers}'
+        f'"{project_folder}" "{inputs_file}" {workers}'
 
     subprocess.call(command, cwd=project_folder, shell=True, env=genv)
 
