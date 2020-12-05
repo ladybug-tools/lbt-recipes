@@ -139,7 +139,13 @@ def run_recipe(recipe_name, project_folder, inputs, workers, env, name, debug):
     command = f'"{python_executable_path}" "{recipe_path}" ' \
         f'"{project_folder}" "{inputs_file}" {workers}'
 
-    subprocess.call(command, cwd=project_folder, shell=True, env=genv)
+    try:
+        subprocess.call(command, cwd=project_folder, shell=True, env=genv)
+    except Exception:
+        print(f'Failed to execute {recipe_name} recipe...')
+        sys.exit(1)
+    else:
+        sys.exit(0)
 
 
 main.add_command(recipe)
