@@ -1,3 +1,8 @@
+"""
+Note: This file is auto-generated from a Queenbee recipe and should not be edited or
+modified directly. Modify the original recipe instead and re-generate the files.
+"""
+
 import luigi
 import os
 from honeybee_radiance_recipe.recipe_helper import QueenbeeTask, load_input_param
