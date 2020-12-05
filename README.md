@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/ladybug-tools/honeybee-radiance-recipe.svg?branch=master)](https://travis-ci.com/ladybug-tools/honeybee-radiance-recipe)
+[![Build Status](https://github.com/ladybug-tools/honeybee-radiance-recipe/workflows/CI/badge.svg)](https://github.com/ladybug-tools/honeybee-radiance-recipe/actions)
 
 # honeybee-radiance-recipe
 

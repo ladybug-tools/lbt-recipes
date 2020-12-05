@@ -24,8 +24,8 @@ def run_daylight_recipe(recipe_name, extension):
 
 
 def test_daylight_factor():
-    run_daylight_recipe('daylight-factor')
+    run_daylight_recipe('daylight-factor', 'res')
 
 
 def test_annual_daylight():
-    run_daylight_recipe('annual-daylight')
+    run_daylight_recipe('annual-daylight', 'ill')
