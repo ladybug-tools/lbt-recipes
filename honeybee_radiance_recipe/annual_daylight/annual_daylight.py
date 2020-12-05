@@ -1,3 +1,8 @@
+"""
+Note: This file is auto-generated from a Queenbee recipe and should not be edited or
+modified directly. Modify the original recipe instead and re-generate the files.
+"""
+
 import sys
 import luigi
 import os
