@@ -55,11 +55,11 @@ def recipe():
 )
 def run_recipe(recipe_name, project_folder, inputs, workers, env, name, debug):
     """Run a honeybee recipe.
-    \n
-    Args:\n
-        recipe_name: Name of a honeybee recipe.\n
-        project_folder: Path to project folder. Default = '.'
 
+    \b
+    Args:
+        recipe_name: Name of a honeybee recipe.
+        project_folder: Path to project folder. (Default: '.')
     """
     cli_dir = os.path.dirname(__file__)
 
