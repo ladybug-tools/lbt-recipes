@@ -9,16 +9,13 @@ jobs:
     name: Unit tests
 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.6, 3.7]
 
     steps:
       - uses: actions/checkout@v2
       - name: set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.7
       - name: install radiance
         run: |
           wget https://ladybug-tools-releases.nyc3.digitaloceanspaces.com/Radiance_5.3a.fc2a2610_Linux.zip
