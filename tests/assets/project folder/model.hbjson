@@ -3805,7 +3805,7 @@
 "type": "Mesh3D"
 }, 
 "display_name": "TestRoom_1", 
-"identifier": "TestRoom_1_7b619502", 
+"identifier": "TestRoom_1", 
 "sensors": [
 {
 "pos": [
@@ -6470,7 +6470,7 @@
 "type": "Mesh3D"
 }, 
 "display_name": "TestRoom_2", 
-"identifier": "TestRoom_2_07acc817", 
+"identifier": "TestRoom_2", 
 "sensors": [
 {
 "pos": [
