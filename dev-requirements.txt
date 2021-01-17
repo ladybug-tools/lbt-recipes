@@ -1,6 +1,6 @@
 pytest==6.2.1
 twine==3.3.0
 wheel==0.36.2
-setuptools==51.3.0
+setuptools==51.3.1
 importlib-metadata==3.4.0
 honeybee-schema==1.40.2
