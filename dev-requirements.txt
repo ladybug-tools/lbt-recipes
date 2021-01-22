@@ -3,4 +3,4 @@ twine==3.3.0
 wheel==0.36.2
 setuptools==51.3.3
 importlib-metadata==3.4.0
-honeybee-schema==1.40.2
+honeybee-schema==1.40.3
