@@ -1,3 +1,3 @@
 luigi==3.0.2
-honeybee-radiance==1.29.1
+honeybee-radiance==1.29.2
 click==7.1.2
