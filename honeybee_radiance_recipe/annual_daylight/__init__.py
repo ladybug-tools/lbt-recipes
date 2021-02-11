@@ -1,1 +1,0 @@
-"""annual daylight recipe."""
