@@ -392,6 +392,10 @@ class CreateRadFolder(QueenbeeTask):
             'model_folder': luigi.LocalTarget(
                 os.path.join(self.execution_folder, 'model')
             ),
+            
+            'sensor_grids_file': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'results/grids_info.json')
+            ),
             'sensor_grids': luigi.LocalTarget(
                 os.path.join(
                     self.params_folder,
@@ -410,6 +414,11 @@ class CreateRadFolder(QueenbeeTask):
             {
                 'name': 'model-folder', 'from': 'model',
                 'to': os.path.join(self.execution_folder, 'model')
+            },
+                
+            {
+                'name': 'sensor-grids-file', 'from': 'model/grid/_info.json',
+                'to': os.path.join(self.execution_folder, 'results/grids_info.json')
             }]
 
     @property
