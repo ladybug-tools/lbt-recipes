@@ -1,17 +1,17 @@
-[![Build Status](https://github.com/ladybug-tools/honeybee-radiance-recipe/workflows/CI/badge.svg)](https://github.com/ladybug-tools/honeybee-radiance-recipe/actions)
+[![Build Status](https://github.com/ladybug-tools/lbt-recipes/workflows/CI/badge.svg)](https://github.com/ladybug-tools/lbt-recipes/actions)
 
-# honeybee-radiance-recipe
+# lbt-recipes
 
-Collection of recipes for running daylight studies using honeybee-radiance.
+A collection of recipes that ship with the Ladybug Tools plugins.
 
-Honeybee Radiance recipe library is a collection of recipes to automate the process of running lighting studies using [Radiance](http://radiance-online.org/).
+This includes Radiance recipes, which automate the process of running daylight and radiation studies using [Radiance](http://radiance-online.org/).
 
-`honeybee-radiance-recipe` is built on top of [`honeybee-radiance`](https://github.com/ladybug-tools/honeybee-radiance). It uses [`radiance-folder-structure`](https://github.com/ladybug-tools/radiance-folder-structure) as the input for running recipes. As long as you follow the folder structure you should be able to use these recipes regardless of how the folder is generated. :rocket:
+It also includes microclimate mapping recipes, which spatially map thermal comfort using [EnergyPlus](https://github.com/NREL/EnergyPlus) and [Radiance](http://radiance-online.org/).
 
 ## Installation
 
 ```console
-pip install honeybee-radiance-recipe
+pip install lbt-recipes
 ```
 
 ## Local Development
@@ -19,16 +19,23 @@ pip install honeybee-radiance-recipe
 1. Clone this repo locally
 
 ```console
-git clone git@github.com:ladybug-tools/honeybee-radiance-recipe
+git clone git@github.com:ladybug-tools/lbt-recipes
 
 # or
 
-git clone https://github.com/ladybug-tools/honeybee-radiance-recipe
+git clone https://github.com/ladybug-tools/lbt-recipes
 ```
 
 2. Install dependencies:
 
 ```console
-cd honeybee-radiance-recipe
+cd lbt-recipes
 pip install -r dev-requirements.txt
+pip install -r requirements.txt
+```
+
+3. Run Tests:
+
+```console
+python -m pytest ./tests
 ```

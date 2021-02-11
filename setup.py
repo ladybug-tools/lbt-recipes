@@ -7,21 +7,18 @@ with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
 setuptools.setup(
-    name="honeybee-radiance-recipe",
+    name="lbt-recipes",
     use_scm_version=True,
     setup_requires=['setuptools_scm'],
     author="Ladybug Tools",
     author_email="info@ladybug.tools",
-    description="Collection of recipes for running daylight studies using honeybee-radiance.",
+    description="A collection of recipes that ship with the Ladybug Tools plugins.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/ladybug-tools/honeybee-radiance-recipe",
+    url="https://github.com/ladybug-tools/lbt-recipes",
     packages=setuptools.find_packages(exclude=["tests*"]),
     include_package_data=True,
     install_requires=requirements,
-    entry_points={
-        "console_scripts": ["honeybee-recipe = honeybee_radiance_recipe.cli:recipe"]
-    },
     classifiers=[
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: Implementation :: CPython",

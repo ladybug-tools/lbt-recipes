@@ -1,2 +1,0 @@
-"""honeybee-radiance-recipe library."""
-

@@ -1,11 +1,12 @@
 from click.testing import CliRunner
-from honeybee_radiance_recipe.cli import run_recipe
+from queenbee_local.cli import run_recipe
 import os
 import shutil
 
 
 def run_daylight_recipe(recipe_name, extension):
     project_folder = './tests/assets/project folder'
+    recipe_folder = './lbt_recipes/{}'.format(recipe_name.replace('-', '_'))
     inputs = './tests/assets/inputs.json'
     name = f'{recipe_name}-test'
     sim_folder = os.path.join(project_folder, name)
@@ -14,7 +15,7 @@ def run_daylight_recipe(recipe_name, extension):
     runner = CliRunner()
     result = runner.invoke(
         run_recipe,
-        [recipe_name, project_folder, '-i', inputs, '--workers', '2',
+        [recipe_folder, project_folder, '-i', inputs, '--workers', '2',
          '--name', name]
     )
     assert result.exit_code == 0

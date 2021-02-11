@@ -1,0 +1,170 @@
+{
+  "type": "RecipeInterface",
+  "annotations": {},
+  "api_version": "v1beta1",
+  "metadata": {
+    "type": "MetaData",
+    "annotations": {},
+    "name": "daylight-factor",
+    "tag": "0.3.3",
+    "app_version": null,
+    "keywords": [
+      "honeybee",
+      "radiance",
+      "ladybug-tools",
+      "daylight",
+      "daylight-factor"
+    ],
+    "maintainers": [
+      {
+        "type": "Maintainer",
+        "annotations": {},
+        "name": "mostapha",
+        "email": "mostapha@ladybug.tools"
+      },
+      {
+        "type": "Maintainer",
+        "annotations": {},
+        "name": "ladybug-tools",
+        "email": "info@ladybug.tools"
+      }
+    ],
+    "home": "https://github.com/pollination/daylight-factor",
+    "sources": [
+      "https://hub.docker.com/r/ladybugtools/honeybee-radiance"
+    ],
+    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/dfrecipe.png",
+    "deprecated": null,
+    "description": "Daylight factor recipe for Pollination.",
+    "license": {
+      "type": "License",
+      "annotations": {},
+      "name": "PolyForm Shield License 1.0.0",
+      "url": "https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt"
+    }
+  },
+  "source": null,
+  "inputs": [
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "model",
+      "description": "A Honeybee model in HBJSON file format.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "A path to a HBJSON file or a HB model object built with Python ordotnet libraries.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.model",
+              "function": "model_to_json"
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "HoneybeeSchema.Handlers",
+              "function": "HBModelToJSON"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        },
+        {
+          "type": "DAGLinkedInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "This input links the model to Rhino model.",
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "HoneybeeRhino.Handlers",
+              "function": "RhinoHBModelToJSON"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": true,
+      "spec": null,
+      "extensions": [
+        "json",
+        "hbjson"
+      ]
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "radiance-parameters",
+      "description": "The radiance parameters for ray tracing",
+      "default": "-ab 2 -aa 0.1 -ad 2048 -ar 64",
+      "alias": [],
+      "required": false,
+      "spec": null
+    },
+    {
+      "type": "DAGIntegerInput",
+      "annotations": {},
+      "name": "sensor-count",
+      "description": "The maximum number of grid points per parallel execution",
+      "default": 200,
+      "alias": [],
+      "required": false,
+      "spec": {
+        "type": "integer",
+        "minimum": 1
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "results",
+      "description": null,
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "results"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "daylight_factor",
+          "description": "Daylight factor values.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.read_file",
+              "function": "read_DF_from_path"
+            }
+          ]
+        }
+      ],
+      "required": true
+    }
+  ]
+}

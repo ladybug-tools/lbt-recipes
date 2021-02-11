@@ -1,0 +1,178 @@
+{
+  "type": "RecipeInterface",
+  "annotations": {},
+  "api_version": "v1beta1",
+  "metadata": {
+    "type": "MetaData",
+    "annotations": {},
+    "name": "annual-daylight",
+    "tag": "0.2.3",
+    "app_version": null,
+    "keywords": [
+      "honeybee",
+      "radiance",
+      "ladybug-tools",
+      "daylight",
+      "annual-daylight"
+    ],
+    "maintainers": [
+      {
+        "type": "Maintainer",
+        "annotations": {},
+        "name": "mostapha",
+        "email": "mostapha@ladybug.tools"
+      },
+      {
+        "type": "Maintainer",
+        "annotations": {},
+        "name": "ladybug-tools",
+        "email": "info@ladybug.tools"
+      }
+    ],
+    "home": "https://github.com/pollination/annual-daylight",
+    "sources": [
+      "https://hub.docker.com/r/ladybugtools/honeybee-radiance"
+    ],
+    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/annualrecipe.png",
+    "deprecated": null,
+    "description": "Annual daylight recipe for Pollination.",
+    "license": {
+      "type": "License",
+      "annotations": {},
+      "name": "PolyForm Shield License 1.0.0",
+      "url": "https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt"
+    }
+  },
+  "source": null,
+  "inputs": [
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "model",
+      "description": "A Honeybee model in HBJSON file format.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "A path to a HBJSON file or a HB model object built with Python ordotnet libraries.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.model",
+              "function": "model_to_json"
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "HoneybeeSchema.Handlers",
+              "function": "HBModelToJSON"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        },
+        {
+          "type": "DAGLinkedInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "This input links the model to Rhino model.",
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "HoneybeeRhino.Handlers",
+              "function": "RhinoHBModelToJSON"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": true,
+      "spec": null,
+      "extensions": [
+        "json",
+        "hbjson"
+      ]
+    },
+    {
+      "type": "DAGNumberInput",
+      "annotations": {},
+      "name": "north",
+      "description": "A number for rotation from north.",
+      "default": 0.0,
+      "alias": [],
+      "required": false,
+      "spec": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 360
+      }
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "radiance-parameters",
+      "description": "The radiance parameters for ray tracing.",
+      "default": "-ab 2 -ad 5000 -lw 2e-05",
+      "alias": [],
+      "required": false,
+      "spec": null
+    },
+    {
+      "type": "DAGIntegerInput",
+      "annotations": {},
+      "name": "sensor-count",
+      "description": "The maximum number of grid points per parallel execution.",
+      "default": 200,
+      "alias": [],
+      "required": false,
+      "spec": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "wea",
+      "description": "Wea file.",
+      "default": null,
+      "alias": [],
+      "required": true,
+      "spec": null,
+      "extensions": [
+        "wea"
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "results",
+      "description": null,
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "results"
+      },
+      "alias": [],
+      "required": true
+    }
+  ]
+}
