@@ -6,7 +6,7 @@ from queenbee_local import QueenbeeTask
 _default_inputs = {   'grid_name': None,
     'octree_file': None,
     'params_folder': '__params',
-    'radiance_parameters': '-ab 2',
+    'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64',
     'sensor_count': 200,
     'sensor_grid': None,
     'simulation_folder': '.'}

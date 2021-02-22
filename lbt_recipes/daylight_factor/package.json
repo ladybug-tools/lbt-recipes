@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "daylight-factor",
-    "tag": "0.4.1",
+    "tag": "0.5.0",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -131,6 +131,16 @@
         "type": "integer",
         "minimum": 1
       }
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "sensor-grid",
+      "description": "A grid name or a pattern to filter the sensor grids. By default all the grids in HBJSON model will be exported.",
+      "default": "*",
+      "alias": [],
+      "required": false,
+      "spec": null
     }
   ],
   "outputs": [
