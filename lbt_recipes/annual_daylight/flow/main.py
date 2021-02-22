@@ -9,6 +9,7 @@ _default_inputs = {   'model': None,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
     'sensor_count': 200,
+    'sensor_grid': '*',
     'simulation_folder': '.',
     'wea': None}
 
@@ -30,7 +31,7 @@ class AnnualDaylightRaytracingLoop(luigi.Task):
 
     @property
     def grid_name(self):
-        return self.item['name']
+        return self.item['full_id']
 
     @property
     def octree_file_with_suns(self):
@@ -46,7 +47,7 @@ class AnnualDaylightRaytracingLoop(luigi.Task):
 
     @property
     def sensor_grid(self):
-        value = os.path.join(self.input()['CreateRadFolder']['model_folder'].path, 'grid/{item_name}.pts'.format(item_name=self.item['name'])).replace('\\', '/')
+        value = os.path.join(self.input()['CreateRadFolder']['model_folder'].path, 'grid/{item_full_id}.pts'.format(item_full_id=self.item['full_id'])).replace('\\', '/')
         return value if os.path.isabs(value) \
             else os.path.join(self.initiation_folder, value)
 
@@ -194,8 +195,20 @@ class CreateDirectSky(QueenbeeTask):
         return self._input_params['north']
 
     @property
-    def sky_component(self):
-        return '-d'
+    def sky_type(self):
+        return 'sun-only'
+
+    @property
+    def sun_up_hours(self):
+        return 'sun-up-hours'
+
+    cumulative = luigi.Parameter(default='hourly')
+
+    output_format = luigi.Parameter(default='ASCII')
+
+    output_type = luigi.Parameter(default='visible')
+
+    sky_density = luigi.Parameter(default='1')
 
     @property
     def wea(self):
@@ -216,7 +229,7 @@ class CreateDirectSky(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'gendaymtx -u -O0 -r {north} -v {sky_component} sky.wea > sky.mtx'.format(north=self.north, sky_component=self.sky_component)
+        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --sun-modifiers suns.mod --output-format {output_format} --sky-density {sky_density}'.format(north=self.north, sky_type=self.sky_type, cumulative=self.cumulative, sun_up_hours=self.sun_up_hours, output_type=self.output_type, output_format=self.output_format, sky_density=self.sky_density)
 
     def output(self):
         return {
@@ -366,6 +379,10 @@ class CreateRadFolder(QueenbeeTask):
 
     # Task inputs
     @property
+    def sensor_grid(self):
+        return self._input_params['sensor_grid']
+
+    @property
     def input_model(self):
         value = self._input_params['model'].replace('\\', '/')
         return value if os.path.isabs(value) \
@@ -384,7 +401,7 @@ class CreateRadFolder(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'honeybee-radiance translate model-to-rad-folder model.hbjson'
+        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid "{sensor_grid}"'.format(sensor_grid=self.sensor_grid)
 
     def output(self):
         return {
@@ -474,7 +491,19 @@ class CreateTotalSky(QueenbeeTask):
     def north(self):
         return self._input_params['north']
 
-    sky_component = luigi.Parameter(default=' ')
+    @property
+    def sun_up_hours(self):
+        return 'sun-up-hours'
+
+    cumulative = luigi.Parameter(default='hourly')
+
+    output_format = luigi.Parameter(default='ASCII')
+
+    output_type = luigi.Parameter(default='visible')
+
+    sky_density = luigi.Parameter(default='1')
+
+    sky_type = luigi.Parameter(default='total')
 
     @property
     def wea(self):
@@ -495,7 +524,7 @@ class CreateTotalSky(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'gendaymtx -u -O0 -r {north} -v {sky_component} sky.wea > sky.mtx'.format(north=self.north, sky_component=self.sky_component)
+        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --sun-modifiers suns.mod --output-format {output_format} --sky-density {sky_density}'.format(north=self.north, sky_type=self.sky_type, cumulative=self.cumulative, sun_up_hours=self.sun_up_hours, output_type=self.output_type, output_format=self.output_format, sky_density=self.sky_density)
 
     def output(self):
         return {
@@ -529,6 +558,8 @@ class GenerateSunpath(QueenbeeTask):
     def north(self):
         return self._input_params['north']
 
+    output_type = luigi.Parameter(default='0')
+
     @property
     def wea(self):
         value = self._input_params['wea'].replace('\\', '/')
@@ -548,7 +579,7 @@ class GenerateSunpath(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'gendaymtx -n -D sunpath.mtx -M suns.mod -O0 -r {north} -v sky.wea'.format(north=self.north)
+        return 'gendaymtx -n -D sunpath.mtx -M suns.mod -O{output_type} -r {north} -v sky.wea'.format(output_type=self.output_type, north=self.north)
 
     def output(self):
         return {

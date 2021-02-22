@@ -7,7 +7,7 @@ _default_inputs = {   'grid_name': None,
     'octree_file': None,
     'octree_file_with_suns': None,
     'params_folder': '__params',
-    'radiance_parameters': '-ab 2',
+    'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
     'sensor_count': 200,
     'sensor_grid': None,
     'simulation_folder': '.',
@@ -30,11 +30,15 @@ class DirectSkyLoop(QueenbeeTask):
 
     @property
     def fixed_radiance_parameters(self):
-        return '-aa 0.0 -I -ab 1 -c 1 -fad'
+        return '-aa 0.0 -I -ab 1 -c 1 -faf'
 
     @property
     def sensor_count(self):
         return self.item['count']
+
+    conversion = luigi.Parameter(default='')
+
+    output_format = luigi.Parameter(default='f')
 
     @property
     def sky_matrix(self):
@@ -79,7 +83,7 @@ class DirectSkyLoop(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}"'.format(sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format}'.format(sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format)
 
     def requires(self):
         return {'SplitGrid': SplitGrid(_input_params=self._input_params)}
@@ -167,13 +171,17 @@ class DirectSunlightLoop(QueenbeeTask):
 
     @property
     def fixed_radiance_parameters(self):
-        return '-aa 0.0 -I -fad -ab 0 -dc 1.0 -dt 0.0 -dj 0.0 -dr 0'
+        return '-aa 0.0 -I -faf -ab 0 -dc 1.0 -dt 0.0 -dj 0.0 -dr 0'
 
     @property
     def sensor_count(self):
         return self.item['count']
 
     calculate_values = luigi.Parameter(default='value')
+
+    conversion = luigi.Parameter(default='')
+
+    output_format = luigi.Parameter(default='a')
 
     @property
     def modifiers(self):
@@ -212,7 +220,7 @@ class DirectSunlightLoop(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --output results.ill'.format(calculate_values=self.calculate_values, sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters)
+        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill'.format(calculate_values=self.calculate_values, sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format)
 
     def requires(self):
         return {'SplitGrid': SplitGrid(_input_params=self._input_params)}
@@ -353,9 +361,13 @@ class OutputMatrixMathLoop(QueenbeeTask):
     _input_params = luigi.DictParameter()
 
     # Task inputs
-    conversion = luigi.Parameter(default='47.4 119.9 11.6')
+    @property
+    def conversion(self):
+        return '47.4 119.9 11.6'
 
-    output_format = luigi.Parameter(default='-fa')
+    header = luigi.Parameter(default='remove')
+
+    output_format = luigi.Parameter(default='a')
 
     @property
     def direct_sky_matrix(self):
@@ -394,7 +406,7 @@ class OutputMatrixMathLoop(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'rmtxop {output_format} sky.ill + -s -1.0 sky_dir.ill + sun.ill -c {conversion} | getinfo - > final.ill'.format(output_format=self.output_format, conversion=self.conversion)
+        return 'honeybee-radiance mtxop operate-three sky.ill sky_dir.ill sun.ill --operator-one "-" --operator-two "+" --{header}-header --conversion "{conversion}" --output-mtx final.ill --output-format {output_format}'.format(header=self.header, conversion=self.conversion, output_format=self.output_format)
 
     def requires(self):
         return {'SplitGrid': SplitGrid(_input_params=self._input_params), 'DirectSunlight': DirectSunlight(_input_params=self._input_params), 'TotalSky': TotalSky(_input_params=self._input_params), 'DirectSky': DirectSky(_input_params=self._input_params)}
@@ -543,11 +555,15 @@ class TotalSkyLoop(QueenbeeTask):
 
     @property
     def fixed_radiance_parameters(self):
-        return '-aa 0.0 -I -c 1 -fad'
+        return '-aa 0.0 -I -c 1 -faf'
 
     @property
     def sensor_count(self):
         return self.item['count']
+
+    conversion = luigi.Parameter(default='')
+
+    output_format = luigi.Parameter(default='f')
 
     @property
     def sky_matrix(self):
@@ -592,7 +608,7 @@ class TotalSkyLoop(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}"'.format(sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format}'.format(sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format)
 
     def requires(self):
         return {'SplitGrid': SplitGrid(_input_params=self._input_params)}

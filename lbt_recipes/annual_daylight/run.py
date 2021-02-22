@@ -12,6 +12,7 @@ _recipe_default_inputs = {   'model': None,
     'north': 0.0,
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
     'sensor_count': 200,
+    'sensor_grid': '*',
     'wea': None}
 
 
