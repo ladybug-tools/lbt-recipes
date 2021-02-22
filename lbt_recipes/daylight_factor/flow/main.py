@@ -8,6 +8,7 @@ _default_inputs = {   'model': None,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64',
     'sensor_count': 200,
+    'sensor_grid': '*',
     'simulation_folder': '.'}
 
 
@@ -82,6 +83,10 @@ class CreateRadFolder(QueenbeeTask):
 
     # Task inputs
     @property
+    def sensor_grid(self):
+        return self._input_params['sensor_grid']
+
+    @property
     def input_model(self):
         value = self._input_params['model'].replace('\\', '/')
         return value if os.path.isabs(value) \
@@ -100,7 +105,7 @@ class CreateRadFolder(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'honeybee-radiance translate model-to-rad-folder model.hbjson'
+        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid "{sensor_grid}"'.format(sensor_grid=self.sensor_grid)
 
     def output(self):
         return {
@@ -159,7 +164,7 @@ class DaylightFactorRayTracingLoop(luigi.Task):
 
     @property
     def grid_name(self):
-        return self.item['name']
+        return self.item['full_id']
 
     @property
     def octree_file(self):
@@ -169,7 +174,7 @@ class DaylightFactorRayTracingLoop(luigi.Task):
 
     @property
     def sensor_grid(self):
-        value = os.path.join(self.input()['CreateRadFolder']['model_folder'].path, 'grid/{item_name}.pts'.format(item_name=self.item['name'])).replace('\\', '/')
+        value = os.path.join(self.input()['CreateRadFolder']['model_folder'].path, 'grid/{item_full_id}.pts'.format(item_full_id=self.item['full_id'])).replace('\\', '/')
         return value if os.path.isabs(value) \
             else os.path.join(self.initiation_folder, value)
 

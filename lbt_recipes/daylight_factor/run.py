@@ -10,7 +10,8 @@ import flow.main as daylight_factor_workerbee
 
 _recipe_default_inputs = {   'model': None,
     'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64',
-    'sensor_count': 200}
+    'sensor_count': 200,
+    'sensor_grid': '*'}
 
 
 class LetDaylightFactorFly(luigi.WrapperTask):
