@@ -3,4 +3,4 @@ pytest==6.2.2
 twine==3.3.0
 wheel==0.36.2
 setuptools==53.0.0
-importlib-metadata==3.5.0
+importlib-metadata==3.6.0
