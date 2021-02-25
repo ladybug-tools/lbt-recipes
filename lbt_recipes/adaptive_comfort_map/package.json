@@ -1,0 +1,334 @@
+{
+  "type": "RecipeInterface",
+  "annotations": {},
+  "api_version": "v1beta1",
+  "metadata": {
+    "type": "MetaData",
+    "annotations": {},
+    "name": "adaptive-comfort-map",
+    "tag": "0.1.0",
+    "app_version": null,
+    "keywords": [
+      "honeybee",
+      "ladybug-tools",
+      "thermal",
+      "comfort",
+      "adaptive"
+    ],
+    "maintainers": [
+      {
+        "type": "Maintainer",
+        "annotations": {},
+        "name": "chris",
+        "email": "chris@ladybug.tools"
+      },
+      {
+        "type": "Maintainer",
+        "annotations": {},
+        "name": "ladybug-tools",
+        "email": "info@ladybug.tools"
+      }
+    ],
+    "home": "https://github.com/pollination/adaptive-comfort-map",
+    "sources": [],
+    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/adaptivemap.png",
+    "deprecated": null,
+    "description": "Adaptive thermal comfort map for Pollination.",
+    "license": {
+      "type": "License",
+      "annotations": {},
+      "name": "PolyForm Shield License 1.0.0",
+      "url": "https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt"
+    }
+  },
+  "source": null,
+  "inputs": [
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "air-speed",
+      "description": "A single number for air speed in m/s or a string of a JSON array with numbers that align with the result-sql reporting period. This will be used for all indoor comfort evaluation.",
+      "default": "0.1",
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "value",
+          "description": "Either a single numerical value or data collection.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.data",
+              "function": "value_or_data_to_str"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": null
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "comfort-parameters",
+      "description": "An AdaptiveParameter string to customize the assumptions of the Adaptive comfort model.",
+      "default": "--standard ASHRAE-55",
+      "alias": [],
+      "required": false,
+      "spec": null
+    },
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "ddy",
+      "description": "A DDY file with design days to be used for the initial sizing calculation.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "ddy",
+          "description": "Either a DDY python object or the path to a ddy or an epw file.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.ddy",
+              "function": "ddy_handler"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": true,
+      "spec": null,
+      "extensions": [
+        "ddy"
+      ]
+    },
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "epw",
+      "description": "EPW weather file to be used for the comfort map simulation.",
+      "default": null,
+      "alias": [],
+      "required": true,
+      "spec": null,
+      "extensions": [
+        "epw"
+      ]
+    },
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "model",
+      "description": "A Honeybee model in HBJSON file format.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "A path to a HBJSON file or a HB model object built with Python or dotnet libraries.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.model",
+              "function": "model_to_json"
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "HoneybeeSchema.Handlers",
+              "function": "HBModelToJSON"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        },
+        {
+          "type": "DAGLinkedInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "This input links the model to Rhino model.",
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "HoneybeeRhino.Handlers",
+              "function": "RhinoHBModelToJSON"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": true,
+      "spec": null,
+      "extensions": [
+        "json",
+        "hbjson"
+      ]
+    },
+    {
+      "type": "DAGNumberInput",
+      "annotations": {},
+      "name": "north",
+      "description": "A a number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees.",
+      "default": 0.0,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "north",
+          "description": "Either a Vector2D for the north direction or a number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.north",
+              "function": "north_vector_to_angle"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": {
+        "type": "number",
+        "minimum": -360,
+        "maximum": 360
+      }
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "radiance-parameters",
+      "description": "Radiance parameters for ray tracing.",
+      "default": "-ab 2 -ad 5000 -lw 2e-05",
+      "alias": [],
+      "required": false,
+      "spec": null
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "run-period",
+      "description": "An AnalysisPeriod string to set the start and end dates of the simulation (eg. \"6/21 to 9/21 between 0 and 23 @1\"). If None, the simulation will be annual.",
+      "default": "",
+      "alias": [],
+      "required": false,
+      "spec": null
+    },
+    {
+      "type": "DAGIntegerInput",
+      "annotations": {},
+      "name": "sensor-count",
+      "description": "The maximum number of grid points per parallel execution.",
+      "default": 200,
+      "alias": [],
+      "required": false,
+      "spec": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "solarcal-parameters",
+      "description": "A SolarCalParameter string to customize the assumptions of the SolarCal model.",
+      "default": "--posture seated --sharp 135 --absorptivity 0.7 --emissivity 0.95",
+      "alias": [],
+      "required": false,
+      "spec": null
+    }
+  ],
+  "outputs": [
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "condition",
+      "description": "A folder containing CSV maps of comfort conditions for each sensor grid. -1 indicates unacceptably cold conditions. +1 indicates unacceptably hot conditions. 0 indicates neutral (comfortable) conditions.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "results/condition"
+      },
+      "alias": [],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "condition-intensity",
+      "description": "A folder containing CSV maps of the degrees Celsius from the adaptive comfort neutral temperature for each sensor grid. This can be used to understand not just whether conditions are acceptable but how uncomfortably hot or cold they are.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "results/condition_intensity"
+      },
+      "alias": [],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "results",
+      "description": "A folder containing all results.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "results"
+      },
+      "alias": [],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "temperature",
+      "description": "A folder containing CSV maps of Operative Temperature for each sensor grid. Values are in Celsius.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "results/temperature"
+      },
+      "alias": [],
+      "required": true
+    }
+  ]
+}
