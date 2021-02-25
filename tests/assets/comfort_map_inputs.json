@@ -1,0 +1,8 @@
+{
+    "epw": "weather.epw", 
+    "ddy": "weather.ddy", 
+    "sensor-count": 200, 
+    "north": 0.0, 
+	"run-period": "6/21 to 6/21 between 0 and 23 @1",
+    "model": "model.hbjson"
+}
