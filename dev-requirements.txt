@@ -1,4 +1,4 @@
-lbt-honeybee==0.4.19
+lbt-honeybee==0.4.21
 pytest==6.2.2
 twine==3.3.0
 wheel==0.36.2
