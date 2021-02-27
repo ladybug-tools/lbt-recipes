@@ -203,6 +203,9 @@ class Recipe(object):
                 EnergyPlus should be checked before executing the recipe. If there
                 is no compatible version installed, an exception will be raised
                 with a clear error message. (Default: False).
+
+        Returns:
+            Path to the project folder containing the recipe results.
         """
         # perform any simulation engine checks
         if radiance_check:
@@ -260,6 +263,7 @@ class Recipe(object):
         else:
             process = subprocess.Popen(command, shell=shell)
             result = process.communicate()  # freeze the canvas while running
+        return folder
 
     def output_value_by_name(self, output_name, project_folder=None):
         """Set the value of an input given the input name.
