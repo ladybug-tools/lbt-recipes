@@ -1,14 +1,20 @@
 # coding: utf-8
-"""Classes to handle recipe inputs and outputs."""
+"""Class to handle recipe inputs and outputs."""
 from __future__ import division
 
 import os
 import json
 import importlib
 import shutil
+import subprocess
 
+from ladybug.futil import preparedir, nukedir, copy_file_tree
 from honeybee.config import folders
-from ladybug.futil import preparedir, copy_file_tree
+from honeybee_radiance.config import folders as rad_folders
+
+from .settings import RecipeSettings
+from .version import check_radiance_date, check_openstudio_version, \
+    check_energyplus_version
 
 
 class Recipe(object):
@@ -119,7 +125,7 @@ class Recipe(object):
 
     def input_value_by_name(self, input_name, input_value):
         """Set the value of an input given the input name.
-        
+
         Args:
             input_name: Text for the name of the input to be set. For example,
                 'radiance-parameters'.
@@ -163,7 +169,7 @@ class Recipe(object):
             inp.handle_value()
             if inp.is_path:  # we need to copy the path to the project folder
                 path_basename = os.path.basename(inp.value)
-                dest = os.path.join(project_folder, path_basename)
+                dest = os.path.join(p_fold, path_basename)
                 if os.path.isfile(inp.value):
                     shutil.copyfile(inp.value, dest)
                 elif os.path.isdir(inp.value):
@@ -176,11 +182,90 @@ class Recipe(object):
             json.dump(inp_dict, fp, indent=indent)
         return file_path
 
+    def run(self, settings=None, radiance_check=False, openstudio_check=False,
+            energyplus_check=False):
+        """Run the recipe using the queenbee local run command.
+
+        Args:
+            settings: An optional RecipeSettings object or RecipeSettings string
+                to dictate the settings of the recipe run (eg. the number of
+                workers or the project folder). If None, default settings will
+                be assumed. (Default: None).
+            radiance_check: Boolean to note whether the installed version of
+                Radiance should be checked before executing the recipe. If there
+                is no compatible version installed, an exception will be raised
+                with a clear error message. (Default: False).
+            openstudio_check: Boolean to note whether the installed version of
+                OpenStudio should be checked before executing the recipe. If there
+                is no compatible version installed, an exception will be raised
+                with a clear error message. (Default: False).
+            energyplus_check: Boolean to note whether the installed version of
+                EnergyPlus should be checked before executing the recipe. If there
+                is no compatible version installed, an exception will be raised
+                with a clear error message. (Default: False).
+        """
+        # perform any simulation engine checks
+        if radiance_check:
+            check_radiance_date()
+        if openstudio_check:
+            check_openstudio_version()
+        if energyplus_check:
+            check_energyplus_version()
+
+        # parse the settings or use default ones
+        if settings is not None:
+            settings = RecipeSettings.from_string(settings) \
+                if isinstance(settings, str) else settings
+        else:
+            settings = RecipeSettings()
+
+        # get the folder out of which the recipe will be executed
+        folder = self.default_project_folder if settings.folder is None \
+            else settings.folder
+        if not os.path.isdir(folder):
+            preparedir(folder)  # create the directory if it's not there
+
+        # delete any existing result files unless reload_old is True
+        if not settings.reload_old and self.simulation_id is not None:
+            wf_folder = os.path.join(folder, self.simulation_id)
+            if os.path.isdir(wf_folder):
+                nukedir(wf_folder, rmdir=True)
+
+        # write the inputs JSON for the recipe and set up the environment variables
+        inputs_json = self.write_inputs_json(folder)
+        genv = {}
+        genv['PATH'] = rad_folders.radbin_path
+        genv['RAYPATH'] = rad_folders.radlib_path
+        env_args = ['--env {}="{}"'.format(k, v) for k, v in genv.items()]
+
+        # create command
+        command = '"{qb_path}" local run "{recipe_folder}" ' \
+            '"{project_folder}" -i "{user_inputs}" --workers {workers} ' \
+            '{environment} --name {simulation_name}'.format(
+                qb_path=os.path.join(folders.python_scripts_path, 'queenbee'),
+                recipe_folder=self.path, project_folder=folder,
+                user_inputs=inputs_json, workers=settings.workers,
+                environment=' '.join(env_args),
+                simulation_name=self.simulation_id
+            )
+
+        # execute command
+        shell = False if os.name == 'nt' else True
+        if settings.report_out:
+            process = subprocess.Popen(
+                command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell)
+            result = process.communicate()
+            print(result[0])
+            print(result[1])
+        else:
+            process = subprocess.Popen(command, shell=shell)
+            result = process.communicate()  # freeze the canvas while running
+
     def output_value_by_name(self, output_name, project_folder=None):
         """Set the value of an input given the input name.
-        
+
         Args:
-            input_name: Text for the name of the input to be set. For example, 'results'.
+            output_name: Text for the name of the output to be obtained.
             project_folder: The full path to the project folder containing
                 completed recipe results. If None, the default_project_folder on
                 this recipe will be assumed. (Default: None).
@@ -376,12 +461,12 @@ class RecipeOutput(_RecipeParameter):
         self._type = output_dict['from']['type']
         try:
             self._path = output_dict['from']['path']
-        except:  # not a file or a folder; this type of output is not yet supported
+        except Exception:  # not a file or a folder; type of output not yet supported
             self._path = None
 
     def value(self, simulation_folder):
         """Get the value of this output given the path to a simulation folder.
-        
+
         Args:
             simulation_folder: The path to a simulation folder that has finished
                 running. This is the path of a project folder joined with
