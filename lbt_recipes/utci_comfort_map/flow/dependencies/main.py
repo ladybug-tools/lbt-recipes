@@ -1,7 +1,7 @@
 import luigi
 import os
 from queenbee_local import QueenbeeTask
-from .dependencies.annual_radiation_ray_tracing import _AnnualRadiationRayTracing_12f6f064Orchestrator as AnnualRadiationRayTracing_12f6f064Workerbee
+from .dependencies.annual_radiation_ray_tracing import _AnnualRadiationRayTracing_8e859993Orchestrator as AnnualRadiationRayTracing_8e859993Workerbee
 
 
 _default_inputs = {   'model': None,
@@ -118,7 +118,7 @@ class AnnualRadiationRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualRadiationRayTracing_12f6f064Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualRadiationRayTracing_8e859993Workerbee(_input_params=self.map_dag_inputs)]
         with open(os.path.join(self.execution_folder, 'annual_radiation_raytracing.done'), 'w') as out_file:
             out_file.write('done!\n')
 
@@ -174,6 +174,110 @@ class AnnualRadiationRaytracing(luigi.Task):
         return {
             'is_done': luigi.LocalTarget(os.path.join(self.execution_folder, 'annual_radiation_raytracing.done'))
         }
+
+
+class CopyGridInfo(QueenbeeTask):
+    """Copy files and folder."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+
+    # Task inputs
+    @property
+    def src(self):
+        value = self.input()['CreateRadFolder']['sensor_grids_file'].path.replace('\\', '/')
+        return value if os.path.isabs(value) \
+            else os.path.join(self.initiation_folder, value)
+
+    @property
+    def execution_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def initiation_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def params_folder(self):
+        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+
+    def command(self):
+        return 'echo copying input path...'
+
+    def requires(self):
+        return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            'dst': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'results/total/grids_info.json')
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'src', 'to': 'input_path', 'from': self.src}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'dst', 'from': 'input_path',
+                'to': os.path.join(self.execution_folder, 'results/total/grids_info.json')
+            }]
+
+
+class CopySunUpHours(QueenbeeTask):
+    """Copy files and folder."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+
+    # Task inputs
+    @property
+    def src(self):
+        value = self.input()['ParseSunUpHours']['sun_up_hours'].path.replace('\\', '/')
+        return value if os.path.isabs(value) \
+            else os.path.join(self.initiation_folder, value)
+
+    @property
+    def execution_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def initiation_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def params_folder(self):
+        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+
+    def command(self):
+        return 'echo copying input path...'
+
+    def requires(self):
+        return {'ParseSunUpHours': ParseSunUpHours(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            'dst': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'results/direct/sun-up-hours.txt')
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'src', 'to': 'input_path', 'from': self.src}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'dst', 'from': 'input_path',
+                'to': os.path.join(self.execution_folder, 'results/direct/sun-up-hours.txt')
+            }]
 
 
 class CreateIndirectSky(QueenbeeTask):
@@ -410,10 +514,6 @@ class CreateRadFolder(QueenbeeTask):
             'sensor_grids_file': luigi.LocalTarget(
                 os.path.join(self.execution_folder, 'results/direct/grids_info.json')
             ),
-            
-            'sensor_grids_file': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/total/grids_info.json')
-            ),
             'sensor_grids': luigi.LocalTarget(
                 os.path.join(
                     self.params_folder,
@@ -437,11 +537,6 @@ class CreateRadFolder(QueenbeeTask):
             {
                 'name': 'sensor-grids-file', 'from': 'model/grid/_info.json',
                 'to': os.path.join(self.execution_folder, 'results/direct/grids_info.json')
-            },
-                
-            {
-                'name': 'sensor-grids-file', 'from': 'model/grid/_info.json',
-                'to': os.path.join(self.execution_folder, 'results/total/grids_info.json')
             }]
 
     @property
@@ -587,10 +682,6 @@ class ParseSunUpHours(QueenbeeTask):
         return {
             'sun_up_hours': luigi.LocalTarget(
                 os.path.join(self.execution_folder, 'results/total/sun-up-hours.txt')
-            ),
-            
-            'sun_up_hours': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/direct/sun-up-hours.txt')
             )
         }
 
@@ -605,15 +696,10 @@ class ParseSunUpHours(QueenbeeTask):
             {
                 'name': 'sun-up-hours', 'from': 'sun-up-hours.txt',
                 'to': os.path.join(self.execution_folder, 'results/total/sun-up-hours.txt')
-            },
-                
-            {
-                'name': 'sun-up-hours', 'from': 'sun-up-hours.txt',
-                'to': os.path.join(self.execution_folder, 'results/direct/sun-up-hours.txt')
             }]
 
 
-class _Main_12f6f064Orchestrator(luigi.WrapperTask):
+class _Main_8e859993Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -625,4 +711,4 @@ class _Main_12f6f064Orchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        return [AnnualRadiationRaytracing(_input_params=self.input_values), ParseSunUpHours(_input_params=self.input_values)]
+        return [AnnualRadiationRaytracing(_input_params=self.input_values), CopyGridInfo(_input_params=self.input_values), CopySunUpHours(_input_params=self.input_values)]
