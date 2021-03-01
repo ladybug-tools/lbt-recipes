@@ -1,2 +1,2 @@
 queenbee-local==0.3.6
-pollination-handlers==0.4.5
+pollination-handlers==0.5.0
