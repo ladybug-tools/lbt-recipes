@@ -1,7 +1,7 @@
 import luigi
 import os
 from queenbee_local import QueenbeeTask
-from .dependencies.main import _Main_12f6f064Orchestrator as Main_12f6f064Workerbee
+from .dependencies.main import _Main_8e859993Orchestrator as Main_8e859993Workerbee
 
 
 _default_inputs = {   'comfort_parameters': '--cold 9 --heat 26',
@@ -16,6 +16,199 @@ _default_inputs = {   'comfort_parameters': '--cold 9 --heat 26',
     'simulation_folder': '.',
     'solarcal_parameters': '--posture seated --sharp 135 --absorptivity 0.7 '
                            '--emissivity 0.95'}
+
+
+class ComputeTcpLoop(QueenbeeTask):
+    """Compute Thermal Comfort Petcent (TCP) from thermal condition CSV map."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+
+    # Task inputs
+    @property
+    def condition_csv(self):
+        value = os.path.join('results/condition', '{item_id}.csv'.format(item_id=self.item['id'])).replace('\\', '/')
+        return value if os.path.isabs(value) \
+            else os.path.join(self.initiation_folder, value)
+
+    @property
+    def enclosure_info(self):
+        value = os.path.join(self.input()['GetEnclosureInfo']['output_folder'].path, '{item_id}.json'.format(item_id=self.item['id'])).replace('\\', '/')
+        return value if os.path.isabs(value) \
+            else os.path.join(self.initiation_folder, value)
+
+    @property
+    def occ_schedule_json(self):
+        value = self.input()['CreateModelOccSchedules']['occ_schedule_json'].path.replace('\\', '/')
+        return value if os.path.isabs(value) \
+            else os.path.join(self.initiation_folder, value)
+
+    # get item for loop
+    try:
+        item = luigi.DictParameter()
+    except Exception:
+        item = luigi.Parameter()
+
+    @property
+    def execution_folder(self):
+        return os.path.join(self._input_params['simulation_folder'], 'metrics').replace('\\', '/')
+
+    @property
+    def initiation_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def params_folder(self):
+        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+
+    def command(self):
+        return 'ladybug-comfort map tcp {condition_csv} {enclosure_info} --occ-schedule-json "{occ_schedule_json}" --folder output'.format(condition_csv=self.condition_csv, enclosure_info=self.enclosure_info, occ_schedule_json=self.occ_schedule_json)
+
+    def requires(self):
+        return {'CreateModelOccSchedules': CreateModelOccSchedules(_input_params=self._input_params), 'GetEnclosureInfo': GetEnclosureInfo(_input_params=self._input_params), 'RunComfortMap': RunComfortMap(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            'tcp': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'TCP/{item_id}.csv'.format(item_id=self.item['id']))
+            ),
+            
+            'hsp': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'HSP/{item_id}.csv'.format(item_id=self.item['id']))
+            ),
+            
+            'csp': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'CSP/{item_id}.csv'.format(item_id=self.item['id']))
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'condition_csv', 'to': 'condition.csv', 'from': self.condition_csv},
+            {'name': 'enclosure_info', 'to': 'enclosure_info.json', 'from': self.enclosure_info},
+            {'name': 'occ_schedule_json', 'to': 'occ_schedule.json', 'from': self.occ_schedule_json}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'tcp', 'from': 'output/tcp.csv',
+                'to': os.path.join(self.execution_folder, 'TCP/{item_id}.csv'.format(item_id=self.item['id']))
+            },
+                
+            {
+                'name': 'hsp', 'from': 'output/hsp.csv',
+                'to': os.path.join(self.execution_folder, 'HSP/{item_id}.csv'.format(item_id=self.item['id']))
+            },
+                
+            {
+                'name': 'csp', 'from': 'output/csp.csv',
+                'to': os.path.join(self.execution_folder, 'CSP/{item_id}.csv'.format(item_id=self.item['id']))
+            }]
+
+
+class ComputeTcp(luigi.Task):
+    """Compute Thermal Comfort Petcent (TCP) from thermal condition CSV map."""
+    # global parameters
+    _input_params = luigi.DictParameter()
+    @property
+    def enclosure_list(self):
+        value = self.input()['GetEnclosureInfo']['enclosure_list'].path.replace('\\', '/')
+        return value if os.path.isabs(value) \
+            else os.path.join(self.initiation_folder, value)
+
+    @property
+    def items(self):
+        try:
+            # assume the input is a file
+            return QueenbeeTask.load_input_param(self.enclosure_list)
+        except:
+            # it is a parameter
+            return self.input()['GetEnclosureInfo']['enclosure_list'].path
+
+    def run(self):
+        yield [ComputeTcpLoop(item=item, _input_params=self._input_params) for item in self.items]
+        with open(os.path.join(self.execution_folder, 'compute_tcp.done'), 'w') as out_file:
+            out_file.write('done!\n')
+
+    @property
+    def initiation_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def execution_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def params_folder(self):
+        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+
+    def requires(self):
+        return {'CreateModelOccSchedules': CreateModelOccSchedules(_input_params=self._input_params), 'GetEnclosureInfo': GetEnclosureInfo(_input_params=self._input_params), 'RunComfortMap': RunComfortMap(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            'is_done': luigi.LocalTarget(os.path.join(self.execution_folder, 'compute_tcp.done'))
+        }
+
+
+class CreateModelOccSchedules(QueenbeeTask):
+    """Translate a Model's occupancy schedules into a JSON of 0/1 values.
+
+    This JSON is useful in workflows that compute thermal comfort percent,
+    daylight autonomy, etc."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+
+    # Task inputs
+    @property
+    def period(self):
+        return self._input_params['run_period']
+
+    threshold = luigi.Parameter(default='0.1')
+
+    @property
+    def model(self):
+        value = self._input_params['model'].replace('\\', '/')
+        return value if os.path.isabs(value) \
+            else os.path.join(self.initiation_folder, value)
+
+    @property
+    def execution_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def initiation_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def params_folder(self):
+        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+
+    def command(self):
+        return 'honeybee-energy translate model-occ-schedules model.json --threshold {threshold} --period "{period}" --output-file occ_schedules.json'.format(threshold=self.threshold, period=self.period)
+
+    def output(self):
+        return {
+            'occ_schedule_json': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'metrics/occupancy_schedules.json')
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'model', 'to': 'model.json', 'from': self.model}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'occ-schedule-json', 'from': 'occ_schedules.json',
+                'to': os.path.join(self.execution_folder, 'metrics/occupancy_schedules.json')
+            }]
 
 
 class CreateResultInfo(QueenbeeTask):
@@ -48,12 +241,20 @@ class CreateResultInfo(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'ladybug-comfort map map-result-info {comfort_model} --run-period "{run_period}" --qualifier "{qualifier}" --output-file results_info.json'.format(comfort_model=self.comfort_model, run_period=self.run_period, qualifier=self.qualifier)
+        return 'ladybug-comfort map map-result-info {comfort_model} --run-period "{run_period}" --qualifier "{qualifier}" --folder output --log-file results_info.json'.format(comfort_model=self.comfort_model, run_period=self.run_period, qualifier=self.qualifier)
 
     def output(self):
         return {
-            'results_info_file': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/results_info.json')
+            'temperature_info': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'results/temperature/results_info.json')
+            ),
+            
+            'condition_info': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'results/condition/results_info.json')
+            ),
+            
+            'condition_intensity_info': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'results/condition_intensity/results_info.json')
             )
         }
 
@@ -61,8 +262,18 @@ class CreateResultInfo(QueenbeeTask):
     def output_artifacts(self):
         return [
             {
-                'name': 'results-info-file', 'from': 'results_info.json',
-                'to': os.path.join(self.execution_folder, 'results/results_info.json')
+                'name': 'temperature-info', 'from': 'output/temperature.json',
+                'to': os.path.join(self.execution_folder, 'results/temperature/results_info.json')
+            },
+                
+            {
+                'name': 'condition-info', 'from': 'output/condition.json',
+                'to': os.path.join(self.execution_folder, 'results/condition/results_info.json')
+            },
+                
+            {
+                'name': 'condition-intensity-info', 'from': 'output/condition_intensity.json',
+                'to': os.path.join(self.execution_folder, 'results/condition_intensity/results_info.json')
             }]
 
 
@@ -218,7 +429,27 @@ class GetEnclosureInfo(QueenbeeTask):
             ),
             
             'enclosure_list_file': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/grids_info.json')
+                os.path.join(self.execution_folder, 'results/temperature/grids_info.json')
+            ),
+            
+            'enclosure_list_file': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'results/condition/grids_info.json')
+            ),
+            
+            'enclosure_list_file': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'results/condition_intensity/grids_info.json')
+            ),
+            
+            'enclosure_list_file': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'metrics/TCP/grids_info.json')
+            ),
+            
+            'enclosure_list_file': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'metrics/HSP/grids_info.json')
+            ),
+            
+            'enclosure_list_file': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'metrics/CSP/grids_info.json')
             ),
             'enclosure_list': luigi.LocalTarget(
                 os.path.join(
@@ -242,7 +473,32 @@ class GetEnclosureInfo(QueenbeeTask):
                 
             {
                 'name': 'enclosure-list-file', 'from': 'enclosure_list.json',
-                'to': os.path.join(self.execution_folder, 'results/grids_info.json')
+                'to': os.path.join(self.execution_folder, 'results/temperature/grids_info.json')
+            },
+                
+            {
+                'name': 'enclosure-list-file', 'from': 'enclosure_list.json',
+                'to': os.path.join(self.execution_folder, 'results/condition/grids_info.json')
+            },
+                
+            {
+                'name': 'enclosure-list-file', 'from': 'enclosure_list.json',
+                'to': os.path.join(self.execution_folder, 'results/condition_intensity/grids_info.json')
+            },
+                
+            {
+                'name': 'enclosure-list-file', 'from': 'enclosure_list.json',
+                'to': os.path.join(self.execution_folder, 'metrics/TCP/grids_info.json')
+            },
+                
+            {
+                'name': 'enclosure-list-file', 'from': 'enclosure_list.json',
+                'to': os.path.join(self.execution_folder, 'metrics/HSP/grids_info.json')
+            },
+                
+            {
+                'name': 'enclosure-list-file', 'from': 'enclosure_list.json',
+                'to': os.path.join(self.execution_folder, 'metrics/CSP/grids_info.json')
             }]
 
     @property
@@ -618,7 +874,7 @@ class RunIrradianceSimulation(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [Main_12f6f064Workerbee(_input_params=self.map_dag_inputs)]
+        yield [Main_8e859993Workerbee(_input_params=self.map_dag_inputs)]
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
         with open(os.path.join(self.execution_folder, 'run_irradiance_simulation.done'), 'w') as out_file:
@@ -690,7 +946,7 @@ class SetModifiersFromConstructions(QueenbeeTask):
             }]
 
 
-class _Main_9a5ab61fOrchestrator(luigi.WrapperTask):
+class _Main_fc9c37c3Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -702,4 +958,4 @@ class _Main_9a5ab61fOrchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        return [CreateResultInfo(_input_params=self.input_values), RunComfortMap(_input_params=self.input_values)]
+        return [ComputeTcp(_input_params=self.input_values), CreateResultInfo(_input_params=self.input_values)]

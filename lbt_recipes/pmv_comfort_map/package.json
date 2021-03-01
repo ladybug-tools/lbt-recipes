@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "pmv-comfort-map",
-    "tag": "0.1.0",
+    "tag": "0.0.1",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -396,7 +396,71 @@
     {
       "type": "DAGFolderOutput",
       "annotations": {},
-      "name": "condition-intensity",
+      "name": "csp",
+      "description": "A folder containing CSV values for Cold Sensation Percent (CSP). CSP is the percentage of occupied time where thermal conditions are colder than what is considered acceptable/comfortable.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "metrics/CSP"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "thermal_comfort_percent",
+          "description": "Thermal comfort percent values.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.comfort",
+              "function": "read_comfort_percent_from_folder"
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "hsp",
+      "description": "A folder containing CSV values for Heat Sensation Percent (HSP). HSP is the percentage of occupied time where thermal conditions are hotter than what is considered acceptable/comfortable.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "metrics/HSP"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "thermal_comfort_percent",
+          "description": "Thermal comfort percent values.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.comfort",
+              "function": "read_comfort_percent_from_folder"
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "pmv",
       "description": "A folder containing CSV maps of the Predicted Mean Vote (PMV) for each sensor grid. This can be used to understand not just whether conditions are acceptable but how uncomfortably hot or cold they are.",
       "from": {
         "type": "FolderReference",
@@ -422,8 +486,40 @@
     {
       "type": "DAGFolderOutput",
       "annotations": {},
+      "name": "tcp",
+      "description": "A folder containing CSV values for Thermal Comfort Percent (TCP). TCP is the percentage of occupied time where thermal conditions are acceptable/comfortable.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "metrics/TCP"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "thermal_comfort_percent",
+          "description": "Thermal comfort percent values.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.comfort",
+              "function": "read_comfort_percent_from_folder"
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
       "name": "temperature",
-      "description": "A folder containing CSV maps of Operative Temperature for each sensor grid. Values are in Celsius.",
+      "description": "A folder containing CSV maps of Operative Temperature for each sensor grid. Alternatively, if the write-set-map option is used, the CSV maps here will contain Standard Effective Temperature (SET). Values are in Celsius.",
       "from": {
         "type": "FolderReference",
         "annotations": {},

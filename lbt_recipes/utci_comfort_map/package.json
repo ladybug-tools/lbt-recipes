@@ -259,6 +259,19 @@
     {
       "type": "DAGFolderOutput",
       "annotations": {},
+      "name": "category",
+      "description": "A folder containing CSV maps of the heat/cold stress categories for each sensor grid. -5 indicates extreme cold stress. +5 indicates extreme heat stress. 0 indicates no thermal stress. This can be used to understand not just whether conditions are acceptable but how uncomfortably hot or cold they are.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "results/condition_intensity"
+      },
+      "alias": [],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
       "name": "condition",
       "description": "A folder containing CSV maps of comfort conditions for each sensor grid. -1 indicates unacceptably cold conditions. +1 indicates unacceptably hot conditions. 0 indicates neutral (comfortable) conditions.",
       "from": {
@@ -272,14 +285,65 @@
     {
       "type": "DAGFolderOutput",
       "annotations": {},
-      "name": "condition-intensity",
-      "description": "A folder containing CSV maps of the heat/cold stress categories for each sensor grid. -5 indicates extreme cold stress. +5 indicates extreme heat stress. 0 indicates no thermal stress. This can be used to understand not just whether conditions are acceptable but how uncomfortably hot or cold they are.",
+      "name": "csp",
+      "description": "A folder containing CSV values for Cold Sensation Percent (CSP). CSP is the percentage of occupied time where thermal conditions are colder than what is considered acceptable/comfortable.",
       "from": {
         "type": "FolderReference",
         "annotations": {},
-        "path": "results/condition_intensity"
+        "path": "metrics/CSP"
       },
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "thermal_comfort_percent",
+          "description": "Thermal comfort percent values.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.comfort",
+              "function": "read_comfort_percent_from_folder"
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "hsp",
+      "description": "A folder containing CSV values for Heat Sensation Percent (HSP). HSP is the percentage of occupied time where thermal conditions are hotter than what is considered acceptable/comfortable.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "metrics/HSP"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "thermal_comfort_percent",
+          "description": "Thermal comfort percent values.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.comfort",
+              "function": "read_comfort_percent_from_folder"
+            }
+          ]
+        }
+      ],
       "required": true
     },
     {
@@ -298,7 +362,39 @@
     {
       "type": "DAGFolderOutput",
       "annotations": {},
-      "name": "temperature",
+      "name": "tcp",
+      "description": "A folder containing CSV values for Thermal Comfort Percent (TCP). TCP is the percentage of occupied time where thermal conditions are acceptable/comfortable. Note that outdoor sensors are considered always occupied.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "metrics/TCP"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "thermal_comfort_percent",
+          "description": "Thermal comfort percent values.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.comfort",
+              "function": "read_comfort_percent_from_folder"
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "utci",
       "description": "A folder containing CSV maps of Universal Thermal Climate Index (UTCI) temperatures for each sensor grid. Values are in Celsius.",
       "from": {
         "type": "FolderReference",
