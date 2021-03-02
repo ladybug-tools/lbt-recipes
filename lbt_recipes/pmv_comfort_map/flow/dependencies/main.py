@@ -1,7 +1,7 @@
 import luigi
 import os
 from queenbee_local import QueenbeeTask
-from .dependencies.annual_radiation_ray_tracing import _AnnualRadiationRayTracing_8e859993Orchestrator as AnnualRadiationRayTracing_8e859993Workerbee
+from .dependencies.annual_radiation_ray_tracing import _AnnualRadiationRayTracing_a5b4547cOrchestrator as AnnualRadiationRayTracing_a5b4547cWorkerbee
 
 
 _default_inputs = {   'model': None,
@@ -118,7 +118,7 @@ class AnnualRadiationRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualRadiationRayTracing_8e859993Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualRadiationRayTracing_a5b4547cWorkerbee(_input_params=self.map_dag_inputs)]
         with open(os.path.join(self.execution_folder, 'annual_radiation_raytracing.done'), 'w') as out_file:
             out_file.write('done!\n')
 
@@ -177,7 +177,7 @@ class AnnualRadiationRaytracing(luigi.Task):
 
 
 class CopyGridInfo(QueenbeeTask):
-    """Copy files and folder."""
+    """Copy a file or folder to a destination."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
@@ -229,7 +229,7 @@ class CopyGridInfo(QueenbeeTask):
 
 
 class CopySunUpHours(QueenbeeTask):
-    """Copy files and folder."""
+    """Copy a file or folder to a destination."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
@@ -699,7 +699,7 @@ class ParseSunUpHours(QueenbeeTask):
             }]
 
 
-class _Main_8e859993Orchestrator(luigi.WrapperTask):
+class _Main_a5b4547cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

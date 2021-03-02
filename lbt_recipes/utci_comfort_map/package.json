@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "utci-comfort-map",
-    "tag": "0.1.dev2+gf205504",
+    "tag": "0.2.2",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -250,7 +250,29 @@
       "name": "wind-speed",
       "description": "A single number for meteorological wind speed in m/s or a string of a JSON array with numbers that align with the result-sql reporting period. This will be used for all indoor comfort evaluation while the EPW wind speed will be used for the outdoors.",
       "default": "0.5",
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "value",
+          "description": "Either a single numerical value or data collection.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.data",
+              "function": "value_or_data_to_str"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
       "required": false,
       "spec": null
     }
