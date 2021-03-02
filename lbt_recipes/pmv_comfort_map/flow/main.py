@@ -1,7 +1,7 @@
 import luigi
 import os
 from queenbee_local import QueenbeeTask
-from .dependencies.main import _Main_8e859993Orchestrator as Main_8e859993Workerbee
+from .dependencies.main import _Main_a5b4547cOrchestrator as Main_a5b4547cWorkerbee
 
 
 _default_inputs = {   'comfort_parameters': '--ppd-threshold 10',
@@ -152,6 +152,94 @@ class ComputeTcp(luigi.Task):
         return {
             'is_done': luigi.LocalTarget(os.path.join(self.execution_folder, 'compute_tcp.done'))
         }
+
+
+class CopyGridInfo(QueenbeeTask):
+    """Copy a file or folder to multiple destinations."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+
+    # Task inputs
+    @property
+    def src(self):
+        value = self.input()['GetEnclosureInfo']['enclosure_list_file'].path.replace('\\', '/')
+        return value if os.path.isabs(value) \
+            else os.path.join(self.initiation_folder, value)
+
+    @property
+    def execution_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def initiation_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def params_folder(self):
+        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+
+    def command(self):
+        return 'echo copying input path...'
+
+    def requires(self):
+        return {'GetEnclosureInfo': GetEnclosureInfo(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            'dst_1': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'results/condition/grids_info.json')
+            ),
+            
+            'dst_2': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'results/condition_intensity/grids_info.json')
+            ),
+            
+            'dst_3': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'metrics/TCP/grids_info.json')
+            ),
+            
+            'dst_4': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'metrics/HSP/grids_info.json')
+            ),
+            
+            'dst_5': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'metrics/CSP/grids_info.json')
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'src', 'to': 'input_path', 'from': self.src}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'dst-1', 'from': 'input_path',
+                'to': os.path.join(self.execution_folder, 'results/condition/grids_info.json')
+            },
+                
+            {
+                'name': 'dst-2', 'from': 'input_path',
+                'to': os.path.join(self.execution_folder, 'results/condition_intensity/grids_info.json')
+            },
+                
+            {
+                'name': 'dst-3', 'from': 'input_path',
+                'to': os.path.join(self.execution_folder, 'metrics/TCP/grids_info.json')
+            },
+                
+            {
+                'name': 'dst-4', 'from': 'input_path',
+                'to': os.path.join(self.execution_folder, 'metrics/HSP/grids_info.json')
+            },
+                
+            {
+                'name': 'dst-5', 'from': 'input_path',
+                'to': os.path.join(self.execution_folder, 'metrics/CSP/grids_info.json')
+            }]
 
 
 class CreateModelOccSchedules(QueenbeeTask):
@@ -434,26 +522,6 @@ class GetEnclosureInfo(QueenbeeTask):
             'enclosure_list_file': luigi.LocalTarget(
                 os.path.join(self.execution_folder, 'results/temperature/grids_info.json')
             ),
-            
-            'enclosure_list_file': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/condition/grids_info.json')
-            ),
-            
-            'enclosure_list_file': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/condition_intensity/grids_info.json')
-            ),
-            
-            'enclosure_list_file': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'metrics/TCP/grids_info.json')
-            ),
-            
-            'enclosure_list_file': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'metrics/HSP/grids_info.json')
-            ),
-            
-            'enclosure_list_file': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'metrics/CSP/grids_info.json')
-            ),
             'enclosure_list': luigi.LocalTarget(
                 os.path.join(
                     self.params_folder,
@@ -477,31 +545,6 @@ class GetEnclosureInfo(QueenbeeTask):
             {
                 'name': 'enclosure-list-file', 'from': 'enclosure_list.json',
                 'to': os.path.join(self.execution_folder, 'results/temperature/grids_info.json')
-            },
-                
-            {
-                'name': 'enclosure-list-file', 'from': 'enclosure_list.json',
-                'to': os.path.join(self.execution_folder, 'results/condition/grids_info.json')
-            },
-                
-            {
-                'name': 'enclosure-list-file', 'from': 'enclosure_list.json',
-                'to': os.path.join(self.execution_folder, 'results/condition_intensity/grids_info.json')
-            },
-                
-            {
-                'name': 'enclosure-list-file', 'from': 'enclosure_list.json',
-                'to': os.path.join(self.execution_folder, 'metrics/TCP/grids_info.json')
-            },
-                
-            {
-                'name': 'enclosure-list-file', 'from': 'enclosure_list.json',
-                'to': os.path.join(self.execution_folder, 'metrics/HSP/grids_info.json')
-            },
-                
-            {
-                'name': 'enclosure-list-file', 'from': 'enclosure_list.json',
-                'to': os.path.join(self.execution_folder, 'metrics/CSP/grids_info.json')
             }]
 
     @property
@@ -889,7 +932,7 @@ class RunIrradianceSimulation(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [Main_8e859993Workerbee(_input_params=self.map_dag_inputs)]
+        yield [Main_a5b4547cWorkerbee(_input_params=self.map_dag_inputs)]
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
         with open(os.path.join(self.execution_folder, 'run_irradiance_simulation.done'), 'w') as out_file:
@@ -961,7 +1004,7 @@ class SetModifiersFromConstructions(QueenbeeTask):
             }]
 
 
-class _Main_376ec64aOrchestrator(luigi.WrapperTask):
+class _Main_ee56c766Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -973,4 +1016,4 @@ class _Main_376ec64aOrchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        return [ComputeTcp(_input_params=self.input_values), CreateResultInfo(_input_params=self.input_values)]
+        return [ComputeTcp(_input_params=self.input_values), CopyGridInfo(_input_params=self.input_values), CreateResultInfo(_input_params=self.input_values)]

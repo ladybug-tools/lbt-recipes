@@ -598,7 +598,7 @@ class SplitGrid(QueenbeeTask):
         return [{'name': 'grids-list', 'from': 'output/grids_info.json', 'to': os.path.join(self.params_folder, 'output/grids_info.json')}]
 
 
-class _AnnualRadiationRayTracing_8e859993Orchestrator(luigi.WrapperTask):
+class _AnnualRadiationRayTracing_a5b4547cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
