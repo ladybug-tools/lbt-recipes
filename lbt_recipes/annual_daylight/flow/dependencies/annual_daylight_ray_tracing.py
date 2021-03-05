@@ -98,10 +98,10 @@ class DirectSkyLoop(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'sky_matrix', 'to': 'sky.mtx', 'from': self.sky_matrix},
-            {'name': 'sky_dome', 'to': 'sky.dome', 'from': self.sky_dome},
-            {'name': 'sensor_grid', 'to': 'grid.pts', 'from': self.sensor_grid},
-            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file}]
+            {'name': 'sky_matrix', 'to': 'sky.mtx', 'from': self.sky_matrix, 'optional': False},
+            {'name': 'sky_dome', 'to': 'sky.dome', 'from': self.sky_dome, 'optional': False},
+            {'name': 'sensor_grid', 'to': 'grid.pts', 'from': self.sensor_grid, 'optional': False},
+            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -235,9 +235,9 @@ class DirectSunlightLoop(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'modifiers', 'to': 'suns.mod', 'from': self.modifiers},
-            {'name': 'sensor_grid', 'to': 'grid.pts', 'from': self.sensor_grid},
-            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file}]
+            {'name': 'modifiers', 'to': 'suns.mod', 'from': self.modifiers, 'optional': False},
+            {'name': 'sensor_grid', 'to': 'grid.pts', 'from': self.sensor_grid, 'optional': False},
+            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -294,7 +294,7 @@ class DirectSunlight(luigi.Task):
         }
 
 
-class MergeResults(QueenbeeTask):
+class MergeRawResults(QueenbeeTask):
     """Merge several files with similar starting name into one."""
 
     # DAG Input parameters
@@ -343,7 +343,7 @@ class MergeResults(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'folder', 'to': 'input_folder', 'from': self.folder}]
+            {'name': 'folder', 'to': 'input_folder', 'from': self.folder, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -421,9 +421,9 @@ class OutputMatrixMathLoop(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'direct_sky_matrix', 'to': 'sky_dir.ill', 'from': self.direct_sky_matrix},
-            {'name': 'total_sky_matrix', 'to': 'sky.ill', 'from': self.total_sky_matrix},
-            {'name': 'sunlight_matrix', 'to': 'sun.ill', 'from': self.sunlight_matrix}]
+            {'name': 'direct_sky_matrix', 'to': 'sky_dir.ill', 'from': self.direct_sky_matrix, 'optional': False},
+            {'name': 'total_sky_matrix', 'to': 'sky.ill', 'from': self.total_sky_matrix, 'optional': False},
+            {'name': 'sunlight_matrix', 'to': 'sun.ill', 'from': self.sunlight_matrix, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -527,7 +527,7 @@ class SplitGrid(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'input_grid', 'to': 'grid.pts', 'from': self.input_grid}]
+            {'name': 'input_grid', 'to': 'grid.pts', 'from': self.input_grid, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -623,10 +623,10 @@ class TotalSkyLoop(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'sky_matrix', 'to': 'sky.mtx', 'from': self.sky_matrix},
-            {'name': 'sky_dome', 'to': 'sky.dome', 'from': self.sky_dome},
-            {'name': 'sensor_grid', 'to': 'grid.pts', 'from': self.sensor_grid},
-            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file}]
+            {'name': 'sky_matrix', 'to': 'sky.mtx', 'from': self.sky_matrix, 'optional': False},
+            {'name': 'sky_dome', 'to': 'sky.dome', 'from': self.sky_dome, 'optional': False},
+            {'name': 'sensor_grid', 'to': 'grid.pts', 'from': self.sensor_grid, 'optional': False},
+            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -682,7 +682,7 @@ class TotalSky(luigi.Task):
         }
 
 
-class _AnnualDaylightRayTracingOrchestrator(luigi.WrapperTask):
+class _AnnualDaylightRayTracing_d3bf888cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -694,4 +694,4 @@ class _AnnualDaylightRayTracingOrchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        return [MergeResults(_input_params=self.input_values)]
+        return [MergeRawResults(_input_params=self.input_values)]

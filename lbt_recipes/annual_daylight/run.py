@@ -11,8 +11,10 @@ import flow.main as annual_daylight_workerbee
 _recipe_default_inputs = {   'model': None,
     'north': 0.0,
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
+    'schedule': None,
     'sensor_count': 200,
     'sensor_grid': '*',
+    'thresholds': '-t 300 -lt 100 -ut 3000',
     'wea': None}
 
 
@@ -21,7 +23,7 @@ class LetAnnualDaylightFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [annual_daylight_workerbee._MainOrchestrator(_input_params=self._input_params)]
+        yield [annual_daylight_workerbee._Main_d3bf888cOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -41,8 +43,14 @@ def start(project_folder, user_values, workers):
         simulation_folder = input_params['simulation_folder']
 
     # copy project folder content to simulation folder
-    artifacts = ['model', 'wea']
+    artifacts = ['model', 'schedule', 'wea']
+    optional_artifacts = ['schedule']
     for artifact in artifacts:
+        value = input_params[artifact]
+        if value is None:
+            if artifact in optional_artifacts:
+                continue
+            raise ValueError('None value for required artifact input: %s' % artifact)
         from_ = os.path.join(project_folder, input_params[artifact])
         to_ = os.path.join(simulation_folder, input_params[artifact])
         _copy_artifacts(from_, to_)
@@ -52,7 +60,6 @@ def start(project_folder, user_values, workers):
         local_scheduler=local_scheduler(),
         workers=workers
     )
-
 
 
 if __name__ == '__main__':

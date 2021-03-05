@@ -1,16 +1,18 @@
 import luigi
 import os
 from queenbee_local import QueenbeeTask
-from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracingOrchestrator as AnnualDaylightRayTracingWorkerbee
+from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_d3bf888cOrchestrator as AnnualDaylightRayTracing_d3bf888cWorkerbee
 
 
 _default_inputs = {   'model': None,
     'north': 0.0,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
+    'schedule': None,
     'sensor_count': 200,
     'sensor_grid': '*',
     'simulation_folder': '.',
+    'thresholds': '-t 300 -lt 100 -ut 3000',
     'wea': None}
 
 
@@ -125,7 +127,7 @@ class AnnualDaylightRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightRayTracingWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightRayTracing_d3bf888cWorkerbee(_input_params=self.map_dag_inputs)]
         with open(os.path.join(self.execution_folder, 'annual_daylight_raytracing.done'), 'w') as out_file:
             out_file.write('done!\n')
 
@@ -181,6 +183,71 @@ class AnnualDaylightRaytracing(luigi.Task):
         return {
             'is_done': luigi.LocalTarget(os.path.join(self.execution_folder, 'annual_daylight_raytracing.done'))
         }
+
+
+class CalculateAnnualMetrics(QueenbeeTask):
+    """Calculate annual daylight metrics for annual daylight simulation."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+
+    # Task inputs
+    @property
+    def thresholds(self):
+        return self._input_params['thresholds']
+
+    @property
+    def folder(self):
+        value = 'results'.replace('\\', '/')
+        return value if os.path.isabs(value) \
+            else os.path.join(self.initiation_folder, value)
+
+    @property
+    def schedule(self):
+        if self._input_params['schedule'] is None:
+            return None
+        value = self._input_params['schedule'].replace('\\', '/')
+        return value if os.path.isabs(value) \
+            else os.path.join(self.initiation_folder, value)
+
+    @property
+    def execution_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def initiation_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def params_folder(self):
+        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+
+    def command(self):
+        return 'honeybee-radiance post-process annual-daylight raw_results --schedule schedule.txt {thresholds} --sub_folder ../metrics'.format(thresholds=self.thresholds)
+
+    def requires(self):
+        return {'ParseSunUpHours': ParseSunUpHours(_input_params=self._input_params), 'AnnualDaylightRaytracing': AnnualDaylightRaytracing(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            'annual_metrics': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'metrics')
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'folder', 'to': 'raw_results', 'from': self.folder, 'optional': False},
+            {'name': 'schedule', 'to': 'schedule.txt', 'from': self.schedule, 'optional': True}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'annual-metrics', 'from': 'metrics',
+                'to': os.path.join(self.execution_folder, 'metrics')
+            }]
 
 
 class CreateDirectSky(QueenbeeTask):
@@ -241,7 +308,7 @@ class CreateDirectSky(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'wea', 'to': 'sky.wea', 'from': self.wea}]
+            {'name': 'wea', 'to': 'sky.wea', 'from': self.wea, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -297,7 +364,7 @@ class CreateOctree(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'model', 'to': 'model', 'from': self.model}]
+            {'name': 'model', 'to': 'model', 'from': self.model, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -359,8 +426,8 @@ class CreateOctreeWithSuns(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'model', 'to': 'model', 'from': self.model},
-            {'name': 'sky', 'to': 'sky.sky', 'from': self.sky}]
+            {'name': 'model', 'to': 'model', 'from': self.model, 'optional': False},
+            {'name': 'sky', 'to': 'sky.sky', 'from': self.sky, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -423,7 +490,7 @@ class CreateRadFolder(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'input_model', 'to': 'model.hbjson', 'from': self.input_model}]
+            {'name': 'input_model', 'to': 'model.hbjson', 'from': self.input_model, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -449,6 +516,9 @@ class CreateSkyDome(QueenbeeTask):
     # DAG Input parameters
     _input_params = luigi.DictParameter()
 
+    # Task inputs
+    sky_density = luigi.Parameter(default='1')
+
     @property
     def execution_folder(self):
         return self._input_params['simulation_folder'].replace('\\', '/')
@@ -462,7 +532,7 @@ class CreateSkyDome(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'honeybee-radiance sky skydome --name rflux_sky.sky'
+        return 'honeybee-radiance sky skydome --name rflux_sky.sky --sky-density {sky_density}'.format(sky_density=self.sky_density)
 
     def output(self):
         return {
@@ -536,7 +606,7 @@ class CreateTotalSky(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'wea', 'to': 'sky.wea', 'from': self.wea}]
+            {'name': 'wea', 'to': 'sky.wea', 'from': self.wea, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -595,7 +665,7 @@ class GenerateSunpath(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'wea', 'to': 'sky.wea', 'from': self.wea}]
+            {'name': 'wea', 'to': 'sky.wea', 'from': self.wea, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -652,7 +722,7 @@ class ParseSunUpHours(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'sun_modifiers', 'to': 'suns.mod', 'from': self.sun_modifiers}]
+            {'name': 'sun_modifiers', 'to': 'suns.mod', 'from': self.sun_modifiers, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -663,7 +733,7 @@ class ParseSunUpHours(QueenbeeTask):
             }]
 
 
-class _MainOrchestrator(luigi.WrapperTask):
+class _Main_d3bf888cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -675,4 +745,4 @@ class _MainOrchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        return [AnnualDaylightRaytracing(_input_params=self.input_values), ParseSunUpHours(_input_params=self.input_values)]
+        return [CalculateAnnualMetrics(_input_params=self.input_values)]
