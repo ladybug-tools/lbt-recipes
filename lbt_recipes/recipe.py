@@ -167,7 +167,7 @@ class Recipe(object):
         inp_dict = {}
         for inp in self.inputs:
             inp.handle_value()
-            if inp.is_path:  # we need to copy the path to the project folder
+            if inp.is_path and inp.value is not None:  # copy artifact to project folder
                 path_basename = os.path.basename(inp.value)
                 dest = os.path.join(p_fold, path_basename)
                 if os.path.isfile(inp.value):
@@ -175,6 +175,8 @@ class Recipe(object):
                 elif os.path.isdir(inp.value):
                     copy_file_tree(inp.value, dest, overwrite=True)
                 inp_dict[inp.name] = path_basename
+            elif inp.is_path and inp.value is None:  # conditional artifact; ignore it
+                pass
             else:
                 inp_dict[inp.name] = inp.value
         # write the inputs dictionary to a file

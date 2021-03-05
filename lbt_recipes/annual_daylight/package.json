@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "annual-daylight",
-    "tag": "0.4.0",
+    "tag": "0.5.0",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -156,6 +156,42 @@
       "spec": null
     },
     {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "schedule",
+      "description": "Path to an annual schedule file. Values should be 0-1 separated by new line. If not provided an 8-5 annual schedule will be created.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "schedule",
+          "description": "An annual occupancy schedule, either as a path to a csv file, a Ladybug Hourly Continuous Data Collection or a HB-Energy schedule object. This can also be the identifier of a schedule in your HB-Energy schedule library. Any value in this schedule that is 0.1 or above will be considered occupied.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.schedule",
+              "function": "schedule_to_csv"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": null,
+      "extensions": [
+        "txt",
+        "csv"
+      ]
+    },
+    {
       "type": "DAGIntegerInput",
       "annotations": {},
       "name": "sensor-count",
@@ -174,6 +210,16 @@
       "name": "sensor-grid",
       "description": "A grid name or a pattern to filter the sensor grids. By default all the grids in HBJSON model will be exported.",
       "default": "*",
+      "alias": [],
+      "required": false,
+      "spec": null
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "thresholds",
+      "description": "A string to change the threshold for daylight autonomy and useful daylight illuminance. Valid keys are -t for daylight autonomy threshold, -lt for the lower threshold for useful daylight illuminance and -ut for the upper threshold. The default is -t 300 -lt 100 -ut 3000. The order of the keys is not important and you can include one or all of them. For instance if you only want to change the upper threshold to 2000 lux you should use -ut 2000 as the input.",
+      "default": "-t 300 -lt 100 -ut 3000",
       "alias": [],
       "required": false,
       "spec": null
@@ -218,8 +264,85 @@
     {
       "type": "DAGFolderOutput",
       "annotations": {},
+      "name": "cda",
+      "description": "Continuous daylight autonomy results.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "metrics/cda"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "cDA",
+          "description": "Continuous daylight autonomy results.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_cda_from_folder"
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "da",
+      "description": "Daylight autonomy results.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "metrics/da"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "DA",
+          "description": "Daylight autonomy results.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_da_from_folder"
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "metrics",
+      "description": "Annual metrics folder.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "metrics"
+      },
+      "alias": [],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
       "name": "results",
-      "description": null,
+      "description": "Folder with raw result files (.ill) that contain illuminance matrices.",
       "from": {
         "type": "FolderReference",
         "annotations": {},
@@ -241,6 +364,102 @@
               "language": "python",
               "module": "pollination_handlers.outputs.daylight",
               "function": "sort_ill_from_folder"
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "udi",
+      "description": "Useful daylight illuminance results.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "metrics/udi"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "UDI",
+          "description": "Useful daylight autonomy results.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_udi_from_folder"
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "udi-lower",
+      "description": "Results for the percent of time that is below the lower threshold of useful daylight illuminance.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "metrics/udi_lower"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "UDI",
+          "description": "Useful daylight autonomy results.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_udi_from_folder"
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "udi-upper",
+      "description": "Results for the percent of time that is above the upper threshold of useful daylight illuminance.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "metrics/udi_upper"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "UDI",
+          "description": "Useful daylight autonomy results.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_udi_from_folder"
             }
           ]
         }
