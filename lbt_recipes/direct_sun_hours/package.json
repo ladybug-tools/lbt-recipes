@@ -1,0 +1,299 @@
+{
+  "type": "RecipeInterface",
+  "annotations": {},
+  "api_version": "v1beta1",
+  "metadata": {
+    "type": "MetaData",
+    "annotations": {},
+    "name": "direct-sun-hours",
+    "tag": "0.1.0",
+    "app_version": null,
+    "keywords": [
+      "honeybee",
+      "radiance",
+      "ladybug-tools",
+      "daylight",
+      "direct-sun-hours"
+    ],
+    "maintainers": [
+      {
+        "type": "Maintainer",
+        "annotations": {},
+        "name": "mostapha",
+        "email": "mostapha@ladybug.tools"
+      },
+      {
+        "type": "Maintainer",
+        "annotations": {},
+        "name": "ladybug-tools",
+        "email": "info@ladybug.tools"
+      }
+    ],
+    "home": "https://github.com/pollination/direct-sun-hours",
+    "sources": [
+      "https://hub.docker.com/r/ladybugtools/honeybee-radiance"
+    ],
+    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/annualrecipe.png",
+    "deprecated": null,
+    "description": "Direct sun hours recipe for Pollination.",
+    "license": {
+      "type": "License",
+      "annotations": {},
+      "name": "PolyForm Shield License 1.0.0",
+      "url": "https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt"
+    }
+  },
+  "source": null,
+  "inputs": [
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "model",
+      "description": "A Honeybee model in HBJSON file format.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "A path to a HBJSON file or a HB model object built with Python or dotnet libraries.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.model",
+              "function": "model_to_json"
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.Handlers",
+              "function": "HBModelToJSON"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        },
+        {
+          "type": "DAGLinkedInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "This input links the model to Rhino model.",
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.Handlers",
+              "function": "RhinoHBModelToJSON"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": true,
+      "spec": null,
+      "extensions": [
+        "json",
+        "hbjson"
+      ]
+    },
+    {
+      "type": "DAGNumberInput",
+      "annotations": {},
+      "name": "north",
+      "description": "A number for rotation from north.",
+      "default": 0.0,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "north",
+          "description": "Either a Vector2D for the north direction or a number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.north",
+              "function": "north_vector_to_angle"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 360
+      }
+    },
+    {
+      "type": "DAGIntegerInput",
+      "annotations": {},
+      "name": "sensor-count",
+      "description": "The maximum number of grid points per parallel execution.",
+      "default": 200,
+      "alias": [],
+      "required": false,
+      "spec": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "sensor-grid",
+      "description": "A grid name or a pattern to filter the sensor grids. By default all the grids in HBJSON model will be exported.",
+      "default": "*",
+      "alias": [],
+      "required": false,
+      "spec": null
+    },
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "wea",
+      "description": "Wea file.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "wea",
+          "description": "Either a Wea python object or the path to a wea or an epw file.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.wea",
+              "function": "wea_handler"
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": true,
+      "spec": null,
+      "extensions": [
+        "wea"
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "cumulative-sun-hours",
+      "description": "Cumulative results for direct sun hours for all the input hours.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "results/cumulative"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "direct_sun_hours",
+          "description": "Hours of direct sun.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_hours_from_folder"
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "direct-radiation",
+      "description": "Hourly direct radiation results. These results only includes the direct radiation from sun disk.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "results/direct_radiation"
+      },
+      "alias": [],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "direct-sun-hours",
+      "description": "Hourly results for direct sun hours.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "results/direct_sun_hours"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "annual_daylight",
+          "description": "Annual daylight result files.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "sort_ill_from_folder"
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "results",
+      "description": "Results folder. There are 3 subfolders under results folder: direct_sun_hours, cumulative and direct_radiation.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "results"
+      },
+      "alias": [],
+      "required": true
+    }
+  ]
+}
