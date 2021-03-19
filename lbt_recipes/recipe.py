@@ -11,6 +11,7 @@ import subprocess
 from ladybug.futil import preparedir, nukedir, copy_file_tree
 from honeybee.config import folders
 from honeybee_radiance.config import folders as rad_folders
+from honeybee.model import Model
 
 from .settings import RecipeSettings
 from .version import check_radiance_date, check_openstudio_version, \
@@ -40,13 +41,14 @@ class Recipe(object):
         * inputs
         * outputs
     """
+    MODEL_EXTENSIONS = ('.hbjson', '.hbpkl', '.dfjson', '.dfpkl', '.json', '.pkl')
 
     def __init__(self, recipe_name):
         # check to be sure that the requested recipe is installed
         install_folder = os.path.dirname(__file__)
-        recipe_folder = os.path.join(install_folder, recipe_name)
+        recipe_folder = os.path.join(install_folder, recipe_name.replace('-', '_'))
         if os.path.isdir(recipe_folder):  # it's a recipe in this package
-            self._name = recipe_name
+            self._name = recipe_name.replace('-', '_')
             self._path = recipe_folder
         elif os.path.isdir(recipe_name):  # it's an externally-installed recipe
             self._name = os.path.basename(recipe_name)
@@ -94,8 +96,20 @@ class Recipe(object):
         If unset, this will be a folder called unnamed_project within the user's
         default simulation folder
         """
-        return self._default_project_folder if self._default_project_folder is not None \
-            else os.path.join(folders.default_simulation_folder, 'unnamed_project')
+        if self._default_project_folder is not None:
+            return self._default_project_folder
+        else:
+            def_sim = folders.default_simulation_folder
+            for inp in self._inputs:
+                if inp.name == 'model':
+                    if isinstance(inp.value, Model):
+                        return os.path.join(def_sim, inp.value.identifier)
+                    elif isinstance(inp.value, str) and os.path.isfile(str(inp.value)):
+                        model = os.path.basename(inp.value)
+                        for ext in self.MODEL_EXTENSIONS:
+                            model = model.replace(ext, '')
+                        return os.path.join(def_sim, model)
+            return os.path.join(def_sim, 'unnamed_project')
 
     @default_project_folder.setter
     def default_project_folder(self, path):
@@ -122,6 +136,16 @@ class Recipe(object):
     def outputs(self):
         """Get a tuple of RecipeOutput objects for the recipe's outputs."""
         return tuple(self._outputs)
+
+    @property
+    def input_names(self):
+        """Get a tuple of text for the recipe's input names."""
+        return tuple(inp.name for inp in self._inputs)
+
+    @property
+    def output_names(self):
+        """Get a tuple of text for the recipe's output names."""
+        return tuple(otp.name for otp in self._outputs)
 
     def input_value_by_name(self, input_name, input_value):
         """Set the value of an input given the input name.
