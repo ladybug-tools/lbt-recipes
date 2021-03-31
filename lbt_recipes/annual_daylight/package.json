@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "annual-daylight",
-    "tag": "0.5.0",
+    "tag": "0.5.5",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -46,6 +46,30 @@
   "source": null,
   "inputs": [
     {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "grid-filter",
+      "description": "Text for a grid identifer or a pattern to filter the sensor grids of the model that are simulated. For instance, first_floor_* will simulate only the sensor grids that have an identifier that starts with first_floor_. By default, all grids in the model will be simulated.",
+      "default": "*",
+      "alias": [
+        {
+          "type": "DAGStringInputAlias",
+          "annotations": {},
+          "name": "grid_filter",
+          "description": "Text for a grid identifer or a pattern to filter the sensor grids of the model that are simulated. For instance, first_floor_* will simulate only the sensor grids that have an identifier that starts with first_floor_. By default, all grids in the model will be simulated.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": "*",
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": null
+    },
+    {
       "type": "DAGFileInput",
       "annotations": {},
       "name": "model",
@@ -56,7 +80,7 @@
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "model",
-          "description": "A path to a HBJSON file or a HB model object built with Python or dotnet libraries.",
+          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large.",
           "platform": [
             "grasshopper"
           ],
@@ -72,7 +96,7 @@
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "HoneybeeSchema.Handlers",
+              "module": "Pollination.Handlers",
               "function": "HBModelToJSON"
             }
           ],
@@ -93,7 +117,7 @@
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "HoneybeeRhino.Handlers",
+              "module": "Pollination.Handlers",
               "function": "RhinoHBModelToJSON"
             }
           ],
@@ -120,7 +144,7 @@
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "north",
-          "description": "Either a Vector2D for the north direction or a number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees.",
+          "description": "A number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees. This can also be Vector for the direction to North. (Default: 0).",
           "platform": [
             "grasshopper"
           ],
@@ -133,8 +157,8 @@
               "function": "north_vector_to_angle"
             }
           ],
-          "default": null,
-          "required": true,
+          "default": "0",
+          "required": false,
           "spec": null
         }
       ],
@@ -151,7 +175,21 @@
       "name": "radiance-parameters",
       "description": "The radiance parameters for ray tracing.",
       "default": "-ab 2 -ad 5000 -lw 2e-05",
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGStringInputAlias",
+          "annotations": {},
+          "name": "radiance_par",
+          "description": "Text for the radiance parameters to be used for ray tracing. (Default: -ab 2 -ad 5000 -lw 2e-05).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": "-ab 2 -ad 5000 -lw 2e-05",
+          "required": false,
+          "spec": null
+        }
+      ],
       "required": false,
       "spec": null
     },
@@ -166,7 +204,7 @@
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "schedule",
-          "description": "An annual occupancy schedule, either as a path to a csv file, a Ladybug Hourly Continuous Data Collection or a HB-Energy schedule object. This can also be the identifier of a schedule in your HB-Energy schedule library. Any value in this schedule that is 0.1 or above will be considered occupied.",
+          "description": "An annual occupancy schedule, either as a path to a csv file (with 8760 rows), a Ladybug Hourly Continuous Data Collection or a HB-Energy schedule object. This can also be the identifier of a schedule in your HB-Energy schedule library. Any value in this schedule that is 0.1 or above will be considered occupied.",
           "platform": [
             "grasshopper"
           ],
@@ -180,7 +218,7 @@
             }
           ],
           "default": null,
-          "required": true,
+          "required": false,
           "spec": null
         }
       ],
@@ -197,7 +235,21 @@
       "name": "sensor-count",
       "description": "The maximum number of grid points per parallel execution.",
       "default": 200,
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGIntegerInputAlias",
+          "annotations": {},
+          "name": "sensor_count",
+          "description": "Positive integer for the number of sensor grid points per parallel execution. Lower numbers will result in sensor grids being split into more pieces and, since each grid piece is run by a separate worker, this can mean a faster simulation on machines with several CPUs. However ,If the number is too low, the overhad of splitting the grid will not be worth the time gained through parallelization. (Default: 200).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": 200,
+          "required": false,
+          "spec": null
+        }
+      ],
       "required": false,
       "spec": {
         "type": "integer",
@@ -207,20 +259,24 @@
     {
       "type": "DAGStringInput",
       "annotations": {},
-      "name": "sensor-grid",
-      "description": "A grid name or a pattern to filter the sensor grids. By default all the grids in HBJSON model will be exported.",
-      "default": "*",
-      "alias": [],
-      "required": false,
-      "spec": null
-    },
-    {
-      "type": "DAGStringInput",
-      "annotations": {},
       "name": "thresholds",
       "description": "A string to change the threshold for daylight autonomy and useful daylight illuminance. Valid keys are -t for daylight autonomy threshold, -lt for the lower threshold for useful daylight illuminance and -ut for the upper threshold. The default is -t 300 -lt 100 -ut 3000. The order of the keys is not important and you can include one or all of them. For instance if you only want to change the upper threshold to 2000 lux you should use -ut 2000 as the input.",
       "default": "-t 300 -lt 100 -ut 3000",
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGStringInputAlias",
+          "annotations": {},
+          "name": "thresholds",
+          "description": "A string to change the threshold for daylight autonomy (DA) and useful daylight illuminance (UDI). Valid keys are -t for daylight autonomy threshold, -lt for the lower threshold for useful daylight illuminance and -ut for the upper threshold. The order of the keys is not important and you can include one or all of them. For instance if you only want to change the upper threshold to 2000 lux you should use -ut 2000 as the input. (Default: -t 300 -lt 100 -ut 3000).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": "-t 300 -lt 100 -ut 3000",
+          "required": false,
+          "spec": null
+        }
+      ],
       "required": false,
       "spec": null
     },
@@ -235,7 +291,7 @@
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "wea",
-          "description": "Either a Wea python object or the path to a wea or an epw file.",
+          "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
           "platform": [
             "grasshopper"
           ],
@@ -276,7 +332,7 @@
           "type": "DAGGenericOutputAlias",
           "annotations": {},
           "name": "cDA",
-          "description": "Continuous daylight autonomy results.",
+          "description": "Continuous daylight autonomy values for each sensor. These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize results.",
           "platform": [
             "grasshopper"
           ],
@@ -308,7 +364,7 @@
           "type": "DAGGenericOutputAlias",
           "annotations": {},
           "name": "DA",
-          "description": "Daylight autonomy results.",
+          "description": "Daylight autonomy values for each sensor. These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize results.",
           "platform": [
             "grasshopper"
           ],
@@ -352,8 +408,8 @@
         {
           "type": "DAGGenericOutputAlias",
           "annotations": {},
-          "name": "annual_daylight",
-          "description": "Annual daylight result files.",
+          "name": "results",
+          "description": "Raw result files (.ill) that contain illuminance matrices.",
           "platform": [
             "grasshopper"
           ],
@@ -385,7 +441,7 @@
           "type": "DAGGenericOutputAlias",
           "annotations": {},
           "name": "UDI",
-          "description": "Useful daylight autonomy results.",
+          "description": "Useful daylight autonomy values for each sensor. These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize results.",
           "platform": [
             "grasshopper"
           ],
@@ -416,8 +472,8 @@
         {
           "type": "DAGGenericOutputAlias",
           "annotations": {},
-          "name": "UDI",
-          "description": "Useful daylight autonomy results.",
+          "name": "UDI_low",
+          "description": "Values for the percent of time that is below the lower threshold of useful daylight illuminance. These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize results.",
           "platform": [
             "grasshopper"
           ],
@@ -448,8 +504,8 @@
         {
           "type": "DAGGenericOutputAlias",
           "annotations": {},
-          "name": "UDI",
-          "description": "Useful daylight autonomy results.",
+          "name": "UDI_up",
+          "description": "Values for the percent of time that is above the upper threshold of useful daylight illuminance. These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize results.",
           "platform": [
             "grasshopper"
           ],

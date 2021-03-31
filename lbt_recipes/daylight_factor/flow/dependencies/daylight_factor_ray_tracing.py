@@ -1,3 +1,17 @@
+"""
+This file is auto-generated from a Queenbee recipe. It is unlikely that
+you should be editing this file directly. Instead try to edit the recipe
+itself and regenerate the code.
+
+Contact the recipe maintainers with additional questions.
+    mostapha: mostapha@ladybug.tools
+    ladybug-tools: info@ladybug.tools
+
+This file is licensed under "PolyForm Shield License 1.0.0".
+See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt for more information.
+"""
+
+
 import luigi
 import os
 from queenbee_local import QueenbeeTask
@@ -61,7 +75,7 @@ class MergeResults(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'folder', 'to': 'input_folder', 'from': self.folder}]
+            {'name': 'folder', 'to': 'input_folder', 'from': self.folder, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -133,8 +147,8 @@ class RayTracingLoop(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'grid', 'to': 'grid.pts', 'from': self.grid},
-            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file}]
+            {'name': 'grid', 'to': 'grid.pts', 'from': self.grid, 'optional': False},
+            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -166,6 +180,7 @@ class RayTracing(luigi.Task):
 
     def run(self):
         yield [RayTracingLoop(item=item, _input_params=self._input_params) for item in self.items]
+        os.makedirs(self.execution_folder, exist_ok=True)
         with open(os.path.join(self.execution_folder, 'ray_tracing.done'), 'w') as out_file:
             out_file.write('done!\n')
 
@@ -238,7 +253,7 @@ class SplitGrid(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'input_grid', 'to': 'grid.pts', 'from': self.input_grid}]
+            {'name': 'input_grid', 'to': 'grid.pts', 'from': self.input_grid, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -253,7 +268,7 @@ class SplitGrid(QueenbeeTask):
         return [{'name': 'grids-list', 'from': 'output/grids_info.json', 'to': os.path.join(self.params_folder, 'output/grids_info.json')}]
 
 
-class _DaylightFactorRayTracingOrchestrator(luigi.WrapperTask):
+class _DaylightFactorRayTracing_5c235853Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

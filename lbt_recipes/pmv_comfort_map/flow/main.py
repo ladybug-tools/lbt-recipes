@@ -1,7 +1,21 @@
+"""
+This file is auto-generated from a Queenbee recipe. It is unlikely that
+you should be editing this file directly. Instead try to edit the recipe
+itself and regenerate the code.
+
+Contact the recipe maintainers with additional questions.
+    chris: chris@ladybug.tools
+    ladybug-tools: info@ladybug.tools
+
+This file is licensed under "PolyForm Shield License 1.0.0".
+See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt for more information.
+"""
+
+
 import luigi
 import os
 from queenbee_local import QueenbeeTask
-from .dependencies.main import _Main_a5b4547cOrchestrator as Main_a5b4547cWorkerbee
+from .dependencies.main import _Main_7b93ed3aOrchestrator as Main_7b93ed3aWorkerbee
 
 
 _default_inputs = {   'comfort_parameters': '--ppd-threshold 10',
@@ -86,9 +100,9 @@ class ComputeTcpLoop(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'condition_csv', 'to': 'condition.csv', 'from': self.condition_csv},
-            {'name': 'enclosure_info', 'to': 'enclosure_info.json', 'from': self.enclosure_info},
-            {'name': 'occ_schedule_json', 'to': 'occ_schedule.json', 'from': self.occ_schedule_json}]
+            {'name': 'condition_csv', 'to': 'condition.csv', 'from': self.condition_csv, 'optional': False},
+            {'name': 'enclosure_info', 'to': 'enclosure_info.json', 'from': self.enclosure_info, 'optional': False},
+            {'name': 'occ_schedule_json', 'to': 'occ_schedule.json', 'from': self.occ_schedule_json, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -130,6 +144,7 @@ class ComputeTcp(luigi.Task):
 
     def run(self):
         yield [ComputeTcpLoop(item=item, _input_params=self._input_params) for item in self.items]
+        os.makedirs(self.execution_folder, exist_ok=True)
         with open(os.path.join(self.execution_folder, 'compute_tcp.done'), 'w') as out_file:
             out_file.write('done!\n')
 
@@ -211,7 +226,7 @@ class CopyGridInfo(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'src', 'to': 'input_path', 'from': self.src}]
+            {'name': 'src', 'to': 'input_path', 'from': self.src, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -289,7 +304,7 @@ class CreateModelOccSchedules(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'model', 'to': 'model.json', 'from': self.model}]
+            {'name': 'model', 'to': 'model.json', 'from': self.model, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -416,7 +431,7 @@ class CreateSimPar(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'ddy', 'to': 'input.ddy', 'from': self.ddy}]
+            {'name': 'ddy', 'to': 'input.ddy', 'from': self.ddy, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -471,7 +486,7 @@ class CreateWea(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'epw', 'to': 'weather.epw', 'from': self.epw}]
+            {'name': 'epw', 'to': 'weather.epw', 'from': self.epw, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -532,7 +547,7 @@ class GetEnclosureInfo(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'model', 'to': 'model.hbjson', 'from': self.model}]
+            {'name': 'model', 'to': 'model.hbjson', 'from': self.model, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -599,7 +614,7 @@ class MirrorSensorGrids(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'model', 'to': 'model.hbjson', 'from': self.model}]
+            {'name': 'model', 'to': 'model.hbjson', 'from': self.model, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -729,13 +744,13 @@ class RunComfortMapLoop(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'result_sql', 'to': 'result.sql', 'from': self.result_sql},
-            {'name': 'enclosure_info', 'to': 'enclosure_info.json', 'from': self.enclosure_info},
-            {'name': 'epw', 'to': 'weather.epw', 'from': self.epw},
-            {'name': 'total_irradiance', 'to': 'total.ill', 'from': self.total_irradiance},
-            {'name': 'direct_irradiance', 'to': 'direct.ill', 'from': self.direct_irradiance},
-            {'name': 'ref_irradiance', 'to': 'ref.ill', 'from': self.ref_irradiance},
-            {'name': 'sun_up_hours', 'to': 'sun-up-hours.txt', 'from': self.sun_up_hours}]
+            {'name': 'result_sql', 'to': 'result.sql', 'from': self.result_sql, 'optional': False},
+            {'name': 'enclosure_info', 'to': 'enclosure_info.json', 'from': self.enclosure_info, 'optional': False},
+            {'name': 'epw', 'to': 'weather.epw', 'from': self.epw, 'optional': False},
+            {'name': 'total_irradiance', 'to': 'total.ill', 'from': self.total_irradiance, 'optional': False},
+            {'name': 'direct_irradiance', 'to': 'direct.ill', 'from': self.direct_irradiance, 'optional': False},
+            {'name': 'ref_irradiance', 'to': 'ref.ill', 'from': self.ref_irradiance, 'optional': False},
+            {'name': 'sun_up_hours', 'to': 'sun-up-hours.txt', 'from': self.sun_up_hours, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -777,6 +792,7 @@ class RunComfortMap(luigi.Task):
 
     def run(self):
         yield [RunComfortMapLoop(item=item, _input_params=self._input_params) for item in self.items]
+        os.makedirs(self.execution_folder, exist_ok=True)
         with open(os.path.join(self.execution_folder, 'run_comfort_map.done'), 'w') as out_file:
             out_file.write('done!\n')
 
@@ -854,9 +870,9 @@ class RunEnergySimulation(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'model', 'to': 'model.hbjson', 'from': self.model},
-            {'name': 'epw', 'to': 'weather.epw', 'from': self.epw},
-            {'name': 'sim_par', 'to': 'sim-par.json', 'from': self.sim_par}]
+            {'name': 'model', 'to': 'model.hbjson', 'from': self.model, 'optional': False},
+            {'name': 'epw', 'to': 'weather.epw', 'from': self.epw, 'optional': False},
+            {'name': 'sim_par', 'to': 'sim-par.json', 'from': self.sim_par, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -886,7 +902,7 @@ class RunIrradianceSimulation(QueenbeeTask):
     def radiance_parameters(self):
         return self._input_params['radiance_parameters']
 
-    sensor_grid = luigi.Parameter(default='*')
+    grid_filter = luigi.Parameter(default='*')
 
     @property
     def model(self):
@@ -932,7 +948,8 @@ class RunIrradianceSimulation(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [Main_a5b4547cWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [Main_7b93ed3aWorkerbee(_input_params=self.map_dag_inputs)]
+        os.makedirs(self.execution_folder, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
         with open(os.path.join(self.execution_folder, 'run_irradiance_simulation.done'), 'w') as out_file:
@@ -993,7 +1010,7 @@ class SetModifiersFromConstructions(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'model', 'to': 'model.hbjson', 'from': self.model}]
+            {'name': 'model', 'to': 'model.hbjson', 'from': self.model, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -1004,7 +1021,7 @@ class SetModifiersFromConstructions(QueenbeeTask):
             }]
 
 
-class _Main_ee56c766Orchestrator(luigi.WrapperTask):
+class _Main_e9d89bc8Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

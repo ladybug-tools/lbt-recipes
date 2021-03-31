@@ -1,17 +1,32 @@
+"""
+This file is auto-generated from a Queenbee recipe. It is unlikely that
+you should be editing this file directly. Instead try to edit the recipe
+itself and regenerate the code.
+
+Contact the recipe maintainers with additional questions.
+    mostapha: mostapha@ladybug.tools
+    ladybug-tools: info@ladybug.tools
+
+This file is licensed under "PolyForm Shield License 1.0.0".
+See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt for more information.
+"""
+
+
 import sys
 import luigi
 import os
 import time
+import pathlib
 from multiprocessing import freeze_support
-from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args
+from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 
 import flow.main as direct_sun_hours_workerbee
 
 
-_recipe_default_inputs = {   'model': None,
+_recipe_default_inputs = {   'grid_filter': '*',
+    'model': None,
     'north': 0.0,
     'sensor_count': 200,
-    'sensor_grid': '*',
     'wea': None}
 
 
@@ -20,7 +35,7 @@ class LetDirectSunHoursFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [direct_sun_hours_workerbee._Main_45518ce1Orchestrator(_input_params=self._input_params)]
+        yield [direct_sun_hours_workerbee._Main_ddc7a9efOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -52,10 +67,19 @@ def start(project_folder, user_values, workers):
         to_ = os.path.join(simulation_folder, input_params[artifact])
         _copy_artifacts(from_, to_)
 
+    # set up logs
+    log_folder = pathlib.Path(simulation_folder, '__logs__')
+    log_folder.mkdir(exist_ok=True)
+    cfg_file = pathlib.Path(simulation_folder, '__logs__', 'logs.cfg')
+    log_file = pathlib.Path(simulation_folder, '__logs__', 'logs.log').as_posix()
+    with cfg_file.open('w') as lf:
+        lf.write(LOGS_CONFIG.replace('WORKFLOW.LOG', log_file))
+
     luigi.build(
         [LetDirectSunHoursFly(_input_params=input_params)],
         local_scheduler=local_scheduler(),
-        workers=workers
+        workers=workers,
+        logging_conf_file=cfg_file.as_posix()
     )
 
 

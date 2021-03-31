@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "utci-comfort-map",
-    "tag": "0.2.2",
+    "tag": "0.2.5",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -49,7 +49,21 @@
       "name": "comfort-parameters",
       "description": "An UTCIParameter string to customize the assumptions of the UTCI comfort model.",
       "default": "--cold 9 --heat 26",
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGStringInputAlias",
+          "annotations": {},
+          "name": "comfort_par",
+          "description": "UTCIParameter string to customize the assumptions of the UTCI comfort model.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": "--cold 9 --heat 26",
+          "required": false,
+          "spec": null
+        }
+      ],
       "required": false,
       "spec": null
     },
@@ -64,7 +78,7 @@
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "ddy",
-          "description": "Either a DDY python object or the path to a ddy or an epw file.",
+          "description": "The path to a .ddy file or an .epw file with design days to be used for the initial sizing calculation.",
           "platform": [
             "grasshopper"
           ],
@@ -112,7 +126,7 @@
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "model",
-          "description": "A path to a HBJSON file or a HB model object built with Python or dotnet libraries.",
+          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large.",
           "platform": [
             "grasshopper"
           ],
@@ -128,7 +142,7 @@
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "HoneybeeSchema.Handlers",
+              "module": "Pollination.Handlers",
               "function": "HBModelToJSON"
             }
           ],
@@ -149,7 +163,7 @@
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "HoneybeeRhino.Handlers",
+              "module": "Pollination.Handlers",
               "function": "RhinoHBModelToJSON"
             }
           ],
@@ -176,7 +190,7 @@
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "north",
-          "description": "Either a Vector2D for the north direction or a number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees.",
+          "description": "A number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees. This can also be Vector for the direction to North. (Default: 0).",
           "platform": [
             "grasshopper"
           ],
@@ -189,8 +203,8 @@
               "function": "north_vector_to_angle"
             }
           ],
-          "default": null,
-          "required": true,
+          "default": "0",
+          "required": false,
           "spec": null
         }
       ],
@@ -207,7 +221,21 @@
       "name": "radiance-parameters",
       "description": "Radiance parameters for ray tracing.",
       "default": "-ab 2 -ad 5000 -lw 2e-05",
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGStringInputAlias",
+          "annotations": {},
+          "name": "radiance_par",
+          "description": "Text for the radiance parameters to be used for ray tracing. (Default: -ab 2 -ad 5000 -lw 2e-05).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": "-ab 2 -ad 5000 -lw 2e-05",
+          "required": false,
+          "spec": null
+        }
+      ],
       "required": false,
       "spec": null
     },
@@ -217,7 +245,21 @@
       "name": "run-period",
       "description": "An AnalysisPeriod string to set the start and end dates of the simulation (eg. \"6/21 to 9/21 between 0 and 23 @1\"). If None, the simulation will be annual.",
       "default": "",
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGStringInputAlias",
+          "annotations": {},
+          "name": "run_period",
+          "description": "An AnalysisPeriod to set the start and end dates of the simulation. If None, the simulation will be annual.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": "",
+          "required": false,
+          "spec": null
+        }
+      ],
       "required": false,
       "spec": null
     },
@@ -227,7 +269,21 @@
       "name": "sensor-count",
       "description": "The maximum number of grid points per parallel execution.",
       "default": 200,
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGIntegerInputAlias",
+          "annotations": {},
+          "name": "sensor_count",
+          "description": "Positive integer for the number of sensor grid points per parallel execution. Lower numbers will result in sensor grids being split into more pieces and, since each grid piece is run by a separate worker, this can mean a faster simulation on machines with several CPUs. However ,If the number is too low, the overhad of splitting the grid will not be worth the time gained through parallelization. (Default: 200).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": 200,
+          "required": false,
+          "spec": null
+        }
+      ],
       "required": false,
       "spec": {
         "type": "integer",
@@ -240,7 +296,21 @@
       "name": "solarcal-parameters",
       "description": "A SolarCalParameter string to customize the assumptions of the SolarCal model.",
       "default": "--posture seated --sharp 135 --absorptivity 0.7 --emissivity 0.95",
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGStringInputAlias",
+          "annotations": {},
+          "name": "solar_body_par",
+          "description": "Optional solar body parameters from the \"LB Solar Body Parameters\" object to specify the properties of the human geometry assumed in the shortwave MRT calculation. The default assumes average skin/clothing absorptivity and a human subject always has their back to the sun at a 45-degree angle (SHARP = 135).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": "--posture seated --sharp 135 --absorptivity 0.7 --emissivity 0.95",
+          "required": false,
+          "spec": null
+        }
+      ],
       "required": false,
       "spec": null
     },
@@ -254,8 +324,8 @@
         {
           "type": "DAGGenericInputAlias",
           "annotations": {},
-          "name": "value",
-          "description": "Either a single numerical value or data collection.",
+          "name": "wind_speed",
+          "description": "A single number for meteorological wind speed in m/s or an hourly data collection of wind speeds that align with the input run period. This will be used for all indoor comfort evaluation. Note that the EPW wind speed will be used for any outdoor sensors. (Default: 0.5).",
           "platform": [
             "grasshopper"
           ],
@@ -268,8 +338,8 @@
               "function": "value_or_data_to_str"
             }
           ],
-          "default": null,
-          "required": true,
+          "default": "0.5",
+          "required": false,
           "spec": null
         }
       ],
@@ -288,7 +358,18 @@
         "annotations": {},
         "path": "results/condition_intensity"
       },
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "category",
+          "description": "A folder containing CSV maps of the heat/cold stress categories for each sensor grid at each time step of the analysis. This can be connected to the \"HB Read Thermal Matrix\" component to parse detailed results into Grasshopper. This can be used to understand not just whether conditions are acceptable but how uncomfortably hot or cold they are. Values indicate the following. -5 = extreme cold stress. -4 = very strong cold stress. -3 = strong cold stress. -2 = moderate cold stress. -1 = slight cold stress.  0 = no thermal stress. +1 = slight heat stress. +2 = moderate heat stress. +3 = strong heat stress. +4 = very strong heat stress. +5 = extreme heat stress",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": []
+        }
+      ],
       "required": true
     },
     {
@@ -301,7 +382,18 @@
         "annotations": {},
         "path": "results/condition"
       },
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "condition",
+          "description": "A folder containing CSV maps of comfort conditions for each sensor grid at each time step of the analysis. This can be connected to the \"HB Read Thermal Matrix\" component to parse detailed results into Grasshopper. -1 indicates unacceptably cold conditions. +1 indicates unacceptably hot conditions. 0 indicates neutral (comfortable) conditions.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": []
+        }
+      ],
       "required": true
     },
     {
@@ -318,8 +410,8 @@
         {
           "type": "DAGGenericOutputAlias",
           "annotations": {},
-          "name": "thermal_comfort_percent",
-          "description": "Thermal comfort percent values.",
+          "name": "CSP",
+          "description": "Lists of values between 0 and 100 for the Cold Sensation Percent (CSP). These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize uncomfortably cold locations. CSP is the percentage of occupied time where thermal conditions are colder than what is considered acceptable/comfortable. Occupied hours are determined from the occupancy schedules of each room (any time where the occupancy schedule is >= 0.1 will be considered occupied). Outdoor sensors are considered occupied at all times. More custom CSP studies can be done by post-processing the condition results.",
           "platform": [
             "grasshopper"
           ],
@@ -350,8 +442,8 @@
         {
           "type": "DAGGenericOutputAlias",
           "annotations": {},
-          "name": "thermal_comfort_percent",
-          "description": "Thermal comfort percent values.",
+          "name": "HSP",
+          "description": "Lists of values between 0 and 100 for the Heat Sensation Percent (HSP). These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize uncomfortably hot locations. HSP is the percentage of occupied time where thermal conditions are hotter than what is considered acceptable/comfortable. Occupied hours are determined from the occupancy schedules of each room (any time where the occupancy schedule is >= 0.1 will be considered occupied). Outdoor sensors are considered occupied at all times. More custom HSP studies can be done by post-processing the condition results.",
           "platform": [
             "grasshopper"
           ],
@@ -395,8 +487,8 @@
         {
           "type": "DAGGenericOutputAlias",
           "annotations": {},
-          "name": "thermal_comfort_percent",
-          "description": "Thermal comfort percent values.",
+          "name": "TCP",
+          "description": "Lists of values between 0 and 100 for the Thermal Comfort Percent (TCP). These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize spatial thermal comfort. TCP is the percentage of occupied time where thermal conditions are acceptable/comfortable. Occupied hours are determined from the occupancy schedules of each room (any time where the occupancy schedule is >= 0.1 will be considered occupied). Outdoor sensors are considered occupied at all times. More custom TCP studies can be done by post-processing the condition results.",
           "platform": [
             "grasshopper"
           ],
@@ -423,7 +515,18 @@
         "annotations": {},
         "path": "results/temperature"
       },
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "utci",
+          "description": "A folder containing CSV maps of Universal Thermal Climate Index (UTCI) temperatures for each sensor grid at each time step of the analysis. This can be connected to the \"HB Read Thermal Matrix\" component to parse detailed results into Grasshopper. Values are in Celsius.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": []
+        }
+      ],
       "required": true
     }
   ]

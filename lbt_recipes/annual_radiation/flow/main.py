@@ -1,15 +1,29 @@
+"""
+This file is auto-generated from a Queenbee recipe. It is unlikely that
+you should be editing this file directly. Instead try to edit the recipe
+itself and regenerate the code.
+
+Contact the recipe maintainers with additional questions.
+    mostapha: mostapha@ladybug.tools
+    ladybug-tools: info@ladybug.tools
+
+This file is licensed under "PolyForm Shield License 1.0.0".
+See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt for more information.
+"""
+
+
 import luigi
 import os
 from queenbee_local import QueenbeeTask
-from .dependencies.annual_radiation_ray_tracing import _AnnualRadiationRayTracing_9da8e0c2Orchestrator as AnnualRadiationRayTracing_9da8e0c2Workerbee
+from .dependencies.annual_radiation_ray_tracing import _AnnualRadiationRayTracing_db5663f4Orchestrator as AnnualRadiationRayTracing_db5663f4Workerbee
 
 
-_default_inputs = {   'model': None,
+_default_inputs = {   'grid_filter': '*',
+    'model': None,
     'north': 0.0,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
     'sensor_count': 200,
-    'sensor_grid': '*',
     'simulation_folder': '.',
     'wea': None}
 
@@ -118,7 +132,8 @@ class AnnualRadiationRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualRadiationRayTracing_9da8e0c2Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualRadiationRayTracing_db5663f4Workerbee(_input_params=self.map_dag_inputs)]
+        os.makedirs(self.execution_folder, exist_ok=True)
         with open(os.path.join(self.execution_folder, 'annual_radiation_raytracing.done'), 'w') as out_file:
             out_file.write('done!\n')
 
@@ -152,6 +167,7 @@ class AnnualRadiationRaytracing(luigi.Task):
 
     def run(self):
         yield [AnnualRadiationRaytracingLoop(item=item, _input_params=self._input_params) for item in self.items]
+        os.makedirs(self.execution_folder, exist_ok=True)
         with open(os.path.join(self.execution_folder, 'annual_radiation_raytracing.done'), 'w') as out_file:
             out_file.write('done!\n')
 
@@ -480,8 +496,8 @@ class CreateRadFolder(QueenbeeTask):
 
     # Task inputs
     @property
-    def sensor_grid(self):
-        return self._input_params['sensor_grid']
+    def grid_filter(self):
+        return self._input_params['grid_filter']
 
     @property
     def input_model(self):
@@ -502,7 +518,7 @@ class CreateRadFolder(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid "{sensor_grid}"'.format(sensor_grid=self.sensor_grid)
+        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid "{grid_filter}" --grid-check'.format(grid_filter=self.grid_filter)
 
     def output(self):
         return {
@@ -657,6 +673,10 @@ class ParseSunUpHours(QueenbeeTask):
     _input_params = luigi.DictParameter()
 
     # Task inputs
+    leap_year = luigi.Parameter(default='full-year')
+
+    timestep = luigi.Parameter(default='1')
+
     @property
     def sun_modifiers(self):
         value = self.input()['GenerateSunpath']['sun_modifiers'].path.replace('\\', '/')
@@ -676,7 +696,7 @@ class ParseSunUpHours(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'honeybee-radiance sunpath parse-hours suns.mod --name sun-up-hours.txt'
+        return 'honeybee-radiance sunpath parse-hours suns.mod --name sun-up-hours.txt --timestep {timestep} --{leap_year}'.format(timestep=self.timestep, leap_year=self.leap_year)
 
     def requires(self):
         return {'GenerateSunpath': GenerateSunpath(_input_params=self._input_params)}
@@ -702,7 +722,7 @@ class ParseSunUpHours(QueenbeeTask):
             }]
 
 
-class _Main_9da8e0c2Orchestrator(luigi.WrapperTask):
+class _Main_db5663f4Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

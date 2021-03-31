@@ -1,14 +1,28 @@
+"""
+This file is auto-generated from a Queenbee recipe. It is unlikely that
+you should be editing this file directly. Instead try to edit the recipe
+itself and regenerate the code.
+
+Contact the recipe maintainers with additional questions.
+    mostapha: mostapha@ladybug.tools
+    ladybug-tools: info@ladybug.tools
+
+This file is licensed under "PolyForm Shield License 1.0.0".
+See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt for more information.
+"""
+
+
 import luigi
 import os
 from queenbee_local import QueenbeeTask
-from .dependencies.daylight_factor_ray_tracing import _DaylightFactorRayTracingOrchestrator as DaylightFactorRayTracingWorkerbee
+from .dependencies.daylight_factor_ray_tracing import _DaylightFactorRayTracing_5c235853Orchestrator as DaylightFactorRayTracing_5c235853Workerbee
 
 
-_default_inputs = {   'model': None,
+_default_inputs = {   'grid_filter': '*',
+    'model': None,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64',
     'sensor_count': 200,
-    'sensor_grid': '*',
     'simulation_folder': '.'}
 
 
@@ -63,8 +77,8 @@ class CreateOctree(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'model', 'to': 'model', 'from': self.model},
-            {'name': 'sky', 'to': 'sky.sky', 'from': self.sky}]
+            {'name': 'model', 'to': 'model', 'from': self.model, 'optional': False},
+            {'name': 'sky', 'to': 'sky.sky', 'from': self.sky, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -83,8 +97,8 @@ class CreateRadFolder(QueenbeeTask):
 
     # Task inputs
     @property
-    def sensor_grid(self):
-        return self._input_params['sensor_grid']
+    def grid_filter(self):
+        return self._input_params['grid_filter']
 
     @property
     def input_model(self):
@@ -105,7 +119,7 @@ class CreateRadFolder(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid "{sensor_grid}"'.format(sensor_grid=self.sensor_grid)
+        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid "{grid_filter}" --grid-check'.format(grid_filter=self.grid_filter)
 
     def output(self):
         return {
@@ -127,7 +141,7 @@ class CreateRadFolder(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'input_model', 'to': 'model.hbjson', 'from': self.input_model}]
+            {'name': 'input_model', 'to': 'model.hbjson', 'from': self.input_model, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -216,7 +230,8 @@ class DaylightFactorRayTracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DaylightFactorRayTracingWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [DaylightFactorRayTracing_5c235853Workerbee(_input_params=self.map_dag_inputs)]
+        os.makedirs(self.execution_folder, exist_ok=True)
         with open(os.path.join(self.execution_folder, 'daylight_factor_ray_tracing.done'), 'w') as out_file:
             out_file.write('done!\n')
 
@@ -250,6 +265,7 @@ class DaylightFactorRayTracing(luigi.Task):
 
     def run(self):
         yield [DaylightFactorRayTracingLoop(item=item, _input_params=self._input_params) for item in self.items]
+        os.makedirs(self.execution_folder, exist_ok=True)
         with open(os.path.join(self.execution_folder, 'daylight_factor_ray_tracing.done'), 'w') as out_file:
             out_file.write('done!\n')
 
@@ -314,7 +330,7 @@ class GenerateSky(QueenbeeTask):
             }]
 
 
-class _MainOrchestrator(luigi.WrapperTask):
+class _Main_5c235853Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

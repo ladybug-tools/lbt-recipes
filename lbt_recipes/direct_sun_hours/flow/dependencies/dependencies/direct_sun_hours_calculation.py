@@ -1,3 +1,17 @@
+"""
+This file is auto-generated from a Queenbee recipe. It is unlikely that
+you should be editing this file directly. Instead try to edit the recipe
+itself and regenerate the code.
+
+Contact the recipe maintainers with additional questions.
+    mostapha: mostapha@ladybug.tools
+    ladybug-tools: info@ladybug.tools
+
+This file is licensed under "PolyForm Shield License 1.0.0".
+See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt for more information.
+"""
+
+
 import luigi
 import os
 from queenbee_local import QueenbeeTask
@@ -83,6 +97,16 @@ class ConvertToSunHours(QueenbeeTask):
     def grid_name(self):
         return self._input_params['grid_name']
 
+    include_max = luigi.Parameter(default='include')
+
+    include_min = luigi.Parameter(default='include')
+
+    maximum = luigi.Parameter(default='1e+100')
+
+    minimum = luigi.Parameter(default='-1e+100')
+
+    reverse = luigi.Parameter(default='comply')
+
     @property
     def input_mtx(self):
         value = self.input()['DirectRadiationCalculation']['result_file'].path.replace('\\', '/')
@@ -102,7 +126,7 @@ class ConvertToSunHours(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'honeybee-radiance post-process convert-to-binary input.mtx --output binary.mtx'
+        return 'honeybee-radiance post-process convert-to-binary input.mtx --output binary.mtx --maximum {maximum} --minimum {minimum} --{reverse} --{include_min}-min --{include_max}-max'.format(maximum=self.maximum, minimum=self.minimum, reverse=self.reverse, include_min=self.include_min, include_max=self.include_max)
 
     def requires(self):
         return {'DirectRadiationCalculation': DirectRadiationCalculation(_input_params=self._input_params)}
@@ -154,6 +178,8 @@ class DirectRadiationCalculation(QueenbeeTask):
 
     calculate_values = luigi.Parameter(default='value')
 
+    order_by = luigi.Parameter(default='sensor')
+
     output_format = luigi.Parameter(default='a')
 
     radiance_parameters = luigi.Parameter(default='')
@@ -189,7 +215,7 @@ class DirectRadiationCalculation(QueenbeeTask):
         return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
 
     def command(self):
-        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill'.format(calculate_values=self.calculate_values, sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format)
+        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by}'.format(calculate_values=self.calculate_values, sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format, order_by=self.order_by)
 
     def output(self):
         return {
@@ -214,7 +240,7 @@ class DirectRadiationCalculation(QueenbeeTask):
             }]
 
 
-class _DirectSunHoursCalculation_45518ce1Orchestrator(luigi.WrapperTask):
+class _DirectSunHoursCalculation_ddc7a9efOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
