@@ -1,7 +1,21 @@
+"""
+This file is auto-generated from a Queenbee recipe. It is unlikely that
+you should be editing this file directly. Instead try to edit the recipe
+itself and regenerate the code.
+
+Contact the recipe maintainers with additional questions.
+    mostapha: mostapha@ladybug.tools
+    ladybug-tools: info@ladybug.tools
+
+This file is licensed under "PolyForm Shield License 1.0.0".
+See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt for more information.
+"""
+
+
 import luigi
 import os
 from queenbee_local import QueenbeeTask
-from .dependencies.direct_sun_hours_calculation import _DirectSunHoursCalculation_45518ce1Orchestrator as DirectSunHoursCalculation_45518ce1Workerbee
+from .dependencies.direct_sun_hours_calculation import _DirectSunHoursCalculation_ddc7a9efOrchestrator as DirectSunHoursCalculation_ddc7a9efWorkerbee
 
 
 _default_inputs = {   'grid_name': None,
@@ -91,7 +105,8 @@ class DirectSunlightLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DirectSunHoursCalculation_45518ce1Workerbee(_input_params=self.map_dag_inputs)]
+        yield [DirectSunHoursCalculation_ddc7a9efWorkerbee(_input_params=self.map_dag_inputs)]
+        os.makedirs(self.execution_folder, exist_ok=True)
         with open(os.path.join(self.execution_folder, 'direct_sunlight.done'), 'w') as out_file:
             out_file.write('done!\n')
 
@@ -125,6 +140,7 @@ class DirectSunlight(luigi.Task):
 
     def run(self):
         yield [DirectSunlightLoop(item=item, _input_params=self._input_params) for item in self.items]
+        os.makedirs(self.execution_folder, exist_ok=True)
         with open(os.path.join(self.execution_folder, 'direct_sunlight.done'), 'w') as out_file:
             out_file.write('done!\n')
 
@@ -392,7 +408,7 @@ class SplitGrid(QueenbeeTask):
         return [{'name': 'grids-list', 'from': 'output/grids_info.json', 'to': os.path.join(self.params_folder, 'output/grids_info.json')}]
 
 
-class _DirectSunHoursEntryLoop_45518ce1Orchestrator(luigi.WrapperTask):
+class _DirectSunHoursEntryLoop_ddc7a9efOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

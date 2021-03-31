@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "daylight-factor",
-    "tag": "0.5.0",
+    "tag": "0.5.6",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -46,6 +46,30 @@
   "source": null,
   "inputs": [
     {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "grid-filter",
+      "description": "Text for a grid identifer or a pattern to filter the sensor grids of the model that are simulated. For instance, first_floor_* will simulate only the sensor grids that have an identifier that starts with first_floor_. By default, all grids in the model will be simulated.",
+      "default": "*",
+      "alias": [
+        {
+          "type": "DAGStringInputAlias",
+          "annotations": {},
+          "name": "grid_filter",
+          "description": "Text for a grid identifer or a pattern to filter the sensor grids of the model that are simulated. For instance, first_floor_* will simulate only the sensor grids that have an identifier that starts with first_floor_. By default, all grids in the model will be simulated.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": "*",
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": null
+    },
+    {
       "type": "DAGFileInput",
       "annotations": {},
       "name": "model",
@@ -56,7 +80,7 @@
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "model",
-          "description": "A path to a HBJSON file or a HB model object built with Python or dotnet libraries.",
+          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large.",
           "platform": [
             "grasshopper"
           ],
@@ -72,7 +96,7 @@
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "HoneybeeSchema.Handlers",
+              "module": "Pollination.Handlers",
               "function": "HBModelToJSON"
             }
           ],
@@ -93,7 +117,7 @@
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "HoneybeeRhino.Handlers",
+              "module": "Pollination.Handlers",
               "function": "RhinoHBModelToJSON"
             }
           ],
@@ -115,7 +139,21 @@
       "name": "radiance-parameters",
       "description": "The radiance parameters for ray tracing",
       "default": "-ab 2 -aa 0.1 -ad 2048 -ar 64",
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGStringInputAlias",
+          "annotations": {},
+          "name": "radiance_par",
+          "description": "Text for the radiance parameters to be used for ray tracing. (Default: -ab 2 -aa 0.1 -ad 2048 -ar 64).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": "-ab 2 -aa 0.1 -ad 2048 -ar 64",
+          "required": false,
+          "spec": null
+        }
+      ],
       "required": false,
       "spec": null
     },
@@ -125,22 +163,26 @@
       "name": "sensor-count",
       "description": "The maximum number of grid points per parallel execution",
       "default": 200,
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGIntegerInputAlias",
+          "annotations": {},
+          "name": "sensor_count",
+          "description": "Positive integer for the number of sensor grid points per parallel execution. Lower numbers will result in sensor grids being split into more pieces and, since each grid piece is run by a separate worker, this can mean a faster simulation on machines with several CPUs. However ,If the number is too low, the overhad of splitting the grid will not be worth the time gained through parallelization. (Default: 200).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": 200,
+          "required": false,
+          "spec": null
+        }
+      ],
       "required": false,
       "spec": {
         "type": "integer",
         "minimum": 1
       }
-    },
-    {
-      "type": "DAGStringInput",
-      "annotations": {},
-      "name": "sensor-grid",
-      "description": "A grid name or a pattern to filter the sensor grids. By default all the grids in HBJSON model will be exported.",
-      "default": "*",
-      "alias": [],
-      "required": false,
-      "spec": null
     }
   ],
   "outputs": [
@@ -148,7 +190,7 @@
       "type": "DAGFolderOutput",
       "annotations": {},
       "name": "results",
-      "description": null,
+      "description": "Folder with raw result files (.res) that contain daylight factor values for each sensor.",
       "from": {
         "type": "FolderReference",
         "annotations": {},
@@ -158,8 +200,8 @@
         {
           "type": "DAGGenericOutputAlias",
           "annotations": {},
-          "name": "daylight_factor",
-          "description": "Daylight factor values.",
+          "name": "results",
+          "description": "Daylight factor values. These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize results.",
           "platform": [
             "grasshopper"
           ],

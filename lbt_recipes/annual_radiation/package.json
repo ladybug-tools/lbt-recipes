@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "annual-radiation",
-    "tag": "0.1.5",
+    "tag": "0.1.8",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -46,6 +46,30 @@
   "source": null,
   "inputs": [
     {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "grid-filter",
+      "description": "Text for a grid identifer or a pattern to filter the sensor grids of the model that are simulated. For instance, first_floor_* will simulate only the sensor grids that have an identifier that starts with first_floor_. By default, all grids in the model will be simulated.",
+      "default": "*",
+      "alias": [
+        {
+          "type": "DAGStringInputAlias",
+          "annotations": {},
+          "name": "grid_filter",
+          "description": "Text for a grid identifer or a pattern to filter the sensor grids of the model that are simulated. For instance, first_floor_* will simulate only the sensor grids that have an identifier that starts with first_floor_. By default, all grids in the model will be simulated.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": "*",
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": null
+    },
+    {
       "type": "DAGFileInput",
       "annotations": {},
       "name": "model",
@@ -56,7 +80,7 @@
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "model",
-          "description": "A path to a HBJSON file or a HB model object built with Python or dotnet libraries.",
+          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large.",
           "platform": [
             "grasshopper"
           ],
@@ -72,7 +96,7 @@
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "HoneybeeSchema.Handlers",
+              "module": "Pollination.Handlers",
               "function": "HBModelToJSON"
             }
           ],
@@ -93,7 +117,7 @@
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "HoneybeeRhino.Handlers",
+              "module": "Pollination.Handlers",
               "function": "RhinoHBModelToJSON"
             }
           ],
@@ -120,7 +144,7 @@
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "north",
-          "description": "Either a Vector2D for the north direction or a number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees.",
+          "description": "A number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees. This can also be Vector for the direction to North. (Default: 0).",
           "platform": [
             "grasshopper"
           ],
@@ -133,8 +157,8 @@
               "function": "north_vector_to_angle"
             }
           ],
-          "default": null,
-          "required": true,
+          "default": "0",
+          "required": false,
           "spec": null
         }
       ],
@@ -151,7 +175,21 @@
       "name": "radiance-parameters",
       "description": "Radiance parameters for ray tracing.",
       "default": "-ab 2 -ad 5000 -lw 2e-05",
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGStringInputAlias",
+          "annotations": {},
+          "name": "radiance_par",
+          "description": "Text for the radiance parameters to be used for ray tracing. (Default: -ab 2 -ad 5000 -lw 2e-05).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": "-ab 2 -ad 5000 -lw 2e-05",
+          "required": false,
+          "spec": null
+        }
+      ],
       "required": false,
       "spec": null
     },
@@ -161,22 +199,26 @@
       "name": "sensor-count",
       "description": "The maximum number of grid points per parallel execution.",
       "default": 200,
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGIntegerInputAlias",
+          "annotations": {},
+          "name": "sensor_count",
+          "description": "Positive integer for the number of sensor grid points per parallel execution. Lower numbers will result in sensor grids being split into more pieces and, since each grid piece is run by a separate worker, this can mean a faster simulation on machines with several CPUs. However ,If the number is too low, the overhad of splitting the grid will not be worth the time gained through parallelization. (Default: 200).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": 200,
+          "required": false,
+          "spec": null
+        }
+      ],
       "required": false,
       "spec": {
         "type": "integer",
         "minimum": 1
       }
-    },
-    {
-      "type": "DAGStringInput",
-      "annotations": {},
-      "name": "sensor-grid",
-      "description": "A grid name or a pattern to filter the sensor grids. By default all the grids in HBJSON model will be exported.",
-      "default": "*",
-      "alias": [],
-      "required": false,
-      "spec": null
     },
     {
       "type": "DAGFileInput",
@@ -189,7 +231,7 @@
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "wea",
-          "description": "Either a Wea python object or the path to a wea or an epw file.",
+          "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
           "platform": [
             "grasshopper"
           ],
@@ -219,7 +261,7 @@
       "type": "DAGFolderOutput",
       "annotations": {},
       "name": "direct-radiation",
-      "description": null,
+      "description": "Folder with raw result files (.ill) that contain matrices of direct irradiance.",
       "from": {
         "type": "FolderReference",
         "annotations": {},
@@ -229,8 +271,8 @@
         {
           "type": "DAGGenericOutputAlias",
           "annotations": {},
-          "name": "annual_daylight",
-          "description": "Annual daylight result files.",
+          "name": "direct",
+          "description": "Raw result files (.ill) that contain irradiance matrices for the direct radiation at each sensor and timestep.",
           "platform": [
             "grasshopper"
           ],
@@ -251,7 +293,7 @@
       "type": "DAGFolderOutput",
       "annotations": {},
       "name": "total-radiation",
-      "description": null,
+      "description": "Folder with raw result files (.ill) that contain matrices of total irradiance.",
       "from": {
         "type": "FolderReference",
         "annotations": {},
@@ -261,8 +303,8 @@
         {
           "type": "DAGGenericOutputAlias",
           "annotations": {},
-          "name": "annual_daylight",
-          "description": "Annual daylight result files.",
+          "name": "total",
+          "description": "Raw result files (.ill) that contain irradiance matrices for the total radiation at each sensor and timestep.",
           "platform": [
             "grasshopper"
           ],
