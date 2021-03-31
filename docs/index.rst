@@ -3,9 +3,9 @@ Welcome to lbt-recipes' documentation!
 
 A collection of recipes that ship with the Ladybug Tools plugins.
 
-This includes Radiance recipes, which automate the process of running daylight and radiation studies using [Radiance](http://radiance-online.org/).
+This includes Radiance recipes, which automate the process of running daylight and radiation studies using `Radiance <https://radiance-online.org/>`_.
 
-It also includes microclimate mapping recipes, which spatially map thermal comfort using [EnergyPlus](https://github.com/NREL/EnergyPlus) and [Radiance](http://radiance-online.org/).
+It also includes microclimate mapping recipes, which spatially map thermal comfort using `EnergyPlus <https://github.com/NREL/EnergyPlus/>`_ and `Radiance <https://radiance-online.org/>`_.
 
 Installation
 ============
