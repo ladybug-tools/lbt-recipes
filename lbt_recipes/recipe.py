@@ -195,7 +195,10 @@ class Recipe(object):
                 path_basename = os.path.basename(inp.value)
                 dest = os.path.join(p_fold, path_basename)
                 if os.path.isfile(inp.value):
-                    shutil.copyfile(inp.value, dest)
+                    try:
+                        shutil.copyfile(inp.value, dest)
+                    except shutil.SameFileError:
+                        pass  # the file is already in the right place; no need to copy
                 elif os.path.isdir(inp.value):
                     copy_file_tree(inp.value, dest, overwrite=True)
                 inp_dict[inp.name] = path_basename
@@ -209,7 +212,7 @@ class Recipe(object):
         return file_path
 
     def run(self, settings=None, radiance_check=False, openstudio_check=False,
-            energyplus_check=False):
+            energyplus_check=False, queenbee_path=None):
         """Run the recipe using the queenbee local run command.
 
         Args:
@@ -229,6 +232,9 @@ class Recipe(object):
                 EnergyPlus should be checked before executing the recipe. If there
                 is no compatible version installed, an exception will be raised
                 with a clear error message. (Default: False).
+            queenbee_path: Optional path to the queenbee executable. If None, the
+                queenbee within the ladybug_tools Python folder will be used.
+                Setting this to just 'queenbee' will use the system Python.
 
         Returns:
             Path to the project folder containing the recipe results.
@@ -268,11 +274,12 @@ class Recipe(object):
         env_args = ['--env {}="{}"'.format(k, v) for k, v in genv.items()]
 
         # create command
+        qb_path = os.path.join(folders.python_scripts_path, 'queenbee') \
+            if queenbee_path is None else queenbee_path
         command = '"{qb_path}" local run "{recipe_folder}" ' \
             '"{project_folder}" -i "{user_inputs}" --workers {workers} ' \
             '{environment} --name {simulation_name}'.format(
-                qb_path=os.path.join(folders.python_scripts_path, 'queenbee'),
-                recipe_folder=self.path, project_folder=folder,
+                qb_path=qb_path, recipe_folder=self.path, project_folder=folder,
                 user_inputs=inputs_json, workers=settings.workers,
                 environment=' '.join(env_args),
                 simulation_name=self.simulation_id
