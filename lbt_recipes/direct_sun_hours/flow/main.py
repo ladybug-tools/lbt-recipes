@@ -15,7 +15,7 @@ See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0
 import luigi
 import os
 from queenbee_local import QueenbeeTask
-from .dependencies.direct_sun_hours_entry_loop import _DirectSunHoursEntryLoop_ddc7a9efOrchestrator as DirectSunHoursEntryLoop_ddc7a9efWorkerbee
+from .dependencies.direct_sun_hours_entry_loop import _DirectSunHoursEntryLoop_e811664fOrchestrator as DirectSunHoursEntryLoop_e811664fWorkerbee
 
 
 _default_inputs = {   'grid_filter': '*',
@@ -25,6 +25,61 @@ _default_inputs = {   'grid_filter': '*',
     'sensor_count': 200,
     'simulation_folder': '.',
     'wea': None}
+
+
+class ConvertWeaToConstant(QueenbeeTask):
+    """Convert a Wea file to have a constant value for each datetime.
+
+    This is useful in workflows where hourly irradiance values are inconsequential
+    to the analysis and one is only using the Wea as a format to pass location
+    and datetime information (eg. for direct sun hours)."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+
+    # Task inputs
+    value = luigi.Parameter(default='1000')
+
+    @property
+    def wea(self):
+        value = self._input_params['wea'].replace('\\', '/')
+        return value if os.path.isabs(value) \
+            else os.path.join(self.initiation_folder, value)
+
+    @property
+    def execution_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def initiation_folder(self):
+        return self._input_params['simulation_folder'].replace('\\', '/')
+
+    @property
+    def params_folder(self):
+        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+
+    def command(self):
+        return 'ladybug translate wea-to-constant weather.wea --value {value} --output-file constant.wea'.format(value=self.value)
+
+    def output(self):
+        return {
+            'constant_wea': luigi.LocalTarget(
+                os.path.join(self.execution_folder, 'resources/constant.wea')
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'wea', 'to': 'weather.wea', 'from': self.wea, 'optional': False}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'constant-wea', 'from': 'constant.wea',
+                'to': os.path.join(self.execution_folder, 'resources/constant.wea')
+            }]
 
 
 class CopyGridInfo(QueenbeeTask):
@@ -301,7 +356,7 @@ class DirectSunHoursRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DirectSunHoursEntryLoop_ddc7a9efWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [DirectSunHoursEntryLoop_e811664fWorkerbee(_input_params=self.map_dag_inputs)]
         os.makedirs(self.execution_folder, exist_ok=True)
         with open(os.path.join(self.execution_folder, 'direct_sun_hours_raytracing.done'), 'w') as out_file:
             out_file.write('done!\n')
@@ -378,7 +433,7 @@ class GenerateSunpath(QueenbeeTask):
 
     @property
     def wea(self):
-        value = self._input_params['wea'].replace('\\', '/')
+        value = self.input()['ConvertWeaToConstant']['constant_wea'].path.replace('\\', '/')
         return value if os.path.isabs(value) \
             else os.path.join(self.initiation_folder, value)
 
@@ -396,6 +451,9 @@ class GenerateSunpath(QueenbeeTask):
 
     def command(self):
         return 'gendaymtx -n -D sunpath.mtx -M suns.mod -O{output_type} -r {north} -v sky.wea'.format(output_type=self.output_type, north=self.north)
+
+    def requires(self):
+        return {'ConvertWeaToConstant': ConvertWeaToConstant(_input_params=self._input_params)}
 
     def output(self):
         return {
@@ -483,7 +541,7 @@ class ParseSunUpHours(QueenbeeTask):
             }]
 
 
-class _Main_ddc7a9efOrchestrator(luigi.WrapperTask):
+class _Main_e811664fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

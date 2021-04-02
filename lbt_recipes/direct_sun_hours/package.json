@@ -268,19 +268,6 @@
     {
       "type": "DAGFolderOutput",
       "annotations": {},
-      "name": "direct-radiation",
-      "description": "Hourly direct radiation results. These results only includes the direct radiation from sun disk.",
-      "from": {
-        "type": "FolderReference",
-        "annotations": {},
-        "path": "results/direct_radiation"
-      },
-      "alias": [],
-      "required": true
-    },
-    {
-      "type": "DAGFolderOutput",
-      "annotations": {},
       "name": "direct-sun-hours",
       "description": "Hourly results for direct sun hours.",
       "from": {

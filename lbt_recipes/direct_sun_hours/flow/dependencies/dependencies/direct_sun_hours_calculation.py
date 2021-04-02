@@ -97,13 +97,17 @@ class ConvertToSunHours(QueenbeeTask):
     def grid_name(self):
         return self._input_params['grid_name']
 
+    @property
+    def minimum(self):
+        return '0'
+
+    @property
+    def include_min(self):
+        return 'exclude'
+
     include_max = luigi.Parameter(default='include')
 
-    include_min = luigi.Parameter(default='include')
-
     maximum = luigi.Parameter(default='1e+100')
-
-    minimum = luigi.Parameter(default='-1e+100')
 
     reverse = luigi.Parameter(default='comply')
 
@@ -240,7 +244,7 @@ class DirectRadiationCalculation(QueenbeeTask):
             }]
 
 
-class _DirectSunHoursCalculation_ddc7a9efOrchestrator(luigi.WrapperTask):
+class _DirectSunHoursCalculation_e811664fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
