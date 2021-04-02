@@ -15,7 +15,7 @@ See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0
 import luigi
 import os
 from queenbee_local import QueenbeeTask
-from .dependencies.direct_sun_hours_calculation import _DirectSunHoursCalculation_ddc7a9efOrchestrator as DirectSunHoursCalculation_ddc7a9efWorkerbee
+from .dependencies.direct_sun_hours_calculation import _DirectSunHoursCalculation_e811664fOrchestrator as DirectSunHoursCalculation_e811664fWorkerbee
 
 
 _default_inputs = {   'grid_name': None,
@@ -105,7 +105,7 @@ class DirectSunlightLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DirectSunHoursCalculation_ddc7a9efWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [DirectSunHoursCalculation_e811664fWorkerbee(_input_params=self.map_dag_inputs)]
         os.makedirs(self.execution_folder, exist_ok=True)
         with open(os.path.join(self.execution_folder, 'direct_sunlight.done'), 'w') as out_file:
             out_file.write('done!\n')
@@ -285,66 +285,6 @@ class MergeDirectSunHours(QueenbeeTask):
             }]
 
 
-class MergeRadiationResults(QueenbeeTask):
-    """Merge several files with similar starting name into one."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def name(self):
-        return self._input_params['grid_name']
-
-    @property
-    def extension(self):
-        return '.ill'
-
-    @property
-    def folder(self):
-        value = 'direct-radiation'.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
-
-    @property
-    def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
-
-    @property
-    def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
-
-    @property
-    def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
-
-    def command(self):
-        return 'honeybee-radiance grid merge input_folder grid {extension} --name {name}'.format(extension=self.extension, name=self.name)
-
-    def requires(self):
-        return {'DirectSunlight': DirectSunlight(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'result_file': luigi.LocalTarget(
-                os.path.join(self.execution_folder, '../../results/direct_radiation/{name}.ill'.format(name=self.name))
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'folder', 'to': 'input_folder', 'from': self.folder, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'result-file', 'from': '{name}{extension}'.format(name=self.name, extension=self.extension),
-                'to': os.path.join(self.execution_folder, '../../results/direct_radiation/{name}.ill'.format(name=self.name))
-            }]
-
-
 class SplitGrid(QueenbeeTask):
     """Split a single sensor grid file into multiple smaller grids."""
 
@@ -408,7 +348,7 @@ class SplitGrid(QueenbeeTask):
         return [{'name': 'grids-list', 'from': 'output/grids_info.json', 'to': os.path.join(self.params_folder, 'output/grids_info.json')}]
 
 
-class _DirectSunHoursEntryLoop_ddc7a9efOrchestrator(luigi.WrapperTask):
+class _DirectSunHoursEntryLoop_e811664fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -420,4 +360,4 @@ class _DirectSunHoursEntryLoop_ddc7a9efOrchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        return [MergeCumulativeSunHours(_input_params=self.input_values), MergeDirectSunHours(_input_params=self.input_values), MergeRadiationResults(_input_params=self.input_values)]
+        return [MergeCumulativeSunHours(_input_params=self.input_values), MergeDirectSunHours(_input_params=self.input_values)]
