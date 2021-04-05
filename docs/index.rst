@@ -10,40 +10,16 @@ It also includes microclimate mapping recipes, which spatially map thermal comfo
 Installation
 ============
 
-```console
-pip install lbt-recipes
-```
+To install the library use ``pip install -U lbt-recipes``.
 
-Local Development
-=================
-
-1) Clone this repo locally
-
-
-   ``git clone git@github.com:ladybug-tools/lbt-recipes``
-
-   # or
-
-   ``git clone https://github.com/ladybug-tools/lbt-recipes``
-
-
-2) Install dependencies::
-
-      cd lbt-recipes
-      pip install -r dev-requirements.txt
-      pip install -r requirements.txt
-
-
-3) Run Tests:
-
-   ``python -m pytest ./tests``
-
+To check if the command line interface is installed correctly use ``lbt-recipes viz`` and you
+should get a ``viiiiiiiiiiiiizzzzzzzzz!`` back in response!
 
 lbt_recipes
 =============
 
 .. toctree::
-  :maxdepth: 2
+  :maxdepth: 4
 
   modules
 

@@ -10,9 +10,10 @@ It also includes microclimate mapping recipes, which spatially map thermal comfo
 
 ## Installation
 
-```console
-pip install lbt-recipes
-```
+`pip install -U lbt-recipes`
+
+To check if command line interface is installed correctly use `lbt-recipes viz` and you
+should get a `viiiiiiiiiiiiizzzzzzzzz!` back in response!
 
 ## Local Development
 
