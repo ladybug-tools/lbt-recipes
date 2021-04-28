@@ -1,0 +1,30 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "11:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: queenbee-local
+    versions:
+    - 0.3.11
+    - 0.3.5
+  - dependency-name: lbt-honeybee
+    versions:
+    - 0.3.17
+    - 0.4.16
+    - 0.4.17
+    - 0.4.2
+    - 0.4.34
+    - 0.4.38
+    - 0.4.39
+    - 0.4.4
+    - 0.4.6
+    - 0.4.74
+    - 0.4.77
+  commit-message:
+    prefix: fix
+    prefix-development: chore
+    include: scope
