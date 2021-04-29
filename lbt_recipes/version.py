@@ -29,9 +29,9 @@ def check_openstudio_version():
     assert energy_folders.openstudio_path is not None, \
         'No OpenStudio installation was found on this machine.\n{}'.format(in_msg)
     os_version = energy_folders.openstudio_version
-    assert os_version is not None and os_version >= COMPATIBILITY_URL, \
+    assert os_version is not None and os_version >= OS_VERSION, \
         'The installed OpenStudio is not version {} or greater.' \
-        '\n{}'.format('.'.join(str(v) for v in COMPATIBILITY_URL), in_msg)
+        '\n{}'.format('.'.join(str(v) for v in OS_VERSION), in_msg)
 
 
 def check_energyplus_version():
