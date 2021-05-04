@@ -1,5 +1,5 @@
 lbt-honeybee==0.4.101
-pytest==6.2.3
+pytest==6.2.4
 Sphinx==3.5.4
 sphinx-bootstrap-theme==0.7.1
 sphinxcontrib-fulltoc==1.2.0
