@@ -1,6 +1,6 @@
 lbt-honeybee==0.4.111
 pytest==6.2.4
-Sphinx==3.5.4
+Sphinx==4.0.0
 sphinx-bootstrap-theme==0.7.1
 sphinxcontrib-fulltoc==1.2.0
 sphinxcontrib-websupport==1.2.4
