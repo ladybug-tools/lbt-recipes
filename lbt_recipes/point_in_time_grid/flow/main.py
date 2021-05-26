@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.point_in_time_grid_ray_tracing import _PointInTimeGridRayTracing_d6dbc3faOrchestrator as PointInTimeGridRayTracing_d6dbc3faWorkerbee
+from .dependencies.point_in_time_grid_ray_tracing import _PointInTimeGridRayTracing_dcea838eOrchestrator as PointInTimeGridRayTracing_dcea838eWorkerbee
 
 
 _default_inputs = {   'grid_filter': '*',
@@ -27,6 +27,65 @@ _default_inputs = {   'grid_filter': '*',
     'sensor_count': 200,
     'simulation_folder': '.',
     'sky': 'cie 21 Jun 12:00 -lat 0 -lon 0 -tz 0 -type 0'}
+
+
+class AdjustSky(QueenbeeTask):
+    """Adjust a sky file to ensure it is suitable for a given metric.
+
+    Specifcally, this ensures that skies being created with gendaylit have a -O
+    option that aligns with visible vs. solar energy."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+
+    # Task inputs
+    @property
+    def metric(self):
+        return self._input_params['metric']
+
+    @property
+    def sky(self):
+        value = pathlib.Path(self.input()['GenerateSky']['sky'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def execution_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def initiation_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def params_folder(self):
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    def command(self):
+        return 'honeybee-radiance sky adjust-for-metric {sky} --metric {metric} --name output.sky'.format(sky=self.sky, metric=self.metric)
+
+    def requires(self):
+        return {'GenerateSky': GenerateSky(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            'adjusted_sky': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'resources/weather.sky').resolve().as_posix()
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'sky', 'to': 'input.sky', 'from': self.sky, 'optional': False}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'adjusted-sky', 'from': 'output.sky',
+                'to': pathlib.Path(self.execution_folder, 'resources/weather.sky').resolve().as_posix()
+            }]
 
 
 class CreateOctree(QueenbeeTask):
@@ -48,7 +107,7 @@ class CreateOctree(QueenbeeTask):
 
     @property
     def sky(self):
-        value = pathlib.Path(self.input()['GenerateSky']['sky'].path)
+        value = pathlib.Path(self.input()['AdjustSky']['adjusted_sky'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -68,7 +127,7 @@ class CreateOctree(QueenbeeTask):
         return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out} --add-before sky.sky'.format(include_aperture=self.include_aperture, black_out=self.black_out)
 
     def requires(self):
-        return {'GenerateSky': GenerateSky(_input_params=self._input_params), 'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
+        return {'AdjustSky': AdjustSky(_input_params=self._input_params), 'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
 
     def output(self):
         return {
@@ -280,7 +339,7 @@ class PointInTimeGridRayTracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [PointInTimeGridRayTracing_d6dbc3faWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [PointInTimeGridRayTracing_dcea838eWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'point_in_time_grid_ray_tracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -340,7 +399,7 @@ class PointInTimeGridRayTracing(luigi.Task):
         }
 
 
-class _Main_d6dbc3faOrchestrator(luigi.WrapperTask):
+class _Main_dcea838eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -36,7 +36,7 @@ class LetPointInTimeGridFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [point_in_time_grid_workerbee._Main_d6dbc3faOrchestrator(_input_params=self._input_params)]
+        yield [point_in_time_grid_workerbee._Main_dcea838eOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

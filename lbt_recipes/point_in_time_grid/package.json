@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "point-in-time-grid",
-    "tag": "0.1.1",
+    "tag": "0.1.3",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -34,7 +34,7 @@
     "sources": [
       "https://hub.docker.com/r/ladybugtools/honeybee-radiance"
     ],
-    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/dfrecipe.png",
+    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/gridrecipe.png",
     "deprecated": null,
     "description": "Point-in-time grid-based recipe for Pollination.",
     "license": {
