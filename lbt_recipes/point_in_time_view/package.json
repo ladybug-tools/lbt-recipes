@@ -1,0 +1,304 @@
+{
+  "type": "RecipeInterface",
+  "annotations": {},
+  "api_version": "v1beta1",
+  "metadata": {
+    "type": "MetaData",
+    "annotations": {},
+    "name": "point-in-time-view",
+    "tag": "0.1.1",
+    "app_version": null,
+    "keywords": [
+      "honeybee",
+      "radiance",
+      "ladybug-tools",
+      "illuminance",
+      "irradiance",
+      "point-in-time-view"
+    ],
+    "maintainers": [
+      {
+        "type": "Maintainer",
+        "annotations": {},
+        "name": "chris",
+        "email": "chris@ladybug.tools"
+      },
+      {
+        "type": "Maintainer",
+        "annotations": {},
+        "name": "ladybug-tools",
+        "email": "info@ladybug.tools"
+      }
+    ],
+    "home": "https://github.com/pollination/point-in-time-view",
+    "sources": [
+      "https://hub.docker.com/r/ladybugtools/honeybee-radiance"
+    ],
+    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/viewrecipe.png",
+    "deprecated": null,
+    "description": "Point-in-time view-based recipe for Pollination.",
+    "license": {
+      "type": "License",
+      "annotations": {},
+      "name": "PolyForm Shield License 1.0.0",
+      "url": "https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt"
+    }
+  },
+  "source": null,
+  "inputs": [
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "metric",
+      "description": "Text for the type of metric to be output from the calculation. Choose from: illuminance, irradiance, luminance, radiance.",
+      "default": "luminance",
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "metric",
+          "description": "Either an integer or the full name of a point-in-time metric to be computed by the recipe. (Default: luminance). Choose from the following:\n* 0 = illuminance\n* 1 = irradiance\n* 2 = luminance\n* 3 = radiance",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.pit",
+              "function": "point_in_time_metric_to_str",
+              "index": 0
+            }
+          ],
+          "default": "luminance",
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": {
+        "type": "string",
+        "enum": [
+          "illuminance",
+          "irradiance",
+          "luminance",
+          "radiance"
+        ]
+      }
+    },
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "model",
+      "description": "A Honeybee model in HBJSON file format.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.model",
+              "function": "model_to_json",
+              "index": 0
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "HBModelToJSON",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        },
+        {
+          "type": "DAGLinkedInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "This input links the model to Rhino model.",
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "RhinoHBModelToJSON",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": true,
+      "spec": null,
+      "extensions": [
+        "json",
+        "hbjson",
+        "pkl",
+        "hbplk"
+      ]
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "radiance-parameters",
+      "description": "The radiance parameters for ray tracing",
+      "default": "-ab 2 -aa 0.1 -ad 2048 -ar 64",
+      "alias": [
+        {
+          "type": "DAGStringInputAlias",
+          "annotations": {},
+          "name": "radiance_par",
+          "description": "Text for the radiance parameters to be used for ray tracing. (Default: -ab 2 -aa 0.1 -ad 2048 -ar 64).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": "-ab 2 -aa 0.1 -ad 2048 -ar 64",
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": null
+    },
+    {
+      "type": "DAGIntegerInput",
+      "annotations": {},
+      "name": "resolution",
+      "description": "An integer for the maximum dimension of each image in pixels (either width or height depending on the input view angle and type).",
+      "default": 512,
+      "alias": [],
+      "required": false,
+      "spec": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "skip-overture",
+      "description": "A switch to note whether an ambient file (.amb) should be generated for an overture calculation before the view is split into smaller views. With an overture calculation, the ambient file (aka ambient cache) is first populated with values. Thereby ensuring that - when reused to create an image - Radiance uses interpolation between already calculated values rather than less reliable extrapolation. The overture calculation has comparatively small computation time to full rendering but is single-core can become time consuming in situations with very high numbers of rendering multiprocessors.",
+      "default": "overture",
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "skip_overture",
+          "description": "A boolean to note whether an ambient file (.amb) should be generated for an overture calculation before the view is split into smaller views. With an overture calculation, the ambient file (aka ambient cache) is first populated with values. Thereby ensuring that - when reused to create an image - Radiance uses interpolation between already calculated values rather than less reliable extrapolation. The overture calculation has comparatively small computation time to full rendering but is single-core can become time consuming in situations with very high numbers of rendering multiprocessors.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.bool_options",
+              "function": "skip_overture_to_str",
+              "index": 0
+            }
+          ],
+          "default": "False",
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": {
+        "type": "string",
+        "enum": [
+          "overture",
+          "skip-overture"
+        ]
+      }
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "sky",
+      "description": "Sky string for any type of sky (cie, climate-based, irradiance, illuminance). This can be a minimal representation of the sky through altitude and azimuth (eg. \"cie -alt 71.6 -az 185.2 -type 0\"). Or it can be a detailed specification of time and location (eg. \"climate-based 21 Jun 12:00 -lat 41.78 -lon -87.75 -tz 5 -dni 800 -dhi 120\"). Both the altitude and azimuth must be specified for the minimal representation to be used. See the honeybee-radiance sky CLI group for a full list of options (https://www.ladybug.tools/honeybee-radiance/docs/cli/sky.html).",
+      "default": null,
+      "alias": [],
+      "required": true,
+      "spec": null
+    },
+    {
+      "type": "DAGIntegerInput",
+      "annotations": {},
+      "name": "view-count",
+      "description": "Number of views into which each Model view will be subdivided for parallelized calculation.",
+      "default": 2,
+      "alias": [],
+      "required": false,
+      "spec": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "view-filter",
+      "description": "Text for a view identifer or a pattern to filter the views of the model that are simulated. For instance, first_floor_* will simulate only the views that have an identifier that starts with first_floor_. By default, all views in the model will be simulated.",
+      "default": "*",
+      "alias": [],
+      "required": false,
+      "spec": null
+    }
+  ],
+  "outputs": [
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "results",
+      "description": "Folder with raw image files (.HDR) that contain images for each view.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "results"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "results",
+          "description": "High Dynamic Range (HDR) images for each View in the model. These can be plugged into the Ladybug \"Image Viewer\" component to preview the image. They can also be plugged into the \"HB False Color\" component to convert the image into a false color version. Lastly, it can be connected to the \"HB HDR to GIF\" component to get a GIF image that is more portable and easily previewed by different software. Pixel values are in the standard SI units of the requested input metric.\n* illuminance = lux\n* irradiance = W/m2\n* luminance = cd/m2\n* radiance = W/m2-sr",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_images_from_folder",
+              "index": 0
+            }
+          ]
+        }
+      ],
+      "required": true
+    }
+  ]
+}
