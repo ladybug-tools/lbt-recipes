@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "point-in-time-grid",
-    "tag": "0.1.3",
+    "tag": "0.1.6",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -20,8 +20,8 @@
       {
         "type": "Maintainer",
         "annotations": {},
-        "name": "mostapha",
-        "email": "mostapha@ladybug.tools"
+        "name": "chris",
+        "email": "chris@ladybug.tools"
       },
       {
         "type": "Maintainer",
@@ -81,7 +81,7 @@
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "metric",
-          "description": "Either an integer or the full name of a point-in-time metric to be computed by the recipe. Choose from the following:\n* 0 = illuminance\n* 1 = irradiance\n* 2 = luminance\n* 3 = radiance",
+          "description": "Either an integer or the full name of a point-in-time metric to be computed by the recipe. (Default: illuminance). Choose from the following:\n* 0 = illuminance\n* 1 = irradiance\n* 2 = luminance\n* 3 = radiance",
           "platform": [
             "grasshopper"
           ],
@@ -91,7 +91,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.pit",
-              "function": "point_in_time_metric_to_str"
+              "function": "point_in_time_metric_to_str",
+              "index": 0
             }
           ],
           "default": "illuminance",
@@ -131,14 +132,16 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.model",
-              "function": "model_to_json"
+              "function": "model_to_json",
+              "index": 0
             },
             {
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
               "module": "Pollination.RhinoHandlers",
-              "function": "HBModelToJSON"
+              "function": "HBModelToJSON",
+              "index": 0
             }
           ],
           "default": null,
@@ -159,7 +162,8 @@
               "annotations": {},
               "language": "csharp",
               "module": "Pollination.RhinoHandlers",
-              "function": "RhinoHBModelToJSON"
+              "function": "RhinoHBModelToJSON",
+              "index": 0
             }
           ],
           "default": null,
@@ -230,9 +234,9 @@
       "annotations": {},
       "name": "sky",
       "description": "Sky string for any type of sky (cie, climate-based, irradiance, illuminance). This can be a minimal representation of the sky through altitude and azimuth (eg. \"cie -alt 71.6 -az 185.2 -type 0\"). Or it can be a detailed specification of time and location (eg. \"climate-based 21 Jun 12:00 -lat 41.78 -lon -87.75 -tz 5 -dni 800 -dhi 120\"). Both the altitude and azimuth must be specified for the minimal representation to be used. See the honeybee-radiance sky CLI group for a full list of options (https://www.ladybug.tools/honeybee-radiance/docs/cli/sky.html).",
-      "default": "cie 21 Jun 12:00 -lat 0 -lon 0 -tz 0 -type 0",
+      "default": null,
       "alias": [],
-      "required": false,
+      "required": true,
       "spec": null
     }
   ],
@@ -252,7 +256,7 @@
           "type": "DAGGenericOutputAlias",
           "annotations": {},
           "name": "results",
-          "description": "Numbers for the point-in-time value at each sensor. Values are in the standard SI units of the requested input metric.\n* illuminance = lux\n* irradiance = W/m2\n* luminance = cd/m2\n* radiance = W/m2-sr\nThese can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize results.",
+          "description": "Numbers for the point-in-time value at each sensor. These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize results. Values are in the standard SI units of the requested input metric.\n* illuminance = lux\n* irradiance = W/m2\n* luminance = cd/m2\n* radiance = W/m2-sr",
           "platform": [
             "grasshopper"
           ],
@@ -262,7 +266,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.daylight",
-              "function": "read_pit_from_folder"
+              "function": "read_pit_from_folder",
+              "index": 0
             }
           ]
         }

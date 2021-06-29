@@ -4,7 +4,7 @@ you should be editing this file directly. Instead try to edit the recipe
 itself and regenerate the code.
 
 Contact the recipe maintainers with additional questions.
-    mostapha: mostapha@ladybug.tools
+    chris: chris@ladybug.tools
     ladybug-tools: info@ladybug.tools
 
 This file is licensed under "PolyForm Shield License 1.0.0".
@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.point_in_time_grid_ray_tracing import _PointInTimeGridRayTracing_dcea838eOrchestrator as PointInTimeGridRayTracing_dcea838eWorkerbee
+from .dependencies.point_in_time_grid_ray_tracing import _PointInTimeGridRayTracing_7f412068Orchestrator as PointInTimeGridRayTracing_7f412068Workerbee
 
 
 _default_inputs = {   'grid_filter': '*',
@@ -26,7 +26,7 @@ _default_inputs = {   'grid_filter': '*',
     'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64',
     'sensor_count': 200,
     'simulation_folder': '.',
-    'sky': 'cie 21 Jun 12:00 -lat 0 -lon 0 -tz 0 -type 0'}
+    'sky': None}
 
 
 class AdjustSky(QueenbeeTask):
@@ -62,7 +62,7 @@ class AdjustSky(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance sky adjust-for-metric {sky} --metric {metric} --name output.sky'.format(sky=self.sky, metric=self.metric)
+        return 'honeybee-radiance sky adjust-for-metric {sky} --metric {metric}'.format(sky=self.sky, metric=self.metric)
 
     def requires(self):
         return {'GenerateSky': GenerateSky(_input_params=self._input_params)}
@@ -83,8 +83,9 @@ class AdjustSky(QueenbeeTask):
     def output_artifacts(self):
         return [
             {
-                'name': 'adjusted-sky', 'from': 'output.sky',
-                'to': pathlib.Path(self.execution_folder, 'resources/weather.sky').resolve().as_posix()
+                'name': 'adjusted-sky', 'from': '{metric}.sky'.format(metric=self.metric),
+                'to': pathlib.Path(self.execution_folder, 'resources/weather.sky').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -147,7 +148,8 @@ class CreateOctree(QueenbeeTask):
         return [
             {
                 'name': 'scene-file', 'from': 'scene.oct',
-                'to': pathlib.Path(self.execution_folder, 'resources/scene.oct').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/scene.oct').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -190,6 +192,10 @@ class CreateRadFolder(QueenbeeTask):
                 pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
             ),
             
+            'bsdf_folder': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
+            ),
+            
             'model_sensor_grids_file': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix()
             ),
@@ -210,12 +216,20 @@ class CreateRadFolder(QueenbeeTask):
         return [
             {
                 'name': 'model-folder', 'from': 'model',
-                'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix(),
+                'optional': False
+            },
+                
+            {
+                'name': 'bsdf-folder', 'from': 'model/bsdf',
+                'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix(),
+                'optional': False
             },
                 
             {
                 'name': 'model-sensor-grids-file', 'from': 'model/grid/_model_grids_info.json',
-                'to': pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix(),
+                'optional': False
             }]
 
     @property
@@ -261,7 +275,8 @@ class GenerateSky(QueenbeeTask):
         return [
             {
                 'name': 'sky', 'from': 'output.sky',
-                'to': pathlib.Path(self.execution_folder, 'resources/weather.sky').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/weather.sky').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -300,6 +315,12 @@ class PointInTimeGridRayTracingLoop(luigi.Task):
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
+    @property
+    def bsdfs(self):
+        value = pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
     # get item for loop
     try:
         item = luigi.DictParameter()
@@ -328,7 +349,8 @@ class PointInTimeGridRayTracingLoop(luigi.Task):
             'metric': self.metric,
             'octree_file': self.octree_file,
             'grid_name': self.grid_name,
-            'sensor_grid': self.sensor_grid
+            'sensor_grid': self.sensor_grid,
+            'bsdfs': self.bsdfs
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -339,7 +361,7 @@ class PointInTimeGridRayTracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [PointInTimeGridRayTracing_dcea838eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [PointInTimeGridRayTracing_7f412068Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'point_in_time_grid_ray_tracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -399,7 +421,7 @@ class PointInTimeGridRayTracing(luigi.Task):
         }
 
 
-class _Main_dcea838eOrchestrator(luigi.WrapperTask):
+class _Main_7f412068Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

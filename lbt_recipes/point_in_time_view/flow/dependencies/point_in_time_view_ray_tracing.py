@@ -18,7 +18,8 @@ import pathlib
 from queenbee_local import QueenbeeTask
 
 
-_default_inputs = {   'metric': 'luminance',
+_default_inputs = {   'bsdfs': None,
+    'metric': 'luminance',
     'octree_file': None,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64',
@@ -90,7 +91,8 @@ class MergeResults(QueenbeeTask):
         return [
             {
                 'name': 'result-image', 'from': '{name}.HDR'.format(name=self.name),
-                'to': pathlib.Path(self.execution_folder, '../../results/{name}.HDR'.format(name=self.name)).resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, '../../results/{name}.HDR'.format(name=self.name)).resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -140,6 +142,12 @@ class RayTracingLoop(QueenbeeTask):
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
+    @property
+    def bsdf_folder(self):
+        value = pathlib.Path(self._input_params['bsdfs'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
     # get item for loop
     try:
         item = luigi.DictParameter()
@@ -176,14 +184,16 @@ class RayTracingLoop(QueenbeeTask):
         return [
             {'name': 'ambient_cache', 'to': 'view.amb', 'from': self.ambient_cache, 'optional': True},
             {'name': 'view', 'to': 'view.vf', 'from': self.view, 'optional': False},
-            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False}]
+            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False},
+            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': False}]
 
     @property
     def output_artifacts(self):
         return [
             {
                 'name': 'result-image', 'from': 'view.HDR',
-                'to': pathlib.Path(self.execution_folder, '{item_name}.unf'.format(item_name=self.item['name'])).resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, '{item_name}.unf'.format(item_name=self.item['name'])).resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -270,6 +280,12 @@ class SplitView(QueenbeeTask):
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
+    def bsdf_folder(self):
+        value = pathlib.Path(self._input_params['bsdfs'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
     def execution_folder(self):
         return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
@@ -290,10 +306,6 @@ class SplitView(QueenbeeTask):
             'output_folder': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'sub_views').resolve().as_posix()
             ),
-            
-            'ambient_cache': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'sub_views/view.amb').resolve().as_posix()
-            ),
             'views_list': luigi.LocalTarget(
                 pathlib.Path(
                     self.params_folder,
@@ -305,19 +317,22 @@ class SplitView(QueenbeeTask):
     def input_artifacts(self):
         return [
             {'name': 'input_view', 'to': 'view.vf', 'from': self.input_view, 'optional': False},
-            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': True}]
+            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': True},
+            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': False}]
 
     @property
     def output_artifacts(self):
         return [
             {
                 'name': 'output-folder', 'from': 'output',
-                'to': pathlib.Path(self.execution_folder, 'sub_views').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'sub_views').resolve().as_posix(),
+                'optional': False
             },
                 
             {
                 'name': 'ambient-cache', 'from': 'output/view.amb',
-                'to': pathlib.Path(self.execution_folder, 'sub_views/view.amb').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'sub_views/view.amb').resolve().as_posix(),
+                'optional': True
             }]
 
     @property
@@ -325,7 +340,7 @@ class SplitView(QueenbeeTask):
         return [{'name': 'views-list', 'from': 'output/views_info.json', 'to': pathlib.Path(self.params_folder, 'output/views_info.json').resolve().as_posix()}]
 
 
-class _PointInTimeViewRayTracing_8b021dbbOrchestrator(luigi.WrapperTask):
+class _PointInTimeViewRayTracing_ab598dfeOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

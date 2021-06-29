@@ -14,11 +14,13 @@ See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0
 
 import luigi
 import os
+import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.direct_sun_hours_calculation import _DirectSunHoursCalculation_e811664fOrchestrator as DirectSunHoursCalculation_e811664fWorkerbee
+from .dependencies.direct_sun_hours_calculation import _DirectSunHoursCalculation_f7b27c6cOrchestrator as DirectSunHoursCalculation_f7b27c6cWorkerbee
 
 
-_default_inputs = {   'grid_name': None,
+_default_inputs = {   'bsdfs': None,
+    'grid_name': None,
     'octree_file': None,
     'params_folder': '__params',
     'sensor_count': 200,
@@ -44,27 +46,33 @@ class DirectSunlightLoop(luigi.Task):
 
     @property
     def octree_file(self):
-        value = self._input_params['octree_file'].replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self._input_params['octree_file'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def sun_modifiers(self):
-        value = self._input_params['sun_modifiers'].replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self._input_params['sun_modifiers'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def sensor_grid(self):
-        value = os.path.join(self.input()['SplitGrid']['output_folder'].path, self.item['path']).replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['SplitGrid']['output_folder'].path, self.item['path'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def scene_file(self):
-        value = self._input_params['octree_file'].replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self._input_params['octree_file'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def bsdfs(self):
+        value = pathlib.Path(self._input_params['bsdfs'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     # get item for loop
     try:
@@ -74,15 +82,15 @@ class DirectSunlightLoop(luigi.Task):
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     @property
     def map_dag_inputs(self):
@@ -94,7 +102,8 @@ class DirectSunlightLoop(luigi.Task):
             'grid_name': self.grid_name,
             'sun_modifiers': self.sun_modifiers,
             'sensor_grid': self.sensor_grid,
-            'scene_file': self.scene_file
+            'scene_file': self.scene_file,
+            'bsdfs': self.bsdfs
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -105,17 +114,17 @@ class DirectSunlightLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DirectSunHoursCalculation_e811664fWorkerbee(_input_params=self.map_dag_inputs)]
-        os.makedirs(self.execution_folder, exist_ok=True)
-        with open(os.path.join(self.execution_folder, 'direct_sunlight.done'), 'w') as out_file:
-            out_file.write('done!\n')
+        yield [DirectSunHoursCalculation_f7b27c6cWorkerbee(_input_params=self.map_dag_inputs)]
+        done_file = pathlib.Path(self.execution_folder, 'direct_sunlight.done')
+        done_file.parent.mkdir(parents=True, exist_ok=True)
+        done_file.write_text('done!')
 
     def requires(self):
         return {'SplitGrid': SplitGrid(_input_params=self._input_params)}
 
     def output(self):
         return {
-            'is_done': luigi.LocalTarget(os.path.join(self.execution_folder, 'direct_sunlight.done'))
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'direct_sunlight.done').resolve().as_posix())
         }
 
 
@@ -125,9 +134,9 @@ class DirectSunlight(luigi.Task):
     _input_params = luigi.DictParameter()
     @property
     def grids_list(self):
-        value = self.input()['SplitGrid']['grids_list'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['SplitGrid']['grids_list'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def items(self):
@@ -136,32 +145,32 @@ class DirectSunlight(luigi.Task):
             return QueenbeeTask.load_input_param(self.grids_list)
         except:
             # it is a parameter
-            return self.input()['SplitGrid']['grids_list'].path
+            return pathlib.Path(self.input()['SplitGrid']['grids_list'].path).as_posix()
 
     def run(self):
         yield [DirectSunlightLoop(item=item, _input_params=self._input_params) for item in self.items]
-        os.makedirs(self.execution_folder, exist_ok=True)
-        with open(os.path.join(self.execution_folder, 'direct_sunlight.done'), 'w') as out_file:
-            out_file.write('done!\n')
+        done_file = pathlib.Path(self.execution_folder, 'direct_sunlight.done')
+        done_file.parent.mkdir(parents=True, exist_ok=True)
+        done_file.write_text('done!')
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def requires(self):
         return {'SplitGrid': SplitGrid(_input_params=self._input_params)}
 
     def output(self):
         return {
-            'is_done': luigi.LocalTarget(os.path.join(self.execution_folder, 'direct_sunlight.done'))
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'direct_sunlight.done').resolve().as_posix())
         }
 
 
@@ -182,24 +191,24 @@ class MergeCumulativeSunHours(QueenbeeTask):
 
     @property
     def folder(self):
-        value = 'cumulative-sun-hours'.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path('cumulative-sun-hours')
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid merge input_folder grid {extension} --name {name}'.format(extension=self.extension, name=self.name)
+        return 'honeybee-radiance grid merge input_folder grid  {extension} --name {name}'.format(extension=self.extension, name=self.name)
 
     def requires(self):
         return {'DirectSunlight': DirectSunlight(_input_params=self._input_params)}
@@ -207,7 +216,7 @@ class MergeCumulativeSunHours(QueenbeeTask):
     def output(self):
         return {
             'result_file': luigi.LocalTarget(
-                os.path.join(self.execution_folder, '../../results/cumulative/{name}.res'.format(name=self.name))
+                pathlib.Path(self.execution_folder, '../../results/cumulative/{name}.res'.format(name=self.name)).resolve().as_posix()
             )
         }
 
@@ -221,7 +230,8 @@ class MergeCumulativeSunHours(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': '{name}{extension}'.format(name=self.name, extension=self.extension),
-                'to': os.path.join(self.execution_folder, '../../results/cumulative/{name}.res'.format(name=self.name))
+                'to': pathlib.Path(self.execution_folder, '../../results/cumulative/{name}.res'.format(name=self.name)).resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -242,24 +252,24 @@ class MergeDirectSunHours(QueenbeeTask):
 
     @property
     def folder(self):
-        value = 'direct-sun-hours'.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path('direct-sun-hours')
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid merge input_folder grid {extension} --name {name}'.format(extension=self.extension, name=self.name)
+        return 'honeybee-radiance grid merge input_folder grid  {extension} --name {name}'.format(extension=self.extension, name=self.name)
 
     def requires(self):
         return {'DirectSunlight': DirectSunlight(_input_params=self._input_params)}
@@ -267,7 +277,7 @@ class MergeDirectSunHours(QueenbeeTask):
     def output(self):
         return {
             'result_file': luigi.LocalTarget(
-                os.path.join(self.execution_folder, '../../results/direct_sun_hours/{name}.ill'.format(name=self.name))
+                pathlib.Path(self.execution_folder, '../../results/direct_sun_hours/{name}.ill'.format(name=self.name)).resolve().as_posix()
             )
         }
 
@@ -281,7 +291,8 @@ class MergeDirectSunHours(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': '{name}{extension}'.format(name=self.name, extension=self.extension),
-                'to': os.path.join(self.execution_folder, '../../results/direct_sun_hours/{name}.ill'.format(name=self.name))
+                'to': pathlib.Path(self.execution_folder, '../../results/direct_sun_hours/{name}.ill'.format(name=self.name)).resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -298,21 +309,21 @@ class SplitGrid(QueenbeeTask):
 
     @property
     def input_grid(self):
-        value = self._input_params['sensor_grid'].replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self._input_params['sensor_grid'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance grid split grid.pts {sensor_count} --folder output --log-file output/grids_info.json'.format(sensor_count=self.sensor_count)
@@ -321,12 +332,12 @@ class SplitGrid(QueenbeeTask):
         return {
             
             'output_folder': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'sub_grids')
+                pathlib.Path(self.execution_folder, 'sub_grids').resolve().as_posix()
             ),
             'grids_list': luigi.LocalTarget(
-                os.path.join(
+                pathlib.Path(
                     self.params_folder,
-                    'output/grids_info.json')
+                    'output/grids_info.json').resolve().as_posix()
                 )
         }
 
@@ -340,15 +351,16 @@ class SplitGrid(QueenbeeTask):
         return [
             {
                 'name': 'output-folder', 'from': 'output',
-                'to': os.path.join(self.execution_folder, 'sub_grids')
+                'to': pathlib.Path(self.execution_folder, 'sub_grids').resolve().as_posix(),
+                'optional': False
             }]
 
     @property
     def output_parameters(self):
-        return [{'name': 'grids-list', 'from': 'output/grids_info.json', 'to': os.path.join(self.params_folder, 'output/grids_info.json')}]
+        return [{'name': 'grids-list', 'from': 'output/grids_info.json', 'to': pathlib.Path(self.params_folder, 'output/grids_info.json').resolve().as_posix()}]
 
 
-class _DirectSunHoursEntryLoop_e811664fOrchestrator(luigi.WrapperTask):
+class _DirectSunHoursEntryLoop_f7b27c6cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -360,4 +372,4 @@ class _DirectSunHoursEntryLoop_e811664fOrchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        return [MergeCumulativeSunHours(_input_params=self.input_values), MergeDirectSunHours(_input_params=self.input_values)]
+        yield [MergeCumulativeSunHours(_input_params=self.input_values), MergeDirectSunHours(_input_params=self.input_values)]

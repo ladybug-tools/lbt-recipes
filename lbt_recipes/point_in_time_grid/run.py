@@ -4,7 +4,7 @@ you should be editing this file directly. Instead try to edit the recipe
 itself and regenerate the code.
 
 Contact the recipe maintainers with additional questions.
-    mostapha: mostapha@ladybug.tools
+    chris: chris@ladybug.tools
     ladybug-tools: info@ladybug.tools
 
 This file is licensed under "PolyForm Shield License 1.0.0".
@@ -28,7 +28,7 @@ _recipe_default_inputs = {   'grid_filter': '*',
     'model': None,
     'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64',
     'sensor_count': 200,
-    'sky': 'cie 21 Jun 12:00 -lat 0 -lon 0 -tz 0 -type 0'}
+    'sky': None}
 
 
 class LetPointInTimeGridFly(luigi.WrapperTask):
@@ -36,7 +36,7 @@ class LetPointInTimeGridFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [point_in_time_grid_workerbee._Main_dcea838eOrchestrator(_input_params=self._input_params)]
+        yield [point_in_time_grid_workerbee._Main_7f412068Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

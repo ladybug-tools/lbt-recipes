@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.point_in_time_view_ray_tracing import _PointInTimeViewRayTracing_8b021dbbOrchestrator as PointInTimeViewRayTracing_8b021dbbWorkerbee
+from .dependencies.point_in_time_view_ray_tracing import _PointInTimeViewRayTracing_ab598dfeOrchestrator as PointInTimeViewRayTracing_ab598dfeWorkerbee
 
 
 _default_inputs = {   'metric': 'luminance',
@@ -86,7 +86,8 @@ class AdjustSky(QueenbeeTask):
         return [
             {
                 'name': 'adjusted-sky', 'from': '{metric}.sky'.format(metric=self.metric),
-                'to': pathlib.Path(self.execution_folder, 'resources/weather.sky').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/weather.sky').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -149,7 +150,8 @@ class CreateOctree(QueenbeeTask):
         return [
             {
                 'name': 'scene-file', 'from': 'scene.oct',
-                'to': pathlib.Path(self.execution_folder, 'resources/scene.oct').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/scene.oct').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -192,6 +194,10 @@ class CreateRadFolder(QueenbeeTask):
                 pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
             ),
             
+            'bsdf_folder': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
+            ),
+            
             'views_file': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'results/views_info.json').resolve().as_posix()
             ),
@@ -212,12 +218,20 @@ class CreateRadFolder(QueenbeeTask):
         return [
             {
                 'name': 'model-folder', 'from': 'model',
-                'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix(),
+                'optional': False
+            },
+                
+            {
+                'name': 'bsdf-folder', 'from': 'model/bsdf',
+                'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix(),
+                'optional': False
             },
                 
             {
                 'name': 'views-file', 'from': 'model/view/_info.json',
-                'to': pathlib.Path(self.execution_folder, 'results/views_info.json').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'results/views_info.json').resolve().as_posix(),
+                'optional': False
             }]
 
     @property
@@ -263,7 +277,8 @@ class GenerateSky(QueenbeeTask):
         return [
             {
                 'name': 'sky', 'from': 'output.sky',
-                'to': pathlib.Path(self.execution_folder, 'resources/weather.sky').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/weather.sky').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -310,6 +325,12 @@ class PointInTimeViewRayTracingLoop(luigi.Task):
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
+    @property
+    def bsdfs(self):
+        value = pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
     # get item for loop
     try:
         item = luigi.DictParameter()
@@ -340,7 +361,8 @@ class PointInTimeViewRayTracingLoop(luigi.Task):
             'view_count': self.view_count,
             'octree_file': self.octree_file,
             'view_name': self.view_name,
-            'view': self.view
+            'view': self.view,
+            'bsdfs': self.bsdfs
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -351,7 +373,7 @@ class PointInTimeViewRayTracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [PointInTimeViewRayTracing_8b021dbbWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [PointInTimeViewRayTracing_ab598dfeWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'point_in_time_view_ray_tracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -411,7 +433,7 @@ class PointInTimeViewRayTracing(luigi.Task):
         }
 
 
-class _Main_8b021dbbOrchestrator(luigi.WrapperTask):
+class _Main_ab598dfeOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

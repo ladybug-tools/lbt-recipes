@@ -4,7 +4,7 @@ you should be editing this file directly. Instead try to edit the recipe
 itself and regenerate the code.
 
 Contact the recipe maintainers with additional questions.
-    mostapha: mostapha@ladybug.tools
+    chris: chris@ladybug.tools
     ladybug-tools: info@ladybug.tools
 
 This file is licensed under "PolyForm Shield License 1.0.0".
@@ -18,7 +18,8 @@ import pathlib
 from queenbee_local import QueenbeeTask
 
 
-_default_inputs = {   'grid_name': None,
+_default_inputs = {   'bsdfs': None,
+    'grid_name': None,
     'metric': 'illuminance',
     'octree_file': None,
     'params_folder': '__params',
@@ -62,7 +63,7 @@ class MergeResults(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid merge input_folder grid {extension} --name {name}'.format(extension=self.extension, name=self.name)
+        return 'honeybee-radiance grid merge input_folder grid  {extension} --name {name}'.format(extension=self.extension, name=self.name)
 
     def requires(self):
         return {'RayTracing': RayTracing(_input_params=self._input_params)}
@@ -84,7 +85,8 @@ class MergeResults(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': '{name}{extension}'.format(name=self.name, extension=self.extension),
-                'to': pathlib.Path(self.execution_folder, '../../results/{name}.res'.format(name=self.name)).resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, '../../results/{name}.res'.format(name=self.name)).resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -114,6 +116,12 @@ class RayTracingLoop(QueenbeeTask):
     @property
     def scene_file(self):
         value = pathlib.Path(self._input_params['octree_file'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def bsdf_folder(self):
+        value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -152,14 +160,16 @@ class RayTracingLoop(QueenbeeTask):
     def input_artifacts(self):
         return [
             {'name': 'grid', 'to': 'grid.pts', 'from': self.grid, 'optional': False},
-            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False}]
+            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False},
+            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': False}]
 
     @property
     def output_artifacts(self):
         return [
             {
                 'name': 'result', 'from': 'grid.res',
-                'to': pathlib.Path(self.execution_folder, '{item_name}.res'.format(item_name=self.item['name'])).resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, '{item_name}.res'.format(item_name=self.item['name'])).resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -264,7 +274,8 @@ class SplitGrid(QueenbeeTask):
         return [
             {
                 'name': 'output-folder', 'from': 'output',
-                'to': pathlib.Path(self.execution_folder, 'sub_grids').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'sub_grids').resolve().as_posix(),
+                'optional': False
             }]
 
     @property
@@ -272,7 +283,7 @@ class SplitGrid(QueenbeeTask):
         return [{'name': 'grids-list', 'from': 'output/grids_info.json', 'to': pathlib.Path(self.params_folder, 'output/grids_info.json').resolve().as_posix()}]
 
 
-class _PointInTimeGridRayTracing_dcea838eOrchestrator(luigi.WrapperTask):
+class _PointInTimeGridRayTracing_7f412068Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

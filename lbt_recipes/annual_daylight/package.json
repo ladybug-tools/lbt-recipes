@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "annual-daylight",
-    "tag": "0.5.5",
+    "tag": "0.5.10",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -90,14 +90,16 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.model",
-              "function": "model_to_json"
+              "function": "model_to_json",
+              "index": 0
             },
             {
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "Pollination.Handlers",
-              "function": "HBModelToJSON"
+              "module": "Pollination.RhinoHandlers",
+              "function": "HBModelToJSON",
+              "index": 0
             }
           ],
           "default": null,
@@ -117,8 +119,9 @@
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "Pollination.Handlers",
-              "function": "RhinoHBModelToJSON"
+              "module": "Pollination.RhinoHandlers",
+              "function": "RhinoHBModelToJSON",
+              "index": 0
             }
           ],
           "default": null,
@@ -154,7 +157,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.north",
-              "function": "north_vector_to_angle"
+              "function": "north_vector_to_angle",
+              "index": 0
             }
           ],
           "default": "0",
@@ -214,7 +218,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.schedule",
-              "function": "schedule_to_csv"
+              "function": "schedule_to_csv",
+              "index": 0
             }
           ],
           "default": null,
@@ -301,7 +306,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.wea",
-              "function": "wea_handler"
+              "function": "wea_handler_timestep_check",
+              "index": 0
             }
           ],
           "default": null,
@@ -342,7 +348,35 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.daylight",
-              "function": "read_cda_from_folder"
+              "function": "read_cda_from_folder",
+              "index": 0
+            }
+          ]
+        },
+        {
+          "type": "DAGLinkedOutputAlias",
+          "annotations": {},
+          "name": "cDA Results",
+          "description": null,
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_cda_from_folder",
+              "index": 0
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "LoadMeshBasedResultsToRhino",
+              "index": 0
             }
           ]
         }
@@ -374,7 +408,35 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.daylight",
-              "function": "read_da_from_folder"
+              "function": "read_da_from_folder",
+              "index": 0
+            }
+          ]
+        },
+        {
+          "type": "DAGLinkedOutputAlias",
+          "annotations": {},
+          "name": "DA Results",
+          "description": null,
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_da_from_folder",
+              "index": 0
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "LoadMeshBasedResultsToRhino",
+              "index": 0
             }
           ]
         }
@@ -419,7 +481,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.daylight",
-              "function": "sort_ill_from_folder"
+              "function": "sort_ill_from_folder",
+              "index": 0
             }
           ]
         }
@@ -451,7 +514,35 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.daylight",
-              "function": "read_udi_from_folder"
+              "function": "read_udi_from_folder",
+              "index": 0
+            }
+          ]
+        },
+        {
+          "type": "DAGLinkedOutputAlias",
+          "annotations": {},
+          "name": "UDI Results",
+          "description": null,
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_udi_from_folder",
+              "index": 0
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "LoadMeshBasedResultsToRhino",
+              "index": 0
             }
           ]
         }
@@ -483,7 +574,35 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.daylight",
-              "function": "read_udi_from_folder"
+              "function": "read_udi_from_folder",
+              "index": 0
+            }
+          ]
+        },
+        {
+          "type": "DAGLinkedOutputAlias",
+          "annotations": {},
+          "name": "UDI low Results",
+          "description": null,
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_udi_from_folder",
+              "index": 0
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "LoadMeshBasedResultsToRhino",
+              "index": 0
             }
           ]
         }
@@ -515,7 +634,35 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.daylight",
-              "function": "read_udi_from_folder"
+              "function": "read_udi_from_folder",
+              "index": 0
+            }
+          ]
+        },
+        {
+          "type": "DAGLinkedOutputAlias",
+          "annotations": {},
+          "name": "UDI up Results",
+          "description": null,
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_udi_from_folder",
+              "index": 0
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "LoadMeshBasedResultsToRhino",
+              "index": 0
             }
           ]
         }

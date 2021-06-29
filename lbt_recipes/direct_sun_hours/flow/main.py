@@ -14,8 +14,9 @@ See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0
 
 import luigi
 import os
+import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.direct_sun_hours_entry_loop import _DirectSunHoursEntryLoop_e811664fOrchestrator as DirectSunHoursEntryLoop_e811664fWorkerbee
+from .dependencies.direct_sun_hours_entry_loop import _DirectSunHoursEntryLoop_f7b27c6cOrchestrator as DirectSunHoursEntryLoop_f7b27c6cWorkerbee
 
 
 _default_inputs = {   'grid_filter': '*',
@@ -42,21 +43,21 @@ class ConvertWeaToConstant(QueenbeeTask):
 
     @property
     def wea(self):
-        value = self._input_params['wea'].replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self._input_params['wea'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'ladybug translate wea-to-constant weather.wea --value {value} --output-file constant.wea'.format(value=self.value)
@@ -64,7 +65,7 @@ class ConvertWeaToConstant(QueenbeeTask):
     def output(self):
         return {
             'constant_wea': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'resources/constant.wea')
+                pathlib.Path(self.execution_folder, 'resources/constant.wea').resolve().as_posix()
             )
         }
 
@@ -78,7 +79,8 @@ class ConvertWeaToConstant(QueenbeeTask):
         return [
             {
                 'name': 'constant-wea', 'from': 'constant.wea',
-                'to': os.path.join(self.execution_folder, 'resources/constant.wea')
+                'to': pathlib.Path(self.execution_folder, 'resources/constant.wea').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -91,21 +93,21 @@ class CopyGridInfo(QueenbeeTask):
     # Task inputs
     @property
     def src(self):
-        value = self.input()['CreateRadFolder']['sensor_grids_file'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['CreateRadFolder']['sensor_grids_file'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'echo copying input path...'
@@ -116,11 +118,11 @@ class CopyGridInfo(QueenbeeTask):
     def output(self):
         return {
             'dst_1': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/cumulative/grids_info.json')
+                pathlib.Path(self.execution_folder, 'results/cumulative/grids_info.json').resolve().as_posix()
             ),
             
             'dst_2': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/direct_radiation/grids_info.json')
+                pathlib.Path(self.execution_folder, 'results/direct_radiation/grids_info.json').resolve().as_posix()
             )
         }
 
@@ -134,12 +136,14 @@ class CopyGridInfo(QueenbeeTask):
         return [
             {
                 'name': 'dst-1', 'from': 'input_path',
-                'to': os.path.join(self.execution_folder, 'results/cumulative/grids_info.json')
+                'to': pathlib.Path(self.execution_folder, 'results/cumulative/grids_info.json').resolve().as_posix(),
+                'optional': False
             },
                 
             {
                 'name': 'dst-2', 'from': 'input_path',
-                'to': os.path.join(self.execution_folder, 'results/direct_radiation/grids_info.json')
+                'to': pathlib.Path(self.execution_folder, 'results/direct_radiation/grids_info.json').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -156,27 +160,27 @@ class CreateOctree(QueenbeeTask):
 
     @property
     def model(self):
-        value = self.input()['CreateRadFolder']['model_folder'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['CreateRadFolder']['model_folder'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def sky(self):
-        value = self.input()['GenerateSunpath']['sunpath'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['GenerateSunpath']['sunpath'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out} --add-before sky.sky'.format(include_aperture=self.include_aperture, black_out=self.black_out)
@@ -187,7 +191,7 @@ class CreateOctree(QueenbeeTask):
     def output(self):
         return {
             'scene_file': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'resources/scene_with_suns.oct')
+                pathlib.Path(self.execution_folder, 'resources/scene_with_suns.oct').resolve().as_posix()
             )
         }
 
@@ -202,7 +206,8 @@ class CreateOctree(QueenbeeTask):
         return [
             {
                 'name': 'scene-file', 'from': 'scene.oct',
-                'to': os.path.join(self.execution_folder, 'resources/scene_with_suns.oct')
+                'to': pathlib.Path(self.execution_folder, 'resources/scene_with_suns.oct').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -219,21 +224,21 @@ class CreateRadFolder(QueenbeeTask):
 
     @property
     def input_model(self):
-        value = self._input_params['model'].replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self._input_params['model'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid "{grid_filter}" --grid-check'.format(grid_filter=self.grid_filter)
@@ -242,16 +247,20 @@ class CreateRadFolder(QueenbeeTask):
         return {
             
             'model_folder': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'model')
+                pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
+            ),
+            
+            'bsdf_folder': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
             ),
             
             'sensor_grids_file': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/direct_sun_hours/grids_info.json')
+                pathlib.Path(self.execution_folder, 'results/direct_sun_hours/grids_info.json').resolve().as_posix()
             ),
             'sensor_grids': luigi.LocalTarget(
-                os.path.join(
+                pathlib.Path(
                     self.params_folder,
-                    'model/grid/_info.json')
+                    'model/grid/_info.json').resolve().as_posix()
                 )
         }
 
@@ -265,17 +274,25 @@ class CreateRadFolder(QueenbeeTask):
         return [
             {
                 'name': 'model-folder', 'from': 'model',
-                'to': os.path.join(self.execution_folder, 'model')
+                'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix(),
+                'optional': False
+            },
+                
+            {
+                'name': 'bsdf-folder', 'from': 'model/bsdf',
+                'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix(),
+                'optional': False
             },
                 
             {
                 'name': 'sensor-grids-file', 'from': 'model/grid/_info.json',
-                'to': os.path.join(self.execution_folder, 'results/direct_sun_hours/grids_info.json')
+                'to': pathlib.Path(self.execution_folder, 'results/direct_sun_hours/grids_info.json').resolve().as_posix(),
+                'optional': False
             }]
 
     @property
     def output_parameters(self):
-        return [{'name': 'sensor-grids', 'from': 'model/grid/_info.json', 'to': os.path.join(self.params_folder, 'model/grid/_info.json')}]
+        return [{'name': 'sensor-grids', 'from': 'model/grid/_info.json', 'to': pathlib.Path(self.params_folder, 'model/grid/_info.json').resolve().as_posix()}]
 
 
 class DirectSunHoursRaytracingLoop(luigi.Task):
@@ -295,27 +312,33 @@ class DirectSunHoursRaytracingLoop(luigi.Task):
 
     @property
     def octree_file(self):
-        value = self.input()['CreateOctree']['scene_file'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['CreateOctree']['scene_file'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def sensor_grid(self):
-        value = os.path.join(self.input()['CreateRadFolder']['model_folder'].path, 'grid/{item_full_id}.pts'.format(item_full_id=self.item['full_id'])).replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['CreateRadFolder']['model_folder'].path, 'grid/{item_full_id}.pts'.format(item_full_id=self.item['full_id']))
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def sunpath(self):
-        value = self.input()['GenerateSunpath']['sunpath'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['GenerateSunpath']['sunpath'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def sun_modifiers(self):
-        value = self.input()['GenerateSunpath']['sun_modifiers'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['GenerateSunpath']['sun_modifiers'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def bsdfs(self):
+        value = pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     # get item for loop
     try:
@@ -325,15 +348,15 @@ class DirectSunHoursRaytracingLoop(luigi.Task):
 
     @property
     def execution_folder(self):
-        return os.path.join(self._input_params['simulation_folder'], 'initial_results/{item_name}'.format(item_name=self.item['name'])).replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder'], 'initial_results/{item_name}'.format(item_name=self.item['name'])).resolve().as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     @property
     def map_dag_inputs(self):
@@ -345,7 +368,8 @@ class DirectSunHoursRaytracingLoop(luigi.Task):
             'grid_name': self.grid_name,
             'sensor_grid': self.sensor_grid,
             'sunpath': self.sunpath,
-            'sun_modifiers': self.sun_modifiers
+            'sun_modifiers': self.sun_modifiers,
+            'bsdfs': self.bsdfs
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -356,17 +380,17 @@ class DirectSunHoursRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DirectSunHoursEntryLoop_e811664fWorkerbee(_input_params=self.map_dag_inputs)]
-        os.makedirs(self.execution_folder, exist_ok=True)
-        with open(os.path.join(self.execution_folder, 'direct_sun_hours_raytracing.done'), 'w') as out_file:
-            out_file.write('done!\n')
+        yield [DirectSunHoursEntryLoop_f7b27c6cWorkerbee(_input_params=self.map_dag_inputs)]
+        done_file = pathlib.Path(self.execution_folder, 'direct_sun_hours_raytracing.done')
+        done_file.parent.mkdir(parents=True, exist_ok=True)
+        done_file.write_text('done!')
 
     def requires(self):
         return {'CreateOctree': CreateOctree(_input_params=self._input_params), 'GenerateSunpath': GenerateSunpath(_input_params=self._input_params), 'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
 
     def output(self):
         return {
-            'is_done': luigi.LocalTarget(os.path.join(self.execution_folder, 'direct_sun_hours_raytracing.done'))
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'direct_sun_hours_raytracing.done').resolve().as_posix())
         }
 
 
@@ -376,9 +400,9 @@ class DirectSunHoursRaytracing(luigi.Task):
     _input_params = luigi.DictParameter()
     @property
     def sensor_grids(self):
-        value = self.input()['CreateRadFolder']['sensor_grids'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['CreateRadFolder']['sensor_grids'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def items(self):
@@ -387,32 +411,32 @@ class DirectSunHoursRaytracing(luigi.Task):
             return QueenbeeTask.load_input_param(self.sensor_grids)
         except:
             # it is a parameter
-            return self.input()['CreateRadFolder']['sensor_grids'].path
+            return pathlib.Path(self.input()['CreateRadFolder']['sensor_grids'].path).as_posix()
 
     def run(self):
         yield [DirectSunHoursRaytracingLoop(item=item, _input_params=self._input_params) for item in self.items]
-        os.makedirs(self.execution_folder, exist_ok=True)
-        with open(os.path.join(self.execution_folder, 'direct_sun_hours_raytracing.done'), 'w') as out_file:
-            out_file.write('done!\n')
+        done_file = pathlib.Path(self.execution_folder, 'direct_sun_hours_raytracing.done')
+        done_file.parent.mkdir(parents=True, exist_ok=True)
+        done_file.write_text('done!')
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def requires(self):
         return {'CreateOctree': CreateOctree(_input_params=self._input_params), 'GenerateSunpath': GenerateSunpath(_input_params=self._input_params), 'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
 
     def output(self):
         return {
-            'is_done': luigi.LocalTarget(os.path.join(self.execution_folder, 'direct_sun_hours_raytracing.done'))
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'direct_sun_hours_raytracing.done').resolve().as_posix())
         }
 
 
@@ -433,21 +457,21 @@ class GenerateSunpath(QueenbeeTask):
 
     @property
     def wea(self):
-        value = self.input()['ConvertWeaToConstant']['constant_wea'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['ConvertWeaToConstant']['constant_wea'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'gendaymtx -n -D sunpath.mtx -M suns.mod -O{output_type} -r {north} -v sky.wea'.format(output_type=self.output_type, north=self.north)
@@ -458,11 +482,11 @@ class GenerateSunpath(QueenbeeTask):
     def output(self):
         return {
             'sunpath': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'resources/sunpath.mtx')
+                pathlib.Path(self.execution_folder, 'resources/sunpath.mtx').resolve().as_posix()
             ),
             
             'sun_modifiers': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'resources/suns.mod')
+                pathlib.Path(self.execution_folder, 'resources/suns.mod').resolve().as_posix()
             )
         }
 
@@ -476,12 +500,14 @@ class GenerateSunpath(QueenbeeTask):
         return [
             {
                 'name': 'sunpath', 'from': 'sunpath.mtx',
-                'to': os.path.join(self.execution_folder, 'resources/sunpath.mtx')
+                'to': pathlib.Path(self.execution_folder, 'resources/sunpath.mtx').resolve().as_posix(),
+                'optional': False
             },
                 
             {
                 'name': 'sun-modifiers', 'from': 'suns.mod',
-                'to': os.path.join(self.execution_folder, 'resources/suns.mod')
+                'to': pathlib.Path(self.execution_folder, 'resources/suns.mod').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -498,21 +524,21 @@ class ParseSunUpHours(QueenbeeTask):
 
     @property
     def sun_modifiers(self):
-        value = self.input()['GenerateSunpath']['sun_modifiers'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['GenerateSunpath']['sun_modifiers'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance sunpath parse-hours suns.mod --name sun-up-hours.txt --timestep {timestep} --{leap_year}'.format(timestep=self.timestep, leap_year=self.leap_year)
@@ -523,7 +549,7 @@ class ParseSunUpHours(QueenbeeTask):
     def output(self):
         return {
             'sun_up_hours': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/direct_sun_hours/sun-up-hours.txt')
+                pathlib.Path(self.execution_folder, 'results/direct_sun_hours/sun-up-hours.txt').resolve().as_posix()
             )
         }
 
@@ -537,11 +563,12 @@ class ParseSunUpHours(QueenbeeTask):
         return [
             {
                 'name': 'sun-up-hours', 'from': 'sun-up-hours.txt',
-                'to': os.path.join(self.execution_folder, 'results/direct_sun_hours/sun-up-hours.txt')
+                'to': pathlib.Path(self.execution_folder, 'results/direct_sun_hours/sun-up-hours.txt').resolve().as_posix(),
+                'optional': False
             }]
 
 
-class _Main_e811664fOrchestrator(luigi.WrapperTask):
+class _Main_f7b27c6cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -553,4 +580,4 @@ class _Main_e811664fOrchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        return [CopyGridInfo(_input_params=self.input_values), DirectSunHoursRaytracing(_input_params=self.input_values), ParseSunUpHours(_input_params=self.input_values)]
+        yield [CopyGridInfo(_input_params=self.input_values), DirectSunHoursRaytracing(_input_params=self.input_values), ParseSunUpHours(_input_params=self.input_values)]
