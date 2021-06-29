@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "daylight-factor",
-    "tag": "0.5.6",
+    "tag": "0.6.0",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -90,14 +90,16 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.model",
-              "function": "model_to_json"
+              "function": "model_to_json",
+              "index": 0
             },
             {
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "Pollination.Handlers",
-              "function": "HBModelToJSON"
+              "module": "Pollination.RhinoHandlers",
+              "function": "HBModelToJSON",
+              "index": 0
             }
           ],
           "default": null,
@@ -117,8 +119,9 @@
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "Pollination.Handlers",
-              "function": "RhinoHBModelToJSON"
+              "module": "Pollination.RhinoHandlers",
+              "function": "RhinoHBModelToJSON",
+              "index": 0
             }
           ],
           "default": null,
@@ -211,7 +214,62 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.daylight",
-              "function": "read_df_from_folder"
+              "function": "read_df_from_folder",
+              "index": 0
+            }
+          ]
+        },
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "results",
+          "description": "Daylight factor values.",
+          "platform": [
+            "revit"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RevitHandlers",
+              "function": "ReadDaylightFactorResultsFromFolder",
+              "index": 0
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_df_from_folder",
+              "index": 0
+            }
+          ]
+        },
+        {
+          "type": "DAGLinkedOutputAlias",
+          "annotations": {},
+          "name": "results",
+          "description": null,
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_df_from_folder",
+              "index": 0
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "LoadMeshBasedResultsToRhino",
+              "index": 0
             }
           ]
         }

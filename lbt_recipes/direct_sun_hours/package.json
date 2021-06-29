@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "direct-sun-hours",
-    "tag": "0.1.7",
+    "tag": "0.1.9",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -90,14 +90,16 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.model",
-              "function": "model_to_json"
+              "function": "model_to_json",
+              "index": 0
             },
             {
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "Pollination.Handlers",
-              "function": "HBModelToJSON"
+              "module": "Pollination.RhinoHandlers",
+              "function": "HBModelToJSON",
+              "index": 0
             }
           ],
           "default": null,
@@ -117,8 +119,9 @@
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "Pollination.Handlers",
-              "function": "RhinoHBModelToJSON"
+              "module": "Pollination.RhinoHandlers",
+              "function": "RhinoHBModelToJSON",
+              "index": 0
             }
           ],
           "default": null,
@@ -154,7 +157,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.north",
-              "function": "north_vector_to_angle"
+              "function": "north_vector_to_angle",
+              "index": 0
             }
           ],
           "default": "0",
@@ -217,7 +221,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.wea",
-              "function": "wea_handler"
+              "function": "wea_handler",
+              "index": 0
             }
           ],
           "default": null,
@@ -258,7 +263,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.daylight",
-              "function": "read_hours_from_folder"
+              "function": "read_hours_from_folder",
+              "index": 0
             }
           ]
         }
@@ -290,7 +296,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.daylight",
-              "function": "sort_ill_from_folder"
+              "function": "sort_ill_from_folder",
+              "index": 0
             }
           ]
         }
