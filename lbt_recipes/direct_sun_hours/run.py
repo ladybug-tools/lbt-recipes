@@ -27,6 +27,7 @@ _recipe_default_inputs = {   'grid_filter': '*',
     'model': None,
     'north': 0.0,
     'sensor_count': 200,
+    'timestep': 1,
     'wea': None}
 
 
@@ -35,7 +36,7 @@ class LetDirectSunHoursFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [direct_sun_hours_workerbee._Main_f7b27c6cOrchestrator(_input_params=self._input_params)]
+        yield [direct_sun_hours_workerbee._Main_3edc04c8Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

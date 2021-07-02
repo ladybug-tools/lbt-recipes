@@ -20,7 +20,7 @@ import pathlib
 from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 
-import flow.main as annual_radiation_workerbee
+import flow.main as annual_irradiance_workerbee
 
 
 _recipe_default_inputs = {   'grid_filter': '*',
@@ -28,15 +28,16 @@ _recipe_default_inputs = {   'grid_filter': '*',
     'north': 0.0,
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
     'sensor_count': 200,
+    'timestep': 1,
     'wea': None}
 
 
-class LetAnnualRadiationFly(luigi.WrapperTask):
+class LetAnnualIrradianceFly(luigi.WrapperTask):
     # global parameters
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [annual_radiation_workerbee._Main_db5663f4Orchestrator(_input_params=self._input_params)]
+        yield [annual_irradiance_workerbee._Main_f2191600Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -46,11 +47,11 @@ def start(project_folder, user_values, workers):
 
     if 'simulation_folder' not in input_params or not input_params['simulation_folder']:
         if 'simulation_id' not in input_params or not input_params['simulation_id']:
-            simulation_id = 'annual_radiation_%d' % int(round(time.time(), 2) * 100)
+            simulation_id = 'annual_irradiance_%d' % int(round(time.time(), 2) * 100)
         else:
             simulation_id = input_params['simulation_id']
 
-        simulation_folder = os.path.join(project_folder, simulation_id)
+        simulation_folder = pathlib.Path(project_folder, simulation_id).as_posix()
         input_params['simulation_folder'] = simulation_folder
     else:
         simulation_folder = input_params['simulation_folder']
@@ -64,8 +65,8 @@ def start(project_folder, user_values, workers):
             if artifact in optional_artifacts:
                 continue
             raise ValueError('None value for required artifact input: %s' % artifact)
-        from_ = os.path.join(project_folder, input_params[artifact])
-        to_ = os.path.join(simulation_folder, input_params[artifact])
+        from_ = pathlib.Path(project_folder, input_params[artifact]).resolve().as_posix()
+        to_ = pathlib.Path(simulation_folder, input_params[artifact]).resolve().as_posix()
         _copy_artifacts(from_, to_)
 
     # set up logs
@@ -77,7 +78,7 @@ def start(project_folder, user_values, workers):
         lf.write(LOGS_CONFIG.replace('WORKFLOW.LOG', log_file))
 
     luigi.build(
-        [LetAnnualRadiationFly(_input_params=input_params)],
+        [LetAnnualIrradianceFly(_input_params=input_params)],
         local_scheduler=local_scheduler(),
         workers=workers,
         logging_conf_file=cfg_file.as_posix()

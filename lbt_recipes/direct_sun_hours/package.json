@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "direct-sun-hours",
-    "tag": "0.1.9",
+    "tag": "0.2.4",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -201,6 +201,20 @@
       }
     },
     {
+      "type": "DAGIntegerInput",
+      "annotations": {},
+      "name": "timestep",
+      "description": "Input wea timestep. This value will be used to divide the cumulative results to ensure the units of the output are in hours.",
+      "default": 1,
+      "alias": [],
+      "required": false,
+      "spec": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 60
+      }
+    },
+    {
       "type": "DAGFileInput",
       "annotations": {},
       "name": "wea",
@@ -242,7 +256,7 @@
       "type": "DAGFolderOutput",
       "annotations": {},
       "name": "cumulative-sun-hours",
-      "description": "Cumulative results for direct sun hours for all the input hours.",
+      "description": "Cumulative direct sun hours for all the input hours.",
       "from": {
         "type": "FolderReference",
         "annotations": {},

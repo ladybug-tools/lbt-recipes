@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "pmv-comfort-map",
-    "tag": "0.2.5",
+    "tag": "0.2.16",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -64,7 +64,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.data",
-              "function": "value_or_data_to_str"
+              "function": "value_or_data_to_str",
+              "index": 0
             }
           ],
           "default": "0.1",
@@ -96,7 +97,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.data",
-              "function": "value_or_data_to_str"
+              "function": "value_or_data_to_str",
+              "index": 0
             }
           ],
           "default": "0.7",
@@ -152,7 +154,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.ddy",
-              "function": "ddy_handler"
+              "function": "ddy_handler",
+              "index": 0
             }
           ],
           "default": null,
@@ -200,7 +203,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.data",
-              "function": "value_or_data_to_str"
+              "function": "value_or_data_to_str",
+              "index": 0
             }
           ],
           "default": "1.1",
@@ -232,14 +236,16 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.model",
-              "function": "model_to_json"
+              "function": "model_to_json",
+              "index": 0
             },
             {
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "Pollination.Handlers",
-              "function": "HBModelToJSON"
+              "module": "Pollination.RhinoHandlers",
+              "function": "HBModelToJSON",
+              "index": 0
             }
           ],
           "default": null,
@@ -259,8 +265,9 @@
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "Pollination.Handlers",
-              "function": "RhinoHBModelToJSON"
+              "module": "Pollination.RhinoHandlers",
+              "function": "RhinoHBModelToJSON",
+              "index": 0
             }
           ],
           "default": null,
@@ -296,7 +303,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.north",
-              "function": "north_vector_to_angle"
+              "function": "north_vector_to_angle",
+              "index": 0
             }
           ],
           "default": "0",
@@ -431,7 +439,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.bool_options",
-              "function": "write_set_map_to_str"
+              "function": "write_set_map_to_str",
+              "index": 0
             }
           ],
           "default": "False",
@@ -499,7 +508,35 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.comfort",
-              "function": "read_comfort_percent_from_folder"
+              "function": "read_comfort_percent_from_folder",
+              "index": 0
+            }
+          ]
+        },
+        {
+          "type": "DAGLinkedOutputAlias",
+          "annotations": {},
+          "name": "CSP",
+          "description": null,
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.comfort",
+              "function": "read_comfort_percent_from_folder",
+              "index": 0
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "LoadMeshBasedResultsToRhino",
+              "index": 0
             }
           ]
         }
@@ -531,7 +568,35 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.comfort",
-              "function": "read_comfort_percent_from_folder"
+              "function": "read_comfort_percent_from_folder",
+              "index": 0
+            }
+          ]
+        },
+        {
+          "type": "DAGLinkedOutputAlias",
+          "annotations": {},
+          "name": "HSP",
+          "description": null,
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.comfort",
+              "function": "read_comfort_percent_from_folder",
+              "index": 0
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "LoadMeshBasedResultsToRhino",
+              "index": 0
             }
           ]
         }
@@ -600,7 +665,35 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.comfort",
-              "function": "read_comfort_percent_from_folder"
+              "function": "read_comfort_percent_from_folder",
+              "index": 0
+            }
+          ]
+        },
+        {
+          "type": "DAGLinkedOutputAlias",
+          "annotations": {},
+          "name": "TCP",
+          "description": null,
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.comfort",
+              "function": "read_comfort_percent_from_folder",
+              "index": 0
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "LoadMeshBasedResultsToRhino",
+              "index": 0
             }
           ]
         }

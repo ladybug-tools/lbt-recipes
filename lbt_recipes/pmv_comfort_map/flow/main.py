@@ -14,8 +14,9 @@ See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0
 
 import luigi
 import os
+import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.main import _Main_7b93ed3aOrchestrator as Main_7b93ed3aWorkerbee
+from .dependencies.annual_irradiance_entry_point import _AnnualIrradianceEntryPoint_6ef32636Orchestrator as AnnualIrradianceEntryPoint_6ef32636Workerbee
 
 
 _default_inputs = {   'comfort_parameters': '--ppd-threshold 10',
@@ -42,21 +43,21 @@ class ComputeTcpLoop(QueenbeeTask):
     # Task inputs
     @property
     def condition_csv(self):
-        value = os.path.join('results/condition', '{item_id}.csv'.format(item_id=self.item['id'])).replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path('results/condition', '{item_id}.csv'.format(item_id=self.item['id']))
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def enclosure_info(self):
-        value = os.path.join(self.input()['GetEnclosureInfo']['output_folder'].path, '{item_id}.json'.format(item_id=self.item['id'])).replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['GetEnclosureInfo']['output_folder'].path, '{item_id}.json'.format(item_id=self.item['id']))
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def occ_schedule_json(self):
-        value = self.input()['CreateModelOccSchedules']['occ_schedule_json'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['CreateModelOccSchedules']['occ_schedule_json'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     # get item for loop
     try:
@@ -66,15 +67,15 @@ class ComputeTcpLoop(QueenbeeTask):
 
     @property
     def execution_folder(self):
-        return os.path.join(self._input_params['simulation_folder'], 'metrics').replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder'], 'metrics').resolve().as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'ladybug-comfort map tcp {condition_csv} {enclosure_info} --occ-schedule-json "{occ_schedule_json}" --folder output'.format(condition_csv=self.condition_csv, enclosure_info=self.enclosure_info, occ_schedule_json=self.occ_schedule_json)
@@ -85,15 +86,15 @@ class ComputeTcpLoop(QueenbeeTask):
     def output(self):
         return {
             'tcp': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'TCP/{item_id}.csv'.format(item_id=self.item['id']))
+                pathlib.Path(self.execution_folder, 'TCP/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix()
             ),
             
             'hsp': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'HSP/{item_id}.csv'.format(item_id=self.item['id']))
+                pathlib.Path(self.execution_folder, 'HSP/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix()
             ),
             
             'csp': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'CSP/{item_id}.csv'.format(item_id=self.item['id']))
+                pathlib.Path(self.execution_folder, 'CSP/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix()
             )
         }
 
@@ -109,17 +110,17 @@ class ComputeTcpLoop(QueenbeeTask):
         return [
             {
                 'name': 'tcp', 'from': 'output/tcp.csv',
-                'to': os.path.join(self.execution_folder, 'TCP/{item_id}.csv'.format(item_id=self.item['id']))
+                'to': pathlib.Path(self.execution_folder, 'TCP/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix()
             },
                 
             {
                 'name': 'hsp', 'from': 'output/hsp.csv',
-                'to': os.path.join(self.execution_folder, 'HSP/{item_id}.csv'.format(item_id=self.item['id']))
+                'to': pathlib.Path(self.execution_folder, 'HSP/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix()
             },
                 
             {
                 'name': 'csp', 'from': 'output/csp.csv',
-                'to': os.path.join(self.execution_folder, 'CSP/{item_id}.csv'.format(item_id=self.item['id']))
+                'to': pathlib.Path(self.execution_folder, 'CSP/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix()
             }]
 
 
@@ -129,9 +130,9 @@ class ComputeTcp(luigi.Task):
     _input_params = luigi.DictParameter()
     @property
     def enclosure_list(self):
-        value = self.input()['GetEnclosureInfo']['enclosure_list'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['GetEnclosureInfo']['enclosure_list'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def items(self):
@@ -140,32 +141,32 @@ class ComputeTcp(luigi.Task):
             return QueenbeeTask.load_input_param(self.enclosure_list)
         except:
             # it is a parameter
-            return self.input()['GetEnclosureInfo']['enclosure_list'].path
+            return pathlib.Path(self.input()['GetEnclosureInfo']['enclosure_list'].path).as_posix()
 
     def run(self):
         yield [ComputeTcpLoop(item=item, _input_params=self._input_params) for item in self.items]
-        os.makedirs(self.execution_folder, exist_ok=True)
-        with open(os.path.join(self.execution_folder, 'compute_tcp.done'), 'w') as out_file:
-            out_file.write('done!\n')
+        done_file = pathlib.Path(self.execution_folder, 'compute_tcp.done')
+        done_file.parent.mkdir(parents=True, exist_ok=True)
+        done_file.write_text('done!')
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def requires(self):
         return {'CreateModelOccSchedules': CreateModelOccSchedules(_input_params=self._input_params), 'GetEnclosureInfo': GetEnclosureInfo(_input_params=self._input_params), 'RunComfortMap': RunComfortMap(_input_params=self._input_params)}
 
     def output(self):
         return {
-            'is_done': luigi.LocalTarget(os.path.join(self.execution_folder, 'compute_tcp.done'))
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'compute_tcp.done').resolve().as_posix())
         }
 
 
@@ -178,21 +179,21 @@ class CopyGridInfo(QueenbeeTask):
     # Task inputs
     @property
     def src(self):
-        value = self.input()['GetEnclosureInfo']['enclosure_list_file'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['GetEnclosureInfo']['enclosure_list_file'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'echo copying input path...'
@@ -203,23 +204,23 @@ class CopyGridInfo(QueenbeeTask):
     def output(self):
         return {
             'dst_1': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/condition/grids_info.json')
+                pathlib.Path(self.execution_folder, 'results/condition/grids_info.json').resolve().as_posix()
             ),
             
             'dst_2': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/condition_intensity/grids_info.json')
+                pathlib.Path(self.execution_folder, 'results/condition_intensity/grids_info.json').resolve().as_posix()
             ),
             
             'dst_3': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'metrics/TCP/grids_info.json')
+                pathlib.Path(self.execution_folder, 'metrics/TCP/grids_info.json').resolve().as_posix()
             ),
             
             'dst_4': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'metrics/HSP/grids_info.json')
+                pathlib.Path(self.execution_folder, 'metrics/HSP/grids_info.json').resolve().as_posix()
             ),
             
             'dst_5': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'metrics/CSP/grids_info.json')
+                pathlib.Path(self.execution_folder, 'metrics/CSP/grids_info.json').resolve().as_posix()
             )
         }
 
@@ -233,27 +234,27 @@ class CopyGridInfo(QueenbeeTask):
         return [
             {
                 'name': 'dst-1', 'from': 'input_path',
-                'to': os.path.join(self.execution_folder, 'results/condition/grids_info.json')
+                'to': pathlib.Path(self.execution_folder, 'results/condition/grids_info.json').resolve().as_posix()
             },
                 
             {
                 'name': 'dst-2', 'from': 'input_path',
-                'to': os.path.join(self.execution_folder, 'results/condition_intensity/grids_info.json')
+                'to': pathlib.Path(self.execution_folder, 'results/condition_intensity/grids_info.json').resolve().as_posix()
             },
                 
             {
                 'name': 'dst-3', 'from': 'input_path',
-                'to': os.path.join(self.execution_folder, 'metrics/TCP/grids_info.json')
+                'to': pathlib.Path(self.execution_folder, 'metrics/TCP/grids_info.json').resolve().as_posix()
             },
                 
             {
                 'name': 'dst-4', 'from': 'input_path',
-                'to': os.path.join(self.execution_folder, 'metrics/HSP/grids_info.json')
+                'to': pathlib.Path(self.execution_folder, 'metrics/HSP/grids_info.json').resolve().as_posix()
             },
                 
             {
                 'name': 'dst-5', 'from': 'input_path',
-                'to': os.path.join(self.execution_folder, 'metrics/CSP/grids_info.json')
+                'to': pathlib.Path(self.execution_folder, 'metrics/CSP/grids_info.json').resolve().as_posix()
             }]
 
 
@@ -275,21 +276,21 @@ class CreateModelOccSchedules(QueenbeeTask):
 
     @property
     def model(self):
-        value = self._input_params['model'].replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self._input_params['model'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-energy translate model-occ-schedules model.json --threshold {threshold} --period "{period}" --output-file occ_schedules.json'.format(threshold=self.threshold, period=self.period)
@@ -297,7 +298,7 @@ class CreateModelOccSchedules(QueenbeeTask):
     def output(self):
         return {
             'occ_schedule_json': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'metrics/occupancy_schedules.json')
+                pathlib.Path(self.execution_folder, 'metrics/occupancy_schedules.json').resolve().as_posix()
             )
         }
 
@@ -311,7 +312,7 @@ class CreateModelOccSchedules(QueenbeeTask):
         return [
             {
                 'name': 'occ-schedule-json', 'from': 'occ_schedules.json',
-                'to': os.path.join(self.execution_folder, 'metrics/occupancy_schedules.json')
+                'to': pathlib.Path(self.execution_folder, 'metrics/occupancy_schedules.json').resolve().as_posix()
             }]
 
 
@@ -336,15 +337,15 @@ class CreateResultInfo(QueenbeeTask):
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'ladybug-comfort map map-result-info {comfort_model} --run-period "{run_period}" --qualifier "{qualifier}" --folder output --log-file results_info.json'.format(comfort_model=self.comfort_model, run_period=self.run_period, qualifier=self.qualifier)
@@ -352,15 +353,15 @@ class CreateResultInfo(QueenbeeTask):
     def output(self):
         return {
             'temperature_info': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/temperature/results_info.json')
+                pathlib.Path(self.execution_folder, 'results/temperature/results_info.json').resolve().as_posix()
             ),
             
             'condition_info': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/condition/results_info.json')
+                pathlib.Path(self.execution_folder, 'results/condition/results_info.json').resolve().as_posix()
             ),
             
             'condition_intensity_info': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/condition_intensity/results_info.json')
+                pathlib.Path(self.execution_folder, 'results/condition_intensity/results_info.json').resolve().as_posix()
             )
         }
 
@@ -369,17 +370,17 @@ class CreateResultInfo(QueenbeeTask):
         return [
             {
                 'name': 'temperature-info', 'from': 'output/temperature.json',
-                'to': os.path.join(self.execution_folder, 'results/temperature/results_info.json')
+                'to': pathlib.Path(self.execution_folder, 'results/temperature/results_info.json').resolve().as_posix()
             },
                 
             {
                 'name': 'condition-info', 'from': 'output/condition.json',
-                'to': os.path.join(self.execution_folder, 'results/condition/results_info.json')
+                'to': pathlib.Path(self.execution_folder, 'results/condition/results_info.json').resolve().as_posix()
             },
                 
             {
                 'name': 'condition-intensity-info', 'from': 'output/condition_intensity.json',
-                'to': os.path.join(self.execution_folder, 'results/condition_intensity/results_info.json')
+                'to': pathlib.Path(self.execution_folder, 'results/condition_intensity/results_info.json').resolve().as_posix()
             }]
 
 
@@ -402,21 +403,21 @@ class CreateSimPar(QueenbeeTask):
 
     @property
     def ddy(self):
-        value = self._input_params['ddy'].replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self._input_params['ddy'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-energy settings comfort-sim-par input.ddy --run-period "{run_period}" --north {north} --{filter_des_days} --output-file sim_par.json'.format(run_period=self.run_period, north=self.north, filter_des_days=self.filter_des_days)
@@ -424,7 +425,7 @@ class CreateSimPar(QueenbeeTask):
     def output(self):
         return {
             'sim_par_json': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'energy/simulation_parameter.json')
+                pathlib.Path(self.execution_folder, 'energy/simulation_parameter.json').resolve().as_posix()
             )
         }
 
@@ -438,7 +439,7 @@ class CreateSimPar(QueenbeeTask):
         return [
             {
                 'name': 'sim-par-json', 'from': 'sim_par.json',
-                'to': os.path.join(self.execution_folder, 'energy/simulation_parameter.json')
+                'to': pathlib.Path(self.execution_folder, 'energy/simulation_parameter.json').resolve().as_posix()
             }]
 
 
@@ -457,21 +458,21 @@ class CreateWea(QueenbeeTask):
 
     @property
     def epw(self):
-        value = self._input_params['epw'].replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self._input_params['epw'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'ladybug translate epw-to-wea weather.epw --analysis-period "{period}" --timestep {timestep} --output-file weather.wea'.format(period=self.period, timestep=self.timestep)
@@ -479,7 +480,7 @@ class CreateWea(QueenbeeTask):
     def output(self):
         return {
             'wea': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'in.wea')
+                pathlib.Path(self.execution_folder, 'in.wea').resolve().as_posix()
             )
         }
 
@@ -493,7 +494,7 @@ class CreateWea(QueenbeeTask):
         return [
             {
                 'name': 'wea', 'from': 'weather.wea',
-                'to': os.path.join(self.execution_folder, 'in.wea')
+                'to': pathlib.Path(self.execution_folder, 'in.wea').resolve().as_posix()
             }]
 
 
@@ -508,21 +509,21 @@ class GetEnclosureInfo(QueenbeeTask):
     # Task inputs
     @property
     def model(self):
-        value = self._input_params['model'].replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self._input_params['model'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance translate model-radiant-enclosure-info model.hbjson --folder output --log-file enclosure_list.json'
@@ -531,16 +532,16 @@ class GetEnclosureInfo(QueenbeeTask):
         return {
             
             'output_folder': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'radiance/enclosures')
+                pathlib.Path(self.execution_folder, 'radiance/enclosures').resolve().as_posix()
             ),
             
             'enclosure_list_file': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'results/temperature/grids_info.json')
+                pathlib.Path(self.execution_folder, 'results/temperature/grids_info.json').resolve().as_posix()
             ),
             'enclosure_list': luigi.LocalTarget(
-                os.path.join(
+                pathlib.Path(
                     self.params_folder,
-                    'enclosure_list.json')
+                    'enclosure_list.json').resolve().as_posix()
                 )
         }
 
@@ -554,17 +555,17 @@ class GetEnclosureInfo(QueenbeeTask):
         return [
             {
                 'name': 'output-folder', 'from': 'output',
-                'to': os.path.join(self.execution_folder, 'radiance/enclosures')
+                'to': pathlib.Path(self.execution_folder, 'radiance/enclosures').resolve().as_posix()
             },
                 
             {
                 'name': 'enclosure-list-file', 'from': 'enclosure_list.json',
-                'to': os.path.join(self.execution_folder, 'results/temperature/grids_info.json')
+                'to': pathlib.Path(self.execution_folder, 'results/temperature/grids_info.json').resolve().as_posix()
             }]
 
     @property
     def output_parameters(self):
-        return [{'name': 'enclosure-list', 'from': 'enclosure_list.json', 'to': os.path.join(self.params_folder, 'enclosure_list.json')}]
+        return [{'name': 'enclosure-list', 'from': 'enclosure_list.json', 'to': pathlib.Path(self.params_folder, 'enclosure_list.json').resolve().as_posix()}]
 
 
 class MirrorSensorGrids(QueenbeeTask):
@@ -582,21 +583,21 @@ class MirrorSensorGrids(QueenbeeTask):
     # Task inputs
     @property
     def model(self):
-        value = self.input()['SetModifiersFromConstructions']['new_model'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['SetModifiersFromConstructions']['new_model'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance edit mirror-model-sensors model.hbjson --output-file new_model.hbjson'
@@ -607,7 +608,7 @@ class MirrorSensorGrids(QueenbeeTask):
     def output(self):
         return {
             'new_model': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'radiance/hbjson/2_mirrored_grids.hbjson')
+                pathlib.Path(self.execution_folder, 'radiance/hbjson/2_mirrored_grids.hbjson').resolve().as_posix()
             )
         }
 
@@ -621,7 +622,7 @@ class MirrorSensorGrids(QueenbeeTask):
         return [
             {
                 'name': 'new-model', 'from': 'new_model.hbjson',
-                'to': os.path.join(self.execution_folder, 'radiance/hbjson/2_mirrored_grids.hbjson')
+                'to': pathlib.Path(self.execution_folder, 'radiance/hbjson/2_mirrored_grids.hbjson').resolve().as_posix()
             }]
 
 
@@ -662,45 +663,45 @@ class RunComfortMapLoop(QueenbeeTask):
 
     @property
     def result_sql(self):
-        value = self.input()['RunEnergySimulation']['sql'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['RunEnergySimulation']['sql'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def enclosure_info(self):
-        value = os.path.join(self.input()['GetEnclosureInfo']['output_folder'].path, '{item_id}.json'.format(item_id=self.item['id'])).replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['GetEnclosureInfo']['output_folder'].path, '{item_id}.json'.format(item_id=self.item['id']))
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def epw(self):
-        value = self._input_params['epw'].replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self._input_params['epw'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def total_irradiance(self):
-        value = os.path.join('radiance/shortwave/results/total', '{item_id}.ill'.format(item_id=self.item['id'])).replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path('radiance/shortwave/results/total', '{item_id}.ill'.format(item_id=self.item['id']))
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def direct_irradiance(self):
-        value = os.path.join('radiance/shortwave/results/direct', '{item_id}.ill'.format(item_id=self.item['id'])).replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path('radiance/shortwave/results/direct', '{item_id}.ill'.format(item_id=self.item['id']))
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def ref_irradiance(self):
-        value = os.path.join('radiance/shortwave/results/total', '{item_id}_ref.ill'.format(item_id=self.item['id'])).replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path('radiance/shortwave/results/total', '{item_id}_ref.ill'.format(item_id=self.item['id']))
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def sun_up_hours(self):
-        value = os.path.join('radiance/shortwave/results/total', 'sun-up-hours.txt').replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path('radiance/shortwave/results/total', 'sun-up-hours.txt')
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     # get item for loop
     try:
@@ -710,15 +711,15 @@ class RunComfortMapLoop(QueenbeeTask):
 
     @property
     def execution_folder(self):
-        return os.path.join(self._input_params['simulation_folder'], 'results').replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder'], 'results').resolve().as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'ladybug-comfort map pmv result.sql enclosure_info.json weather.epw --total-irradiance total.ill --direct-irradiance direct.ill --ref-irradiance ref.ill --sun-up-hours sun-up-hours.txt --air-speed "{air_speed}" --met-rate "{met_rate}" --clo-value "{clo_value}" --solarcal-par "{solarcal_par}" --comfort-par "{comfort_par}" --run-period "{run_period}" --{write_set_map}  --folder output'.format(air_speed=self.air_speed, met_rate=self.met_rate, clo_value=self.clo_value, solarcal_par=self.solarcal_par, comfort_par=self.comfort_par, run_period=self.run_period, write_set_map=self.write_set_map)
@@ -729,15 +730,15 @@ class RunComfortMapLoop(QueenbeeTask):
     def output(self):
         return {
             'temperature_map': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'temperature/{item_id}.csv'.format(item_id=self.item['id']))
+                pathlib.Path(self.execution_folder, 'temperature/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix()
             ),
             
             'condition_map': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'condition/{item_id}.csv'.format(item_id=self.item['id']))
+                pathlib.Path(self.execution_folder, 'condition/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix()
             ),
             
             'pmv_map': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'condition_intensity/{item_id}.csv'.format(item_id=self.item['id']))
+                pathlib.Path(self.execution_folder, 'condition_intensity/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix()
             )
         }
 
@@ -757,17 +758,17 @@ class RunComfortMapLoop(QueenbeeTask):
         return [
             {
                 'name': 'temperature-map', 'from': 'output/temperature.csv',
-                'to': os.path.join(self.execution_folder, 'temperature/{item_id}.csv'.format(item_id=self.item['id']))
+                'to': pathlib.Path(self.execution_folder, 'temperature/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix()
             },
                 
             {
                 'name': 'condition-map', 'from': 'output/condition.csv',
-                'to': os.path.join(self.execution_folder, 'condition/{item_id}.csv'.format(item_id=self.item['id']))
+                'to': pathlib.Path(self.execution_folder, 'condition/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix()
             },
                 
             {
                 'name': 'pmv-map', 'from': 'output/condition_intensity.csv',
-                'to': os.path.join(self.execution_folder, 'condition_intensity/{item_id}.csv'.format(item_id=self.item['id']))
+                'to': pathlib.Path(self.execution_folder, 'condition_intensity/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix()
             }]
 
 
@@ -777,9 +778,9 @@ class RunComfortMap(luigi.Task):
     _input_params = luigi.DictParameter()
     @property
     def enclosure_list(self):
-        value = self.input()['GetEnclosureInfo']['enclosure_list'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['GetEnclosureInfo']['enclosure_list'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def items(self):
@@ -788,32 +789,32 @@ class RunComfortMap(luigi.Task):
             return QueenbeeTask.load_input_param(self.enclosure_list)
         except:
             # it is a parameter
-            return self.input()['GetEnclosureInfo']['enclosure_list'].path
+            return pathlib.Path(self.input()['GetEnclosureInfo']['enclosure_list'].path).as_posix()
 
     def run(self):
         yield [RunComfortMapLoop(item=item, _input_params=self._input_params) for item in self.items]
-        os.makedirs(self.execution_folder, exist_ok=True)
-        with open(os.path.join(self.execution_folder, 'run_comfort_map.done'), 'w') as out_file:
-            out_file.write('done!\n')
+        done_file = pathlib.Path(self.execution_folder, 'run_comfort_map.done')
+        done_file.parent.mkdir(parents=True, exist_ok=True)
+        done_file.write_text('done!')
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def requires(self):
         return {'RunEnergySimulation': RunEnergySimulation(_input_params=self._input_params), 'RunIrradianceSimulation': RunIrradianceSimulation(_input_params=self._input_params), 'GetEnclosureInfo': GetEnclosureInfo(_input_params=self._input_params)}
 
     def output(self):
         return {
-            'is_done': luigi.LocalTarget(os.path.join(self.execution_folder, 'run_comfort_map.done'))
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'run_comfort_map.done').resolve().as_posix())
         }
 
 
@@ -824,38 +825,45 @@ class RunEnergySimulation(QueenbeeTask):
     _input_params = luigi.DictParameter()
 
     # Task inputs
+    additional_string = luigi.Parameter(default='')
+
     @property
     def model(self):
-        value = self._input_params['model'].replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self._input_params['model'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def epw(self):
-        value = self._input_params['epw'].replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self._input_params['epw'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def sim_par(self):
-        value = self.input()['CreateSimPar']['sim_par_json'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        try:
+            pathlib.Path(self.input()['CreateSimPar']['sim_par_json'].path)
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self.input()['CreateSimPar']['sim_par_json'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-energy simulate model model.hbjson weather.epw --sim-par-json sim-par.json --folder output'
+        return 'honeybee-energy simulate model model.hbjson weather.epw --sim-par-json sim-par.json --additional-string "{additional_string}" --folder output'.format(additional_string=self.additional_string)
 
     def requires(self):
         return {'CreateSimPar': CreateSimPar(_input_params=self._input_params)}
@@ -863,7 +871,7 @@ class RunEnergySimulation(QueenbeeTask):
     def output(self):
         return {
             'sql': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'energy/eplusout.sql')
+                pathlib.Path(self.execution_folder, 'energy/eplusout.sql').resolve().as_posix()
             )
         }
 
@@ -872,14 +880,14 @@ class RunEnergySimulation(QueenbeeTask):
         return [
             {'name': 'model', 'to': 'model.hbjson', 'from': self.model, 'optional': False},
             {'name': 'epw', 'to': 'weather.epw', 'from': self.epw, 'optional': False},
-            {'name': 'sim_par', 'to': 'sim-par.json', 'from': self.sim_par, 'optional': False}]
+            {'name': 'sim_par', 'to': 'sim-par.json', 'from': self.sim_par, 'optional': True}]
 
     @property
     def output_artifacts(self):
         return [
             {
                 'name': 'sql', 'from': 'output/run/eplusout.sql',
-                'to': os.path.join(self.execution_folder, 'energy/eplusout.sql')
+                'to': pathlib.Path(self.execution_folder, 'energy/eplusout.sql').resolve().as_posix()
             }]
 
 
@@ -906,27 +914,27 @@ class RunIrradianceSimulation(QueenbeeTask):
 
     @property
     def model(self):
-        value = self.input()['MirrorSensorGrids']['new_model'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['MirrorSensorGrids']['new_model'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def wea(self):
-        value = self.input()['CreateWea']['wea'].path.replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self.input()['CreateWea']['wea'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return os.path.join(self._input_params['simulation_folder'], 'radiance/shortwave').replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder'], 'radiance/shortwave').resolve().as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     @property
     def map_dag_inputs(self):
@@ -948,19 +956,18 @@ class RunIrradianceSimulation(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [Main_7b93ed3aWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualIrradianceEntryPoint_6ef32636Workerbee(_input_params=self.map_dag_inputs)]
         os.makedirs(self.execution_folder, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
-        with open(os.path.join(self.execution_folder, 'run_irradiance_simulation.done'), 'w') as out_file:
-            out_file.write('done!\n')
+        pathlib.Path(self.execution_folder, 'run_irradiance_simulation.done').write_text('done!')
 
     def requires(self):
         return {'CreateWea': CreateWea(_input_params=self._input_params), 'MirrorSensorGrids': MirrorSensorGrids(_input_params=self._input_params)}
 
     def output(self):
         return {
-            'is_done': luigi.LocalTarget(os.path.join(self.execution_folder, 'run_irradiance_simulation.done'))
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'run_irradiance_simulation.done').resolve().as_posix())
         }
 
 
@@ -981,21 +988,21 @@ class SetModifiersFromConstructions(QueenbeeTask):
 
     @property
     def model(self):
-        value = self._input_params['model'].replace('\\', '/')
-        return value if os.path.isabs(value) \
-            else os.path.join(self.initiation_folder, value)
+        value = pathlib.Path(self._input_params['model'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
-        return self._input_params['simulation_folder'].replace('\\', '/')
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def params_folder(self):
-        return os.path.join(self.execution_folder, self._input_params['params_folder']).replace('\\', '/')
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-energy edit modifiers-from-constructions model.hbjson --{use_visible} --exterior-offset {exterior_offset} --output-file new_model.hbjson'.format(use_visible=self.use_visible, exterior_offset=self.exterior_offset)
@@ -1003,7 +1010,7 @@ class SetModifiersFromConstructions(QueenbeeTask):
     def output(self):
         return {
             'new_model': luigi.LocalTarget(
-                os.path.join(self.execution_folder, 'radiance/hbjson/1_energy_modifiers.hbjson')
+                pathlib.Path(self.execution_folder, 'radiance/hbjson/1_energy_modifiers.hbjson').resolve().as_posix()
             )
         }
 
@@ -1017,11 +1024,11 @@ class SetModifiersFromConstructions(QueenbeeTask):
         return [
             {
                 'name': 'new-model', 'from': 'new_model.hbjson',
-                'to': os.path.join(self.execution_folder, 'radiance/hbjson/1_energy_modifiers.hbjson')
+                'to': pathlib.Path(self.execution_folder, 'radiance/hbjson/1_energy_modifiers.hbjson').resolve().as_posix()
             }]
 
 
-class _Main_e9d89bc8Orchestrator(luigi.WrapperTask):
+class _Main_6ef32636Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -1033,4 +1040,4 @@ class _Main_e9d89bc8Orchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        return [ComputeTcp(_input_params=self.input_values), CopyGridInfo(_input_params=self.input_values), CreateResultInfo(_input_params=self.input_values)]
+        yield [ComputeTcp(_input_params=self.input_values), CopyGridInfo(_input_params=self.input_values), CreateResultInfo(_input_params=self.input_values)]

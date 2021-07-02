@@ -44,7 +44,7 @@ class LetPmvComfortMapFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [pmv_comfort_map_workerbee._Main_e9d89bc8Orchestrator(_input_params=self._input_params)]
+        yield [pmv_comfort_map_workerbee._Main_6ef32636Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -58,7 +58,7 @@ def start(project_folder, user_values, workers):
         else:
             simulation_id = input_params['simulation_id']
 
-        simulation_folder = os.path.join(project_folder, simulation_id)
+        simulation_folder = pathlib.Path(project_folder, simulation_id).as_posix()
         input_params['simulation_folder'] = simulation_folder
     else:
         simulation_folder = input_params['simulation_folder']
@@ -72,8 +72,8 @@ def start(project_folder, user_values, workers):
             if artifact in optional_artifacts:
                 continue
             raise ValueError('None value for required artifact input: %s' % artifact)
-        from_ = os.path.join(project_folder, input_params[artifact])
-        to_ = os.path.join(simulation_folder, input_params[artifact])
+        from_ = pathlib.Path(project_folder, input_params[artifact]).resolve().as_posix()
+        to_ = pathlib.Path(simulation_folder, input_params[artifact]).resolve().as_posix()
         _copy_artifacts(from_, to_)
 
     # set up logs
