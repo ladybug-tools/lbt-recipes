@@ -25,7 +25,8 @@ _default_inputs = {   'bsdfs': None,
     'sensor_count': 200,
     'sensor_grid': None,
     'simulation_folder': '.',
-    'sun_modifiers': None}
+    'sun_modifiers': None,
+    'timestep': 1}
 
 
 class CalculateCumulativeHours(QueenbeeTask):
@@ -42,6 +43,10 @@ class CalculateCumulativeHours(QueenbeeTask):
     @property
     def grid_name(self):
         return self._input_params['grid_name']
+
+    @property
+    def divisor(self):
+        return self._input_params['timestep']
 
     @property
     def input_mtx(self):
@@ -62,7 +67,7 @@ class CalculateCumulativeHours(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance post-process sum-row input.mtx --output sum.mtx'
+        return 'honeybee-radiance post-process sum-row input.mtx --divisor {divisor} --output sum.mtx'.format(divisor=self.divisor)
 
     def requires(self):
         return {'ConvertToSunHours': ConvertToSunHours(_input_params=self._input_params)}
@@ -84,8 +89,7 @@ class CalculateCumulativeHours(QueenbeeTask):
         return [
             {
                 'name': 'output-mtx', 'from': 'sum.mtx',
-                'to': pathlib.Path(self.execution_folder, '{grid_name}.res'.format(grid_name=self.grid_name)).resolve().as_posix(),
-                'optional': False
+                'to': pathlib.Path(self.execution_folder, '{grid_name}.res'.format(grid_name=self.grid_name)).resolve().as_posix()
             }]
 
 
@@ -116,7 +120,7 @@ class ConvertToSunHours(QueenbeeTask):
 
     @property
     def input_mtx(self):
-        value = pathlib.Path(self.input()['DirectRadiationCalculation']['result_file'].path)
+        value = pathlib.Path(self.input()['DirectIrradianceCalculation']['result_file'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -136,7 +140,7 @@ class ConvertToSunHours(QueenbeeTask):
         return 'honeybee-radiance post-process convert-to-binary input.mtx --output binary.mtx --maximum {maximum} --minimum {minimum} --{reverse} --{include_min}-min --{include_max}-max'.format(maximum=self.maximum, minimum=self.minimum, reverse=self.reverse, include_min=self.include_min, include_max=self.include_max)
 
     def requires(self):
-        return {'DirectRadiationCalculation': DirectRadiationCalculation(_input_params=self._input_params)}
+        return {'DirectIrradianceCalculation': DirectIrradianceCalculation(_input_params=self._input_params)}
 
     def output(self):
         return {
@@ -155,12 +159,11 @@ class ConvertToSunHours(QueenbeeTask):
         return [
             {
                 'name': 'output-mtx', 'from': 'binary.mtx',
-                'to': pathlib.Path(self.execution_folder, '{grid_name}.ill'.format(grid_name=self.grid_name)).resolve().as_posix(),
-                'optional': False
+                'to': pathlib.Path(self.execution_folder, '{grid_name}.ill'.format(grid_name=self.grid_name)).resolve().as_posix()
             }]
 
 
-class DirectRadiationCalculation(QueenbeeTask):
+class DirectIrradianceCalculation(QueenbeeTask):
     """Calculate daylight contribution for a grid of sensors from a series of modifiers
     using rcontrib command."""
 
@@ -212,13 +215,18 @@ class DirectRadiationCalculation(QueenbeeTask):
 
     @property
     def bsdf_folder(self):
+        try:
+            pathlib.Path(self._input_params['bsdfs'])
+        except TypeError:
+            # optional artifact
+            return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder'], 'direct-radiation').resolve().as_posix()
+        return pathlib.Path(self._input_params['simulation_folder'], 'direct-irradiance').resolve().as_posix()
 
     @property
     def initiation_folder(self):
@@ -244,19 +252,18 @@ class DirectRadiationCalculation(QueenbeeTask):
             {'name': 'modifiers', 'to': 'suns.mod', 'from': self.modifiers, 'optional': False},
             {'name': 'sensor_grid', 'to': 'grid.pts', 'from': self.sensor_grid, 'optional': False},
             {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False},
-            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': False}]
+            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': True}]
 
     @property
     def output_artifacts(self):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, '{grid_name}.ill'.format(grid_name=self.grid_name)).resolve().as_posix(),
-                'optional': False
+                'to': pathlib.Path(self.execution_folder, '{grid_name}.ill'.format(grid_name=self.grid_name)).resolve().as_posix()
             }]
 
 
-class _DirectSunHoursCalculation_f7b27c6cOrchestrator(luigi.WrapperTask):
+class _DirectSunHoursCalculation_3edc04c8Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

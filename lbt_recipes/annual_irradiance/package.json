@@ -5,15 +5,15 @@
   "metadata": {
     "type": "MetaData",
     "annotations": {},
-    "name": "annual-radiation",
-    "tag": "0.1.8",
+    "name": "annual-irradiance",
+    "tag": "0.0.2",
     "app_version": null,
     "keywords": [
       "honeybee",
       "radiance",
       "ladybug-tools",
       "daylight",
-      "annual-radiation"
+      "annual-irradiance"
     ],
     "maintainers": [
       {
@@ -29,13 +29,13 @@
         "email": "info@ladybug.tools"
       }
     ],
-    "home": "https://github.com/pollination/annual-radiation",
+    "home": "https://github.com/pollination/annual-irradiance",
     "sources": [
       "https://hub.docker.com/r/ladybugtools/honeybee-radiance"
     ],
-    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/annualradrecipe.png",
+    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/annualirrrecipe.png",
     "deprecated": null,
-    "description": "Annual radiation recipe for Pollination.",
+    "description": "Annual irradiance recipe for Pollination.",
     "license": {
       "type": "License",
       "annotations": {},
@@ -90,14 +90,16 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.model",
-              "function": "model_to_json"
+              "function": "model_to_json",
+              "index": 0
             },
             {
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "Pollination.Handlers",
-              "function": "HBModelToJSON"
+              "module": "Pollination.RhinoHandlers",
+              "function": "HBModelToJSON",
+              "index": 0
             }
           ],
           "default": null,
@@ -117,8 +119,9 @@
               "type": "IOAliasHandler",
               "annotations": {},
               "language": "csharp",
-              "module": "Pollination.Handlers",
-              "function": "RhinoHBModelToJSON"
+              "module": "Pollination.RhinoHandlers",
+              "function": "RhinoHBModelToJSON",
+              "index": 0
             }
           ],
           "default": null,
@@ -154,7 +157,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.north",
-              "function": "north_vector_to_angle"
+              "function": "north_vector_to_angle",
+              "index": 0
             }
           ],
           "default": "0",
@@ -221,6 +225,20 @@
       }
     },
     {
+      "type": "DAGIntegerInput",
+      "annotations": {},
+      "name": "timestep",
+      "description": "Input wea timestep. This value will be used to compute cumulative radiation results.",
+      "default": 1,
+      "alias": [],
+      "required": false,
+      "spec": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 60
+      }
+    },
+    {
       "type": "DAGFileInput",
       "annotations": {},
       "name": "wea",
@@ -241,7 +259,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.wea",
-              "function": "wea_handler"
+              "function": "wea_handler",
+              "index": 0
             }
           ],
           "default": null,
@@ -260,19 +279,19 @@
     {
       "type": "DAGFolderOutput",
       "annotations": {},
-      "name": "direct-radiation",
-      "description": "Folder with raw result files (.ill) that contain matrices of direct irradiance.",
+      "name": "average-irradiance",
+      "description": "The average irradiance in W/m2 for each sensor over the Wea time period.",
       "from": {
         "type": "FolderReference",
         "annotations": {},
-        "path": "results/direct"
+        "path": "metrics/average_irradiance"
       },
       "alias": [
         {
           "type": "DAGGenericOutputAlias",
           "annotations": {},
-          "name": "direct",
-          "description": "Raw result files (.ill) that contain irradiance matrices for the direct radiation at each sensor and timestep.",
+          "name": "avg_irr",
+          "description": "The average irradiance in W/m2 for each sensor over the Wea time period.",
           "platform": [
             "grasshopper"
           ],
@@ -282,7 +301,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.daylight",
-              "function": "sort_ill_from_folder"
+              "function": "read_pit_from_folder",
+              "index": 0
             }
           ]
         }
@@ -292,8 +312,74 @@
     {
       "type": "DAGFolderOutput",
       "annotations": {},
-      "name": "total-radiation",
-      "description": "Folder with raw result files (.ill) that contain matrices of total irradiance.",
+      "name": "cumulative-radiation",
+      "description": "The cumulative radiation in Wh/m2 over the Wea time period.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "metrics/cumulative_radiation"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "radiation",
+          "description": "The cumulative radiation in kWh/m2 over the Wea time period.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_pit_from_folder",
+              "index": 0
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "peak-irradiance",
+      "description": "The highest irradiance value in W/m2 during the Wea time period. This is suitable for assessing the worst-case solar load on cooling design days or the highest radiant temperatures that occupants might experience in over the time period of the Wea.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "metrics/peak_irradiance"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "peak_irr",
+          "description": "The highest irradiance value in W/m2 during the Wea time period. This is suitable for assessing the worst-case solar load of clear skies on cooling design days. It can also be used to determine the highest radiant temperatures that occupants might experience in over the time period of the Wea.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_pit_from_folder",
+              "index": 0
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "results",
+      "description": "Folder with raw result files (.ill) that contain matrices of irradiance in W/m2 for each time step of the Wea time period.",
       "from": {
         "type": "FolderReference",
         "annotations": {},
@@ -303,7 +389,7 @@
         {
           "type": "DAGGenericOutputAlias",
           "annotations": {},
-          "name": "total",
+          "name": "results",
           "description": "Raw result files (.ill) that contain irradiance matrices for the total radiation at each sensor and timestep.",
           "platform": [
             "grasshopper"
@@ -314,7 +400,8 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.outputs.daylight",
-              "function": "sort_ill_from_folder"
+              "function": "sort_ill_from_folder",
+              "index": 0
             }
           ]
         }
