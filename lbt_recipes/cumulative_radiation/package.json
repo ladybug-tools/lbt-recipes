@@ -5,15 +5,16 @@
   "metadata": {
     "type": "MetaData",
     "annotations": {},
-    "name": "annual-irradiance",
-    "tag": "0.1.1",
+    "name": "cumulative-radiation",
+    "tag": "0.1.0",
     "app_version": null,
     "keywords": [
       "honeybee",
       "radiance",
       "ladybug-tools",
       "daylight",
-      "annual-irradiance"
+      "cumulative",
+      "radiation"
     ],
     "maintainers": [
       {
@@ -29,13 +30,13 @@
         "email": "info@ladybug.tools"
       }
     ],
-    "home": "https://github.com/pollination/annual-irradiance",
+    "home": "https://github.com/pollination/cumulative-radiation",
     "sources": [
       "https://hub.docker.com/r/ladybugtools/honeybee-radiance"
     ],
-    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/annualirrrecipe.png",
+    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/radrecipe.png",
     "deprecated": null,
-    "description": "Annual irradiance recipe for Pollination.",
+    "description": "Cumulative Radiation recipe for Pollination.",
     "license": {
       "type": "License",
       "annotations": {},
@@ -227,6 +228,19 @@
     {
       "type": "DAGIntegerInput",
       "annotations": {},
+      "name": "sky-density",
+      "description": "The density of generated sky. This input corresponds to gendaymtx -m option. -m 1 generates 146 patch starting with 0 for the ground and continuing to 145 for the zenith. Increasing the -m parameter yields a higher resolution sky using the Reinhart patch subdivision. For example, setting -m 4 yields a sky with 2305 patches plus one patch for the ground.",
+      "default": 1,
+      "alias": [],
+      "required": false,
+      "spec": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    {
+      "type": "DAGIntegerInput",
+      "annotations": {},
       "name": "timestep",
       "description": "Input wea timestep. This value will be used to compute cumulative radiation results.",
       "default": 1,
@@ -284,7 +298,7 @@
       "from": {
         "type": "FolderReference",
         "annotations": {},
-        "path": "metrics/average_irradiance"
+        "path": "results/average_irradiance"
       },
       "alias": [
         {
@@ -317,7 +331,7 @@
       "from": {
         "type": "FolderReference",
         "annotations": {},
-        "path": "metrics/cumulative_radiation"
+        "path": "results/cumulative_radiation"
       },
       "alias": [
         {
@@ -335,72 +349,6 @@
               "language": "python",
               "module": "pollination_handlers.outputs.daylight",
               "function": "read_pit_from_folder",
-              "index": 0
-            }
-          ]
-        }
-      ],
-      "required": true
-    },
-    {
-      "type": "DAGFolderOutput",
-      "annotations": {},
-      "name": "peak-irradiance",
-      "description": "The highest irradiance value in W/m2 during the Wea time period. This is suitable for assessing the worst-case solar load on cooling design days or the highest radiant temperatures that occupants might experience in over the time period of the Wea.",
-      "from": {
-        "type": "FolderReference",
-        "annotations": {},
-        "path": "metrics/peak_irradiance"
-      },
-      "alias": [
-        {
-          "type": "DAGGenericOutputAlias",
-          "annotations": {},
-          "name": "peak_irr",
-          "description": "The highest irradiance value in W/m2 during the Wea time period. This is suitable for assessing the worst-case solar load of clear skies on cooling design days. It can also be used to determine the highest radiant temperatures that occupants might experience in over the time period of the Wea.",
-          "platform": [
-            "grasshopper"
-          ],
-          "handler": [
-            {
-              "type": "IOAliasHandler",
-              "annotations": {},
-              "language": "python",
-              "module": "pollination_handlers.outputs.daylight",
-              "function": "read_pit_from_folder",
-              "index": 0
-            }
-          ]
-        }
-      ],
-      "required": true
-    },
-    {
-      "type": "DAGFolderOutput",
-      "annotations": {},
-      "name": "results",
-      "description": "Folder with raw result files (.ill) that contain matrices of irradiance in W/m2 for each time step of the Wea time period.",
-      "from": {
-        "type": "FolderReference",
-        "annotations": {},
-        "path": "results/total"
-      },
-      "alias": [
-        {
-          "type": "DAGGenericOutputAlias",
-          "annotations": {},
-          "name": "results",
-          "description": "Raw result files (.ill) that contain irradiance matrices for the total radiation at each sensor and timestep.",
-          "platform": [
-            "grasshopper"
-          ],
-          "handler": [
-            {
-              "type": "IOAliasHandler",
-              "annotations": {},
-              "language": "python",
-              "module": "pollination_handlers.outputs.daylight",
-              "function": "sort_ill_from_folder",
               "index": 0
             }
           ]

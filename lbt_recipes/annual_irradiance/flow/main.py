@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.annual_irradiance_ray_tracing import _AnnualIrradianceRayTracing_f2191600Orchestrator as AnnualIrradianceRayTracing_f2191600Workerbee
+from .dependencies.annual_irradiance_ray_tracing import _AnnualIrradianceRayTracing_005b9456Orchestrator as AnnualIrradianceRayTracing_005b9456Workerbee
 
 
 _default_inputs = {   'grid_filter': '*',
@@ -153,7 +153,7 @@ class AnnualIrradianceRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualIrradianceRayTracing_f2191600Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualIrradianceRayTracing_005b9456Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_irradiance_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -829,10 +829,6 @@ class ParseSunUpHours(QueenbeeTask):
     _input_params = luigi.DictParameter()
 
     # Task inputs
-    leap_year = luigi.Parameter(default='full-year')
-
-    timestep = luigi.Parameter(default='1')
-
     @property
     def sun_modifiers(self):
         value = pathlib.Path(self.input()['GenerateSunpath']['sun_modifiers'].path)
@@ -852,7 +848,7 @@ class ParseSunUpHours(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance sunpath parse-hours suns.mod --name sun-up-hours.txt --timestep {timestep} --{leap_year}'.format(timestep=self.timestep, leap_year=self.leap_year)
+        return 'honeybee-radiance sunpath parse-hours suns.mod --name sun-up-hours.txt'
 
     def requires(self):
         return {'GenerateSunpath': GenerateSunpath(_input_params=self._input_params)}
@@ -878,7 +874,7 @@ class ParseSunUpHours(QueenbeeTask):
             }]
 
 
-class _Main_f2191600Orchestrator(luigi.WrapperTask):
+class _Main_005b9456Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.direct_sun_hours_calculation import _DirectSunHoursCalculation_3edc04c8Orchestrator as DirectSunHoursCalculation_3edc04c8Workerbee
+from .dependencies.direct_sun_hours_calculation import _DirectSunHoursCalculation_8b5851b1Orchestrator as DirectSunHoursCalculation_8b5851b1Workerbee
 
 
 _default_inputs = {   'bsdfs': None,
@@ -125,7 +125,7 @@ class DirectSunlightLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DirectSunHoursCalculation_3edc04c8Workerbee(_input_params=self.map_dag_inputs)]
+        yield [DirectSunHoursCalculation_8b5851b1Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'direct_sunlight.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -368,7 +368,7 @@ class SplitGrid(QueenbeeTask):
         return [{'name': 'grids-list', 'from': 'output/grids_info.json', 'to': pathlib.Path(self.params_folder, 'output/grids_info.json').resolve().as_posix()}]
 
 
-class _DirectSunHoursEntryLoop_3edc04c8Orchestrator(luigi.WrapperTask):
+class _DirectSunHoursEntryLoop_8b5851b1Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -20,23 +20,25 @@ import pathlib
 from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 
-import flow.main as direct_sun_hours_workerbee
+import flow.main as cumulative_radiation_workerbee
 
 
 _recipe_default_inputs = {   'grid_filter': '*',
     'model': None,
     'north': 0.0,
+    'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
     'sensor_count': 200,
+    'sky_density': 1,
     'timestep': 1,
     'wea': None}
 
 
-class LetDirectSunHoursFly(luigi.WrapperTask):
+class LetCumulativeRadiationFly(luigi.WrapperTask):
     # global parameters
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [direct_sun_hours_workerbee._Main_8b5851b1Orchestrator(_input_params=self._input_params)]
+        yield [cumulative_radiation_workerbee._Main_52de34a8Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -46,7 +48,7 @@ def start(project_folder, user_values, workers):
 
     if 'simulation_folder' not in input_params or not input_params['simulation_folder']:
         if 'simulation_id' not in input_params or not input_params['simulation_id']:
-            simulation_id = 'direct_sun_hours_%d' % int(round(time.time(), 2) * 100)
+            simulation_id = 'cumulative_radiation_%d' % int(round(time.time(), 2) * 100)
         else:
             simulation_id = input_params['simulation_id']
 
@@ -77,7 +79,7 @@ def start(project_folder, user_values, workers):
         lf.write(LOGS_CONFIG.replace('WORKFLOW.LOG', log_file))
 
     luigi.build(
-        [LetDirectSunHoursFly(_input_params=input_params)],
+        [LetCumulativeRadiationFly(_input_params=input_params)],
         local_scheduler=local_scheduler(),
         workers=workers,
         logging_conf_file=cfg_file.as_posix()
