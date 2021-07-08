@@ -84,6 +84,11 @@ class DirectSkyLoop(QueenbeeTask):
 
     @property
     def bsdf_folder(self):
+        try:
+            pathlib.Path(self._input_params['bsdfs'])
+        except TypeError:
+            # optional artifact
+            return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -126,15 +131,14 @@ class DirectSkyLoop(QueenbeeTask):
             {'name': 'sky_dome', 'to': 'sky.dome', 'from': self.sky_dome, 'optional': False},
             {'name': 'sensor_grid', 'to': 'grid.pts', 'from': self.sensor_grid, 'optional': False},
             {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False},
-            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': False}]
+            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': True}]
 
     @property
     def output_artifacts(self):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix(),
-                'optional': False
+                'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix()
             }]
 
 
@@ -232,6 +236,11 @@ class DirectSunlightLoop(QueenbeeTask):
 
     @property
     def bsdf_folder(self):
+        try:
+            pathlib.Path(self._input_params['bsdfs'])
+        except TypeError:
+            # optional artifact
+            return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -273,15 +282,14 @@ class DirectSunlightLoop(QueenbeeTask):
             {'name': 'modifiers', 'to': 'suns.mod', 'from': self.modifiers, 'optional': False},
             {'name': 'sensor_grid', 'to': 'grid.pts', 'from': self.sensor_grid, 'optional': False},
             {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False},
-            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': False}]
+            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': True}]
 
     @property
     def output_artifacts(self):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix(),
-                'optional': False
+                'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix()
             }]
 
 
@@ -388,8 +396,7 @@ class MergeRawResults(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': '{name}{extension}'.format(name=self.name, extension=self.extension),
-                'to': pathlib.Path(self.execution_folder, '../../results/{name}.ill'.format(name=self.name)).resolve().as_posix(),
-                'optional': False
+                'to': pathlib.Path(self.execution_folder, '../../results/{name}.ill'.format(name=self.name)).resolve().as_posix()
             }]
 
 
@@ -469,8 +476,7 @@ class OutputMatrixMathLoop(QueenbeeTask):
         return [
             {
                 'name': 'results-file', 'from': 'final.ill',
-                'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix(),
-                'optional': False
+                'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix()
             }]
 
 
@@ -575,8 +581,7 @@ class SplitGrid(QueenbeeTask):
         return [
             {
                 'name': 'output-folder', 'from': 'output',
-                'to': pathlib.Path(self.execution_folder, 'sub_grids').resolve().as_posix(),
-                'optional': False
+                'to': pathlib.Path(self.execution_folder, 'sub_grids').resolve().as_posix()
             }]
 
     @property
@@ -635,6 +640,11 @@ class TotalSkyLoop(QueenbeeTask):
 
     @property
     def bsdf_folder(self):
+        try:
+            pathlib.Path(self._input_params['bsdfs'])
+        except TypeError:
+            # optional artifact
+            return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -677,15 +687,14 @@ class TotalSkyLoop(QueenbeeTask):
             {'name': 'sky_dome', 'to': 'sky.dome', 'from': self.sky_dome, 'optional': False},
             {'name': 'sensor_grid', 'to': 'grid.pts', 'from': self.sensor_grid, 'optional': False},
             {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False},
-            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': False}]
+            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': True}]
 
     @property
     def output_artifacts(self):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix(),
-                'optional': False
+                'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix()
             }]
 
 
@@ -735,7 +744,7 @@ class TotalSky(luigi.Task):
         }
 
 
-class _AnnualDaylightRayTracing_b08bf9f3Orchestrator(luigi.WrapperTask):
+class _AnnualDaylightRayTracing_ade551eaOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
