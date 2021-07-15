@@ -212,7 +212,7 @@ class Recipe(object):
         return file_path
 
     def run(self, settings=None, radiance_check=False, openstudio_check=False,
-            energyplus_check=False, queenbee_path=None):
+            energyplus_check=False, queenbee_path=None, silent=False):
         """Run the recipe using the queenbee local run command.
 
         Args:
@@ -235,6 +235,8 @@ class Recipe(object):
             queenbee_path: Optional path to the queenbee executable. If None, the
                 queenbee within the ladybug_tools Python folder will be used.
                 Setting this to just 'queenbee' will use the system Python.
+            silent: Boolean to note whether the recipe should be run silently on
+                Windows (True) or with a command window (False). (Default: False).
 
         Returns:
             Path to the project folder containing the recipe results.
@@ -286,7 +288,7 @@ class Recipe(object):
             )
 
         # execute command
-        shell = False if os.name == 'nt' else True
+        shell = False if os.name == 'nt' and not silent else True
         if settings.report_out:
             process = subprocess.Popen(
                 command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell)
@@ -316,6 +318,41 @@ class Recipe(object):
             raise ValueError(
                 'Output "{}" was not found for recipe "{}".'.format(
                     output_name, self.name))
+
+    def luigi_execution_summary(self, project_folder=None):
+        """Get a string of the luigi execution summary after the recipe has run.
+
+        Args:
+            project_folder: The full path to the project folder containing
+                completed recipe logs. If None, the default_project_folder on
+                this recipe will be assumed. (Default: None).
+        """
+        # determine the log file path from the project folder
+        proj = self.default_project_folder if project_folder is None else project_folder
+        sim_path = os.path.join(proj, self.simulation_id)
+        log_file = os.path.join(sim_path, '__logs__', 'logs.log')
+        # open the file and load the summary
+        read_lines, summary_lines = False, []
+        with open(log_file) as lf:
+            for line in lf:
+                if line.strip() == '===== Luigi Execution Summary =====':
+                    read_lines = not read_lines
+                    continue
+                elif read_lines:
+                    summary_lines.append(line)
+        return ''.join(summary_lines)
+
+    def failure_message(self, project_folder=None):
+        """Get a string of a recipe failure message that gives a summary of failed tasks.
+
+        Args:
+            project_folder: The full path to the project folder containing
+                completed recipe logs. If None, the default_project_folder on
+                this recipe will be assumed. (Default: None).
+        """
+        st_msg = 'The recipe failed to run with the following summary:\n'
+        end_msg = 'Use the report_out attribute of recipe settings to see a full report.'
+        return ''.join([st_msg, self.luigi_execution_summary(project_folder), end_msg])
 
     def ToString(self):
         return self.__repr__()
