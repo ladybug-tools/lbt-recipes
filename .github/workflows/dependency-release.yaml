@@ -4,6 +4,60 @@ on: repository_dispatch
 
 jobs:
 
+  bump_queenbee_local:
+    name: "Check Event"
+    runs-on: ubuntu-latest
+    if: github.event.action == 'queenbee_local_release'
+    steps:
+    - name: "Checkout Master Branch"
+      uses: actions/checkout@v2
+      with:
+        ref: refs/heads/master
+        token: ${{ secrets.DEPS_UPDATING }}
+    - name: "Run Update Script"
+      env:
+        VERSION: ${{ github.event.client_payload.version }}
+      run: |
+        export CLEAN_VERSION=$(echo $VERSION | sed 's/v//g')
+        sed -i --regexp-extended 's/(queenbee-local==).*/queenbee-local=='"$CLEAN_VERSION"'/' requirements.txt
+    - name: "Commit and Push Changes"
+      id: push
+      env:
+        VERSION: ${{ github.event.client_payload.version }}
+      run: |
+        git config --global user.name 'ladybugbot'
+        git config --global user.email 'ladybugbot@users.noreply.github.com'
+        git add .
+        git commit -m "fix(deps): Bump queenbee-local to $VERSION"
+        git push
+
+  bump_pollination_handlers:
+    name: "Check Event"
+    runs-on: ubuntu-latest
+    if: github.event.action == 'pollination_handlers_release'
+    steps:
+    - name: "Checkout Master Branch"
+      uses: actions/checkout@v2
+      with:
+        ref: refs/heads/master
+        token: ${{ secrets.DEPS_UPDATING }}
+    - name: "Run Update Script"
+      env:
+        VERSION: ${{ github.event.client_payload.version }}
+      run: |
+        export CLEAN_VERSION=$(echo $VERSION | sed 's/v//g')
+        sed -i --regexp-extended 's/(pollination-handlers==).*/pollination-handlers=='"$CLEAN_VERSION"'/' requirements.txt
+    - name: "Commit and Push Changes"
+      id: push
+      env:
+        VERSION: ${{ github.event.client_payload.version }}
+      run: |
+        git config --global user.name 'ladybugbot'
+        git config --global user.email 'ladybugbot@users.noreply.github.com'
+        git add .
+        git commit -m "fix(deps): Bump pollination-handlers to $VERSION"
+        git push
+
   bump_lbt_honeybee:
     name: "Check Event"
     runs-on: ubuntu-latest
