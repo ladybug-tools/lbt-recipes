@@ -86,7 +86,8 @@ class AdjustSky(QueenbeeTask):
         return [
             {
                 'name': 'adjusted-sky', 'from': '{metric}.sky'.format(metric=self.metric),
-                'to': pathlib.Path(self.execution_folder, 'resources/weather.sky').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/weather.sky').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -149,7 +150,8 @@ class CreateOctree(QueenbeeTask):
         return [
             {
                 'name': 'scene-file', 'from': 'scene.oct',
-                'to': pathlib.Path(self.execution_folder, 'resources/scene.oct').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/scene.oct').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -192,10 +194,6 @@ class CreateRadFolder(QueenbeeTask):
                 pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
             ),
             
-            'bsdf_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
-            ),
-            
             'views_file': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'results/views_info.json').resolve().as_posix()
             ),
@@ -216,17 +214,20 @@ class CreateRadFolder(QueenbeeTask):
         return [
             {
                 'name': 'model-folder', 'from': 'model',
-                'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix(),
+                'optional': False
             },
                 
             {
                 'name': 'bsdf-folder', 'from': 'model/bsdf',
-                'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix(),
+                'optional': True
             },
                 
             {
                 'name': 'views-file', 'from': 'model/view/_info.json',
-                'to': pathlib.Path(self.execution_folder, 'results/views_info.json').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'results/views_info.json').resolve().as_posix(),
+                'optional': False
             }]
 
     @property
@@ -272,7 +273,8 @@ class GenerateSky(QueenbeeTask):
         return [
             {
                 'name': 'sky', 'from': 'output.sky',
-                'to': pathlib.Path(self.execution_folder, 'resources/weather.sky').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/weather.sky').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -325,6 +327,9 @@ class PointInTimeViewRayTracingLoop(luigi.Task):
             pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
         except TypeError:
             # optional artifact
+            return None
+        except KeyError:
+            # optional artifact from an optional output artifact
             return None
         value = pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
         return value.as_posix() if value.is_absolute() \
