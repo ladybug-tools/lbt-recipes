@@ -18,8 +18,9 @@ def check_radiance_date():
     assert rad_folders.radiance_path is not None, \
         'No Radiance installation was found on this machine.\n{}'.format(rad_msg)
     assert rad_folders.radiance_version_date >= RADIANCE_DATE, \
-        'The installed Radiance is not from {} or later.' \
-        '\n{}'.format('/'.join(str(v) for v in RADIANCE_DATE), rad_msg)
+        'The installed Radiance is from {}.\n Must be from from {} or later.\n{}'.format(
+            '/'.join(str(v) for v in rad_folders.radiance_version_date),
+            '/'.join(str(v) for v in RADIANCE_DATE), rad_msg)
 
 
 def check_openstudio_version():
@@ -30,8 +31,9 @@ def check_openstudio_version():
         'No OpenStudio installation was found on this machine.\n{}'.format(in_msg)
     os_version = energy_folders.openstudio_version
     assert os_version is not None and os_version >= OS_VERSION, \
-        'The installed OpenStudio is not version {} or greater.' \
-        '\n{}'.format('.'.join(str(v) for v in OS_VERSION), in_msg)
+        'The installed OpenStudio is {}.\nMust be version {} or greater.\n{}'.format(
+            '.'.join(str(v) for v in os_version),
+            '.'.join(str(v) for v in OS_VERSION), in_msg)
 
 
 def check_energyplus_version():
@@ -43,5 +45,6 @@ def check_energyplus_version():
         'No EnergyPlus installation was found on this machine.\n{}'.format(in_msg)
     ep_version = energy_folders.energyplus_version
     assert ep_version is not None and ep_version >= EP_VERSION, \
-        'The installed EnergyPlus is not version {} or greater.' \
-        '\n{}'.format('.'.join(str(v) for v in EP_VERSION), in_msg)
+        'The installed EnergyPlus is {}.\nMust be version {} or greater.\n{}'.format(
+            '.'.join(str(v) for v in ep_version),
+            '.'.join(str(v) for v in EP_VERSION), in_msg)
