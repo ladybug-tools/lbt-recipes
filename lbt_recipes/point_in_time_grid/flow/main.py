@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.point_in_time_grid_ray_tracing import _PointInTimeGridRayTracing_7f412068Orchestrator as PointInTimeGridRayTracing_7f412068Workerbee
+from .dependencies.point_in_time_grid_ray_tracing import _PointInTimeGridRayTracing_07e19618Orchestrator as PointInTimeGridRayTracing_07e19618Workerbee
 
 
 _default_inputs = {   'grid_filter': '*',
@@ -192,10 +192,6 @@ class CreateRadFolder(QueenbeeTask):
                 pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
             ),
             
-            'bsdf_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
-            ),
-            
             'model_sensor_grids_file': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix()
             ),
@@ -223,7 +219,7 @@ class CreateRadFolder(QueenbeeTask):
             {
                 'name': 'bsdf-folder', 'from': 'model/bsdf',
                 'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix(),
-                'optional': False
+                'optional': True
             },
                 
             {
@@ -317,6 +313,14 @@ class PointInTimeGridRayTracingLoop(luigi.Task):
 
     @property
     def bsdfs(self):
+        try:
+            pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
+        except TypeError:
+            # optional artifact
+            return None
+        except KeyError:
+            # optional artifact from an optional output artifact
+            return None
         value = pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -361,7 +365,7 @@ class PointInTimeGridRayTracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [PointInTimeGridRayTracing_7f412068Workerbee(_input_params=self.map_dag_inputs)]
+        yield [PointInTimeGridRayTracing_07e19618Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'point_in_time_grid_ray_tracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -421,7 +425,7 @@ class PointInTimeGridRayTracing(luigi.Task):
         }
 
 
-class _Main_7f412068Orchestrator(luigi.WrapperTask):
+class _Main_07e19618Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

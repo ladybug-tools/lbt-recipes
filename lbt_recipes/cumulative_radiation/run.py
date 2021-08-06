@@ -38,7 +38,7 @@ class LetCumulativeRadiationFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [cumulative_radiation_workerbee._Main_52de34a8Orchestrator(_input_params=self._input_params)]
+        yield [cumulative_radiation_workerbee._Main_80f18d4dOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

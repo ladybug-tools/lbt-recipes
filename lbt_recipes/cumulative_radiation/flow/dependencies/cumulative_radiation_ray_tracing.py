@@ -95,7 +95,8 @@ class AccumulateResults(QueenbeeTask):
         return [
             {
                 'name': 'radiation', 'from': 'radiation.mtx',
-                'to': pathlib.Path(self.execution_folder, '../../results/cumulative_radiation/{name}.res'.format(name=self.name)).resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, '../../results/cumulative_radiation/{name}.res'.format(name=self.name)).resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -155,7 +156,8 @@ class MergeResults(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': '{name}{extension}'.format(name=self.name, extension=self.extension),
-                'to': pathlib.Path(self.execution_folder, '../../results/average_irradiance/{name}.res'.format(name=self.name)).resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, '../../results/average_irradiance/{name}.res'.format(name=self.name)).resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -214,7 +216,8 @@ class SplitGrid(QueenbeeTask):
         return [
             {
                 'name': 'output-folder', 'from': 'output',
-                'to': pathlib.Path(self.execution_folder, '00_sub_grids').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, '00_sub_grids').resolve().as_posix(),
+                'optional': False
             }]
 
     @property
@@ -282,6 +285,9 @@ class TotalSkyLoop(QueenbeeTask):
         except TypeError:
             # optional artifact
             return None
+        except KeyError:
+            # optional artifact from an optional output artifact
+            return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -331,7 +337,8 @@ class TotalSkyLoop(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, '{item_name}.res'.format(item_name=self.item['name'])).resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, '{item_name}.res'.format(item_name=self.item['name'])).resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -381,7 +388,7 @@ class TotalSky(luigi.Task):
         }
 
 
-class _CumulativeRadiationRayTracing_52de34a8Orchestrator(luigi.WrapperTask):
+class _CumulativeRadiationRayTracing_80f18d4dOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

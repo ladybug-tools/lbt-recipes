@@ -36,7 +36,7 @@ class LetDirectSunHoursFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [direct_sun_hours_workerbee._Main_8b5851b1Orchestrator(_input_params=self._input_params)]
+        yield [direct_sun_hours_workerbee._Main_bafdc769Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
