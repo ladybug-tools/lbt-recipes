@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.daylight_factor_ray_tracing import _DaylightFactorRayTracing_e548dc8eOrchestrator as DaylightFactorRayTracing_e548dc8eWorkerbee
+from .dependencies.daylight_factor_ray_tracing import _DaylightFactorRayTracing_6d87dac1Orchestrator as DaylightFactorRayTracing_6d87dac1Workerbee
 
 
 _default_inputs = {   'grid_filter': '*',
@@ -130,10 +130,6 @@ class CreateRadFolder(QueenbeeTask):
                 pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
             ),
             
-            'bsdf_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
-            ),
-            
             'model_sensor_grids_file': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix()
             ),
@@ -161,7 +157,7 @@ class CreateRadFolder(QueenbeeTask):
             {
                 'name': 'bsdf-folder', 'from': 'model/bsdf',
                 'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix(),
-                'optional': False
+                'optional': True
             },
                 
             {
@@ -208,6 +204,14 @@ class DaylightFactorRayTracingLoop(luigi.Task):
 
     @property
     def bsdfs(self):
+        try:
+            pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
+        except TypeError:
+            # optional artifact
+            return None
+        except KeyError:
+            # optional artifact from an optional output artifact
+            return None
         value = pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -251,7 +255,7 @@ class DaylightFactorRayTracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DaylightFactorRayTracing_e548dc8eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [DaylightFactorRayTracing_6d87dac1Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'daylight_factor_ray_tracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -352,7 +356,7 @@ class GenerateSky(QueenbeeTask):
             }]
 
 
-class _Main_e548dc8eOrchestrator(luigi.WrapperTask):
+class _Main_6d87dac1Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

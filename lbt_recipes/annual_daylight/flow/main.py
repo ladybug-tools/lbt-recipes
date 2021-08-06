@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_ade551eaOrchestrator as AnnualDaylightRayTracing_ade551eaWorkerbee
+from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_2f3a63deOrchestrator as AnnualDaylightRayTracing_2f3a63deWorkerbee
 
 
 _default_inputs = {   'grid_filter': '*',
@@ -105,6 +105,9 @@ class AnnualDaylightRaytracingLoop(luigi.Task):
         except TypeError:
             # optional artifact
             return None
+        except KeyError:
+            # optional artifact from an optional output artifact
+            return None
         value = pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -154,7 +157,7 @@ class AnnualDaylightRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightRayTracing_ade551eaWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightRayTracing_2f3a63deWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_daylight_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -238,6 +241,9 @@ class CalculateAnnualMetrics(QueenbeeTask):
         except TypeError:
             # optional artifact
             return None
+        except KeyError:
+            # optional artifact from an optional output artifact
+            return None
         value = pathlib.Path(self._input_params['schedule'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -278,7 +284,8 @@ class CalculateAnnualMetrics(QueenbeeTask):
         return [
             {
                 'name': 'annual-metrics', 'from': 'metrics',
-                'to': pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -347,7 +354,8 @@ class CreateDirectSky(QueenbeeTask):
         return [
             {
                 'name': 'sky-matrix', 'from': 'sky.mtx',
-                'to': pathlib.Path(self.execution_folder, 'resources/sky_direct.mtx').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/sky_direct.mtx').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -403,7 +411,8 @@ class CreateOctree(QueenbeeTask):
         return [
             {
                 'name': 'scene-file', 'from': 'scene.oct',
-                'to': pathlib.Path(self.execution_folder, 'resources/scene.oct').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/scene.oct').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -466,7 +475,8 @@ class CreateOctreeWithSuns(QueenbeeTask):
         return [
             {
                 'name': 'scene-file', 'from': 'scene.oct',
-                'to': pathlib.Path(self.execution_folder, 'resources/scene_with_suns.oct').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/scene_with_suns.oct').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -509,10 +519,6 @@ class CreateRadFolder(QueenbeeTask):
                 pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
             ),
             
-            'bsdf_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
-            ),
-            
             'sensor_grids_file': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix()
             ),
@@ -533,17 +539,20 @@ class CreateRadFolder(QueenbeeTask):
         return [
             {
                 'name': 'model-folder', 'from': 'model',
-                'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix(),
+                'optional': False
             },
                 
             {
                 'name': 'bsdf-folder', 'from': 'model/bsdf',
-                'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix(),
+                'optional': True
             },
                 
             {
                 'name': 'sensor-grids-file', 'from': 'model/grid/_info.json',
-                'to': pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix(),
+                'optional': False
             }]
 
     @property
@@ -587,7 +596,8 @@ class CreateSkyDome(QueenbeeTask):
         return [
             {
                 'name': 'sky-dome', 'from': 'rflux_sky.sky',
-                'to': pathlib.Path(self.execution_folder, 'resources/sky.dome').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/sky.dome').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -654,7 +664,8 @@ class CreateTotalSky(QueenbeeTask):
         return [
             {
                 'name': 'sky-matrix', 'from': 'sky.mtx',
-                'to': pathlib.Path(self.execution_folder, 'resources/sky.mtx').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/sky.mtx').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -713,12 +724,14 @@ class GenerateSunpath(QueenbeeTask):
         return [
             {
                 'name': 'sunpath', 'from': 'sunpath.mtx',
-                'to': pathlib.Path(self.execution_folder, 'resources/sunpath.mtx').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/sunpath.mtx').resolve().as_posix(),
+                'optional': False
             },
                 
             {
                 'name': 'sun-modifiers', 'from': 'suns.mod',
-                'to': pathlib.Path(self.execution_folder, 'resources/suns.mod').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/suns.mod').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -770,11 +783,12 @@ class ParseSunUpHours(QueenbeeTask):
         return [
             {
                 'name': 'sun-up-hours', 'from': 'sun-up-hours.txt',
-                'to': pathlib.Path(self.execution_folder, 'results/sun-up-hours.txt').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'results/sun-up-hours.txt').resolve().as_posix(),
+                'optional': False
             }]
 
 
-class _Main_ade551eaOrchestrator(luigi.WrapperTask):
+class _Main_2f3a63deOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

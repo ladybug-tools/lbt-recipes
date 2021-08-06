@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.cumulative_radiation_ray_tracing import _CumulativeRadiationRayTracing_52de34a8Orchestrator as CumulativeRadiationRayTracing_52de34a8Workerbee
+from .dependencies.cumulative_radiation_ray_tracing import _CumulativeRadiationRayTracing_80f18d4dOrchestrator as CumulativeRadiationRayTracing_80f18d4dWorkerbee
 
 
 _default_inputs = {   'grid_filter': '*',
@@ -79,7 +79,8 @@ class CopyGridInfo(QueenbeeTask):
         return [
             {
                 'name': 'dst', 'from': 'input_path',
-                'to': pathlib.Path(self.execution_folder, 'results/cumulative_radiation/grids_info.json').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'results/cumulative_radiation/grids_info.json').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -135,7 +136,8 @@ class CreateOctree(QueenbeeTask):
         return [
             {
                 'name': 'scene-file', 'from': 'scene.oct',
-                'to': pathlib.Path(self.execution_folder, 'resources/scene.oct').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/scene.oct').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -178,10 +180,6 @@ class CreateRadFolder(QueenbeeTask):
                 pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
             ),
             
-            'bsdf_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
-            ),
-            
             'sensor_grids_file': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'results/average_irradiance/grids_info.json').resolve().as_posix()
             ),
@@ -202,17 +200,20 @@ class CreateRadFolder(QueenbeeTask):
         return [
             {
                 'name': 'model-folder', 'from': 'model',
-                'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix(),
+                'optional': False
             },
                 
             {
                 'name': 'bsdf-folder', 'from': 'model/bsdf',
-                'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix(),
+                'optional': True
             },
                 
             {
                 'name': 'sensor-grids-file', 'from': 'model/grid/_info.json',
-                'to': pathlib.Path(self.execution_folder, 'results/average_irradiance/grids_info.json').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'results/average_irradiance/grids_info.json').resolve().as_posix(),
+                'optional': False
             }]
 
     @property
@@ -291,7 +292,8 @@ class CreateSky(QueenbeeTask):
         return [
             {
                 'name': 'sky-matrix', 'from': 'sky.mtx',
-                'to': pathlib.Path(self.execution_folder, 'resources/sky.mtx').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/sky.mtx').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -333,7 +335,8 @@ class CreateSkyDome(QueenbeeTask):
         return [
             {
                 'name': 'sky-dome', 'from': 'rflux_sky.sky',
-                'to': pathlib.Path(self.execution_folder, 'resources/sky.dome').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'resources/sky.dome').resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -397,6 +400,9 @@ class SkyRadiationRaytracingLoop(luigi.Task):
         except TypeError:
             # optional artifact
             return None
+        except KeyError:
+            # optional artifact from an optional output artifact
+            return None
         value = pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -444,7 +450,7 @@ class SkyRadiationRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [CumulativeRadiationRayTracing_52de34a8Workerbee(_input_params=self.map_dag_inputs)]
+        yield [CumulativeRadiationRayTracing_80f18d4dWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'sky_radiation_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -504,7 +510,7 @@ class SkyRadiationRaytracing(luigi.Task):
         }
 
 
-class _Main_52de34a8Orchestrator(luigi.WrapperTask):
+class _Main_80f18d4dOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

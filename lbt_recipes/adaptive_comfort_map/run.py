@@ -41,7 +41,7 @@ class LetAdaptiveComfortMapFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [adaptive_comfort_map_workerbee._Main_55884ac0Orchestrator(_input_params=self._input_params)]
+        yield [adaptive_comfort_map_workerbee._Main_623d41a6Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

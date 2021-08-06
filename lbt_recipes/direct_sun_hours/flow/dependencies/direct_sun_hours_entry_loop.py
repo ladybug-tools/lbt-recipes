@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.direct_sun_hours_calculation import _DirectSunHoursCalculation_8b5851b1Orchestrator as DirectSunHoursCalculation_8b5851b1Workerbee
+from .dependencies.direct_sun_hours_calculation import _DirectSunHoursCalculation_bafdc769Orchestrator as DirectSunHoursCalculation_bafdc769Workerbee
 
 
 _default_inputs = {   'bsdfs': None,
@@ -80,6 +80,9 @@ class DirectSunlightLoop(luigi.Task):
         except TypeError:
             # optional artifact
             return None
+        except KeyError:
+            # optional artifact from an optional output artifact
+            return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -125,7 +128,7 @@ class DirectSunlightLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DirectSunHoursCalculation_8b5851b1Workerbee(_input_params=self.map_dag_inputs)]
+        yield [DirectSunHoursCalculation_bafdc769Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'direct_sunlight.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -241,7 +244,8 @@ class MergeCumulativeSunHours(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': '{name}{extension}'.format(name=self.name, extension=self.extension),
-                'to': pathlib.Path(self.execution_folder, '../../results/cumulative/{name}.res'.format(name=self.name)).resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, '../../results/cumulative/{name}.res'.format(name=self.name)).resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -301,7 +305,8 @@ class MergeDirectSunHours(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': '{name}{extension}'.format(name=self.name, extension=self.extension),
-                'to': pathlib.Path(self.execution_folder, '../../results/direct_sun_hours/{name}.ill'.format(name=self.name)).resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, '../../results/direct_sun_hours/{name}.ill'.format(name=self.name)).resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -360,7 +365,8 @@ class SplitGrid(QueenbeeTask):
         return [
             {
                 'name': 'output-folder', 'from': 'output',
-                'to': pathlib.Path(self.execution_folder, 'sub_grids').resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, 'sub_grids').resolve().as_posix(),
+                'optional': False
             }]
 
     @property
@@ -368,7 +374,7 @@ class SplitGrid(QueenbeeTask):
         return [{'name': 'grids-list', 'from': 'output/grids_info.json', 'to': pathlib.Path(self.params_folder, 'output/grids_info.json').resolve().as_posix()}]
 
 
-class _DirectSunHoursEntryLoop_8b5851b1Orchestrator(luigi.WrapperTask):
+class _DirectSunHoursEntryLoop_bafdc769Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

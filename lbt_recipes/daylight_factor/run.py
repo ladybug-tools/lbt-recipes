@@ -34,7 +34,7 @@ class LetDaylightFactorFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [daylight_factor_workerbee._Main_e548dc8eOrchestrator(_input_params=self._input_params)]
+        yield [daylight_factor_workerbee._Main_6d87dac1Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

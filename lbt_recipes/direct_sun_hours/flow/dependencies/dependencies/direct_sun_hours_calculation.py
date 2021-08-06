@@ -89,7 +89,8 @@ class CalculateCumulativeHours(QueenbeeTask):
         return [
             {
                 'name': 'output-mtx', 'from': 'sum.mtx',
-                'to': pathlib.Path(self.execution_folder, '{grid_name}.res'.format(grid_name=self.grid_name)).resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, '{grid_name}.res'.format(grid_name=self.grid_name)).resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -159,7 +160,8 @@ class ConvertToSunHours(QueenbeeTask):
         return [
             {
                 'name': 'output-mtx', 'from': 'binary.mtx',
-                'to': pathlib.Path(self.execution_folder, '{grid_name}.ill'.format(grid_name=self.grid_name)).resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, '{grid_name}.ill'.format(grid_name=self.grid_name)).resolve().as_posix(),
+                'optional': False
             }]
 
 
@@ -220,6 +222,9 @@ class DirectIrradianceCalculation(QueenbeeTask):
         except TypeError:
             # optional artifact
             return None
+        except KeyError:
+            # optional artifact from an optional output artifact
+            return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -259,11 +264,12 @@ class DirectIrradianceCalculation(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, '{grid_name}.ill'.format(grid_name=self.grid_name)).resolve().as_posix()
+                'to': pathlib.Path(self.execution_folder, '{grid_name}.ill'.format(grid_name=self.grid_name)).resolve().as_posix(),
+                'optional': False
             }]
 
 
-class _DirectSunHoursCalculation_8b5851b1Orchestrator(luigi.WrapperTask):
+class _DirectSunHoursCalculation_bafdc769Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

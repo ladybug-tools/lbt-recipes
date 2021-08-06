@@ -118,6 +118,14 @@ class RayTracingLoop(QueenbeeTask):
 
     @property
     def bsdf_folder(self):
+        try:
+            pathlib.Path(self._input_params['bsdfs'])
+        except TypeError:
+            # optional artifact
+            return None
+        except KeyError:
+            # optional artifact from an optional output artifact
+            return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -158,7 +166,7 @@ class RayTracingLoop(QueenbeeTask):
         return [
             {'name': 'grid', 'to': 'grid.pts', 'from': self.grid, 'optional': False},
             {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False},
-            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': False}]
+            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': True}]
 
     @property
     def output_artifacts(self):
@@ -280,7 +288,7 @@ class SplitGrid(QueenbeeTask):
         return [{'name': 'grids-list', 'from': 'output/grids_info.json', 'to': pathlib.Path(self.params_folder, 'output/grids_info.json').resolve().as_posix()}]
 
 
-class _DaylightFactorRayTracing_e548dc8eOrchestrator(luigi.WrapperTask):
+class _DaylightFactorRayTracing_6d87dac1Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
