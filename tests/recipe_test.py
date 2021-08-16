@@ -14,6 +14,8 @@ def test_recipe_init():
     south_face = room[3]
     south_face.apertures_by_ratio(0.4, 0.01)
     model = Model('TinyHouse', [room])
+    model.properties.radiance.sensor_grids = \
+        [room.properties.radiance.generate_sensor_grid(1, offset=0.8)]
 
     # pass the model to the recipe
     recipe = Recipe('daylight_factor')
@@ -43,6 +45,8 @@ def test_recipe_run():
     south_face = room[3]
     south_face.apertures_by_ratio(0.4, 0.01)
     model = Model('TinyHouse', [room])
+    model.properties.radiance.sensor_grids = \
+        [room.properties.radiance.generate_sensor_grid(1, offset=0.8)]
 
     # pass the model to the recipe
     recipe = Recipe('daylight_factor')

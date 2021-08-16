@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.daylight_factor_ray_tracing import _DaylightFactorRayTracing_6d87dac1Orchestrator as DaylightFactorRayTracing_6d87dac1Workerbee
+from .dependencies.daylight_factor_ray_tracing import _DaylightFactorRayTracing_28174b46Orchestrator as DaylightFactorRayTracing_28174b46Workerbee
 
 
 _default_inputs = {   'grid_filter': '*',
@@ -255,7 +255,7 @@ class DaylightFactorRayTracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DaylightFactorRayTracing_6d87dac1Workerbee(_input_params=self.map_dag_inputs)]
+        yield [DaylightFactorRayTracing_28174b46Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'daylight_factor_ray_tracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -322,7 +322,11 @@ class GenerateSky(QueenbeeTask):
     _input_params = luigi.DictParameter()
 
     # Task inputs
+    ground_reflectance = luigi.Parameter(default='0.2')
+
     illuminance = luigi.Parameter(default='100000.0')
+
+    uniform = luigi.Parameter(default='cloudy')
 
     @property
     def execution_folder(self):
@@ -337,7 +341,7 @@ class GenerateSky(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance sky illuminance {illuminance} --name overcast.sky'.format(illuminance=self.illuminance)
+        return 'honeybee-radiance sky illuminance {illuminance} --ground {ground_reflectance} --{uniform} --name output.sky'.format(illuminance=self.illuminance, ground_reflectance=self.ground_reflectance, uniform=self.uniform)
 
     def output(self):
         return {
@@ -350,13 +354,13 @@ class GenerateSky(QueenbeeTask):
     def output_artifacts(self):
         return [
             {
-                'name': 'sky', 'from': 'overcast.sky',
+                'name': 'sky', 'from': 'output.sky',
                 'to': pathlib.Path(self.execution_folder, 'resources/100000_lux.sky').resolve().as_posix(),
                 'optional': False
             }]
 
 
-class _Main_6d87dac1Orchestrator(luigi.WrapperTask):
+class _Main_28174b46Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

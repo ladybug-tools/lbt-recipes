@@ -759,7 +759,7 @@ class TotalSky(luigi.Task):
         }
 
 
-class _AnnualDaylightRayTracing_2f3a63deOrchestrator(luigi.WrapperTask):
+class _AnnualDaylightRayTracing_5cabed59Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

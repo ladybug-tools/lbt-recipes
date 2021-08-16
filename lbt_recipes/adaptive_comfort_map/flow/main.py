@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.annual_irradiance_entry_point import _AnnualIrradianceEntryPoint_623d41a6Orchestrator as AnnualIrradianceEntryPoint_623d41a6Workerbee
+from .dependencies.annual_irradiance_entry_point import _AnnualIrradianceEntryPoint_ba43e120Orchestrator as AnnualIrradianceEntryPoint_ba43e120Workerbee
 
 
 _default_inputs = {   'comfort_parameters': '--standard ASHRAE-55',
@@ -965,7 +965,7 @@ class RunIrradianceSimulation(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [AnnualIrradianceEntryPoint_623d41a6Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualIrradianceEntryPoint_ba43e120Workerbee(_input_params=self.map_dag_inputs)]
         os.makedirs(self.execution_folder, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -1038,7 +1038,7 @@ class SetModifiersFromConstructions(QueenbeeTask):
             }]
 
 
-class _Main_623d41a6Orchestrator(luigi.WrapperTask):
+class _Main_ba43e120Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -269,7 +269,7 @@ class DirectIrradianceCalculation(QueenbeeTask):
             }]
 
 
-class _DirectSunHoursCalculation_bafdc769Orchestrator(luigi.WrapperTask):
+class _DirectSunHoursCalculation_04f49a1bOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

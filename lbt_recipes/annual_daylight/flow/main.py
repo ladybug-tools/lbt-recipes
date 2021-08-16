@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_2f3a63deOrchestrator as AnnualDaylightRayTracing_2f3a63deWorkerbee
+from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_5cabed59Orchestrator as AnnualDaylightRayTracing_5cabed59Workerbee
 
 
 _default_inputs = {   'grid_filter': '*',
@@ -157,7 +157,7 @@ class AnnualDaylightRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightRayTracing_2f3a63deWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightRayTracing_5cabed59Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_daylight_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -788,7 +788,7 @@ class ParseSunUpHours(QueenbeeTask):
             }]
 
 
-class _Main_2f3a63deOrchestrator(luigi.WrapperTask):
+class _Main_5cabed59Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
