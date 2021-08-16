@@ -3,6 +3,7 @@
 from __future__ import division
 import argparse
 import shlex
+import os
 
 from honeybee.typing import int_in_range
 
@@ -17,7 +18,9 @@ class RecipeSettings(object):
         workers: An integer to set the number of CPUs used in the execution of the
             recipe. This number should not exceed the number of CPUs on the
             machine running the simulation and should be lower if other tasks
-            are running while the simulation is running. (Default: 2).
+            are running while the simulation is running. If set to None, it
+            should automatically default to one less than the number of CPUs
+            currently available on the machine. (Default: None).
         reload_old: A boolean to indicate whether existing results for a given project
             and simulation ID should be reloaded if they are found instead of
             re-running the entire recipe from the beginning. If False, any existing
@@ -36,7 +39,7 @@ class RecipeSettings(object):
     """
     __slots__ = ('_folder', '_workers', '_reload_old', '_report_out')
 
-    def __init__(self, folder=None, workers=2, reload_old=False, report_out=False):
+    def __init__(self, folder=None, workers=None, reload_old=False, report_out=False):
         """Initialize RecipeSettings."""
         self.folder = folder
         self.workers = workers
@@ -57,7 +60,7 @@ class RecipeSettings(object):
 
         # assign the properties
         folder = args.folder if 'folder' in args else None
-        workers = int(args.workers) if 'workers' in args else 2
+        workers = int(args.workers) if 'workers' in args else None
         return cls(folder, workers, args.reload_old, args.report_out)
 
     @property
@@ -75,12 +78,18 @@ class RecipeSettings(object):
     @property
     def workers(self):
         """Get or set a integer the number of CPUs used in the execution of the recipe.
+
+        If set to None, this should be equal to one less than the number of processors
+        currently available on the machine.
         """
-        return self._workers
+        return self._workers if self._workers is not None \
+            else self._recommended_processor_count()
 
     @workers.setter
     def workers(self, value):
-        self._workers = int_in_range(value, mi=1, input_name='recipe workers')
+        if value is not None:
+            value = int_in_range(value, mi=1, input_name='recipe workers')
+        self._workers = value
 
     @property
     def reload_old(self):
@@ -107,6 +116,24 @@ class RecipeSettings(object):
     def duplicate(self):
         """Get a copy of this object."""
         return self.__copy__()
+
+    @staticmethod
+    def _recommended_processor_count():
+        """Get an integer for one minus the number of processors on this machine.
+
+        This method should work on all of the major operating systems and in
+        both IronPython and cPython. If, for whatever reason, the number of
+        processors could not be sensed, a value of 1 will be returned.
+        """
+        try:  # assume that we are in cPython
+            cpu_count = os.cpu_count()
+        except AttributeError:  # we are probably in IronPython
+            try:
+                from System.Environment import ProcessorCount
+                cpu_count = ProcessorCount
+            except ImportError:  # no idea what Python this is; let's play it safe
+                cpu_count = 1
+        return 1 if cpu_count is None or cpu_count <= 1 else cpu_count - 1
 
     def __copy__(self):
         return RecipeSettings(

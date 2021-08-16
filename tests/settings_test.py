@@ -7,7 +7,7 @@ def test_settings_init():
     settings = RecipeSettings()
 
     assert settings.folder is None
-    assert settings.workers == 2
+    assert settings.workers >= 1
     assert not settings.reload_old
     assert not settings.report_out
 
