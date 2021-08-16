@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.cumulative_radiation_ray_tracing import _CumulativeRadiationRayTracing_80f18d4dOrchestrator as CumulativeRadiationRayTracing_80f18d4dWorkerbee
+from .dependencies.cumulative_radiation_ray_tracing import _CumulativeRadiationRayTracing_eb7cd2d1Orchestrator as CumulativeRadiationRayTracing_eb7cd2d1Workerbee
 
 
 _default_inputs = {   'grid_filter': '*',
@@ -450,7 +450,7 @@ class SkyRadiationRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [CumulativeRadiationRayTracing_80f18d4dWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [CumulativeRadiationRayTracing_eb7cd2d1Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'sky_radiation_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -510,7 +510,7 @@ class SkyRadiationRaytracing(luigi.Task):
         }
 
 
-class _Main_80f18d4dOrchestrator(luigi.WrapperTask):
+class _Main_eb7cd2d1Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

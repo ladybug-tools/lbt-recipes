@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "pmv-comfort-map",
-    "tag": "0.3.1",
+    "tag": "0.3.2",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -226,7 +226,7 @@
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "model",
-          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large.",
+          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. Note that this model must contain rooms and have sensor grids assigned to it.",
           "platform": [
             "grasshopper"
           ],
@@ -236,7 +236,7 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.model",
-              "function": "model_to_json",
+              "function": "model_to_json_grid_room_check",
               "index": 0
             },
             {

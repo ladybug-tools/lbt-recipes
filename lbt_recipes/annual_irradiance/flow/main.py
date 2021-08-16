@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.annual_irradiance_ray_tracing import _AnnualIrradianceRayTracing_e732e98bOrchestrator as AnnualIrradianceRayTracing_e732e98bWorkerbee
+from .dependencies.annual_irradiance_ray_tracing import _AnnualIrradianceRayTracing_e751455aOrchestrator as AnnualIrradianceRayTracing_e751455aWorkerbee
 
 
 _default_inputs = {   'grid_filter': '*',
@@ -156,7 +156,7 @@ class AnnualIrradianceRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualIrradianceRayTracing_e732e98bWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualIrradianceRayTracing_e751455aWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_irradiance_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -261,6 +261,10 @@ class CalculateMetrics(QueenbeeTask):
         return {
             'metrics': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix()
+            ),
+            
+            'timestep_file': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'results/total/timestep.txt').resolve().as_posix()
             )
         }
 
@@ -276,6 +280,12 @@ class CalculateMetrics(QueenbeeTask):
             {
                 'name': 'metrics', 'from': 'metrics',
                 'to': pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix(),
+                'optional': False
+            },
+                
+            {
+                'name': 'timestep-file', 'from': 'raw_results/timestep.txt',
+                'to': pathlib.Path(self.execution_folder, 'results/total/timestep.txt').resolve().as_posix(),
                 'optional': False
             }]
 
@@ -887,7 +897,7 @@ class ParseSunUpHours(QueenbeeTask):
             }]
 
 
-class _Main_e732e98bOrchestrator(luigi.WrapperTask):
+class _Main_e751455aOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
