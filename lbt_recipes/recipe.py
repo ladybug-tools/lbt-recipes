@@ -4,6 +4,7 @@ from __future__ import division
 
 import os
 import json
+import re
 import importlib
 import shutil
 import subprocess
@@ -103,7 +104,9 @@ class Recipe(object):
             for inp in self._inputs:
                 if inp.name == 'model':
                     if isinstance(inp.value, Model):
-                        return os.path.join(def_sim, inp.value.identifier)
+                        clean_name = \
+                            re.sub(r'[^.A-Za-z0-9_-]', '_', inp.value.display_name)
+                        return os.path.join(def_sim, clean_name)
                     elif isinstance(inp.value, str) and os.path.isfile(str(inp.value)):
                         model = os.path.basename(inp.value)
                         for ext in self.MODEL_EXTENSIONS:
