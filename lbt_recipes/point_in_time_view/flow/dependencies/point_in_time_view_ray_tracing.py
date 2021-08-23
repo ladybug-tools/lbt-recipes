@@ -22,7 +22,7 @@ _default_inputs = {   'bsdfs': None,
     'metric': 'luminance',
     'octree_file': None,
     'params_folder': '__params',
-    'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64',
+    'radiance_parameters': '-ab 2 -aa 0.25 -ad 512 -ar 16',
     'resolution': 512,
     'simulation_folder': '.',
     'skip_overture': 'overture',
@@ -266,6 +266,10 @@ class SplitView(QueenbeeTask):
         return self._input_params['view_count']
 
     @property
+    def resolution(self):
+        return self._input_params['resolution']
+
+    @property
     def overture(self):
         return self._input_params['skip_overture']
 
@@ -320,7 +324,7 @@ class SplitView(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance view split view.vf {view_count} --{overture} --octree {scene_file} --rad-params "{radiance_parameters}" --folder output --log-file output/views_info.json'.format(view_count=self.view_count, overture=self.overture, scene_file=self.scene_file, radiance_parameters=self.radiance_parameters)
+        return 'honeybee-radiance view split view.vf {view_count} --resolution {resolution} --{overture} --octree {scene_file} --rad-params "{radiance_parameters}" --folder output --log-file output/views_info.json'.format(view_count=self.view_count, resolution=self.resolution, overture=self.overture, scene_file=self.scene_file, radiance_parameters=self.radiance_parameters)
 
     def output(self):
         return {
@@ -362,7 +366,7 @@ class SplitView(QueenbeeTask):
         return [{'name': 'views-list', 'from': 'output/views_info.json', 'to': pathlib.Path(self.params_folder, 'output/views_info.json').resolve().as_posix()}]
 
 
-class _PointInTimeViewRayTracing_60b8c2edOrchestrator(luigi.WrapperTask):
+class _PointInTimeViewRayTracing_71e443fdOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

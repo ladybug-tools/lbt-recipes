@@ -25,8 +25,8 @@ import flow.main as point_in_time_view_workerbee
 
 _recipe_default_inputs = {   'metric': 'luminance',
     'model': None,
-    'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64',
-    'resolution': 512,
+    'radiance_parameters': '-ab 2 -aa 0.25 -ad 512 -ar 16',
+    'resolution': 800,
     'skip_overture': 'overture',
     'sky': None,
     'view_count': 2,
@@ -38,7 +38,7 @@ class LetPointInTimeViewFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [point_in_time_view_workerbee._Main_60b8c2edOrchestrator(_input_params=self._input_params)]
+        yield [point_in_time_view_workerbee._Main_71e443fdOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

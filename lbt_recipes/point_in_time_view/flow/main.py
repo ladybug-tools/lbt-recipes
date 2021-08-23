@@ -16,14 +16,14 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.point_in_time_view_ray_tracing import _PointInTimeViewRayTracing_60b8c2edOrchestrator as PointInTimeViewRayTracing_60b8c2edWorkerbee
+from .dependencies.point_in_time_view_ray_tracing import _PointInTimeViewRayTracing_71e443fdOrchestrator as PointInTimeViewRayTracing_71e443fdWorkerbee
 
 
 _default_inputs = {   'metric': 'luminance',
     'model': None,
     'params_folder': '__params',
-    'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64',
-    'resolution': 512,
+    'radiance_parameters': '-ab 2 -aa 0.25 -ad 512 -ar 16',
+    'resolution': 800,
     'simulation_folder': '.',
     'skip_overture': 'overture',
     'sky': None,
@@ -377,7 +377,7 @@ class PointInTimeViewRayTracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [PointInTimeViewRayTracing_60b8c2edWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [PointInTimeViewRayTracing_71e443fdWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'point_in_time_view_ray_tracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -437,7 +437,7 @@ class PointInTimeViewRayTracing(luigi.Task):
         }
 
 
-class _Main_60b8c2edOrchestrator(luigi.WrapperTask):
+class _Main_71e443fdOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
