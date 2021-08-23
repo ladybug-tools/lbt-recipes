@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "point-in-time-view",
-    "tag": "0.2.4",
+    "tag": "0.2.5",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -161,7 +161,7 @@
       "annotations": {},
       "name": "radiance-parameters",
       "description": "The radiance parameters for ray tracing",
-      "default": "-ab 2 -aa 0.1 -ad 2048 -ar 64",
+      "default": "-ab 2 -aa 0.25 -ad 512 -ar 16",
       "alias": [
         {
           "type": "DAGStringInputAlias",
@@ -185,7 +185,7 @@
       "annotations": {},
       "name": "resolution",
       "description": "An integer for the maximum dimension of each image in pixels (either width or height depending on the input view angle and type).",
-      "default": 512,
+      "default": 800,
       "alias": [],
       "required": false,
       "spec": {
