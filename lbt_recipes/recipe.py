@@ -215,7 +215,8 @@ class Recipe(object):
         return file_path
 
     def run(self, settings=None, radiance_check=False, openstudio_check=False,
-            energyplus_check=False, queenbee_path=None, silent=False):
+            energyplus_check=False, queenbee_path=None, silent=False,
+            debug_folder=None):
         """Run the recipe using the queenbee local run command.
 
         Args:
@@ -240,6 +241,9 @@ class Recipe(object):
                 Setting this to just 'queenbee' will use the system Python.
             silent: Boolean to note whether the recipe should be run silently on
                 Windows (True) or with a command window (False). (Default: False).
+            debug_folder: An optional path to a debug folder. If debug folder is
+                provided all the steps of the simulation will be executed inside
+                the debug folder which can be used for furthur inspection.
 
         Returns:
             Path to the project folder containing the recipe results.
@@ -289,6 +293,8 @@ class Recipe(object):
                 environment=' '.join(env_args),
                 simulation_name=self.simulation_id
             )
+        if debug_folder is not None:
+            command += ' --debug "{}"'.format(debug_folder)
 
         # execute command
         shell = False if os.name == 'nt' and not silent else True
