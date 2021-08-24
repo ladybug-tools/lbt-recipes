@@ -35,7 +35,14 @@ def main():
     'machine running the simulation and should be lower if other tasks '
     'are running while the simulation is running.'
 )
-def run(recipe_name, inputs, project_folder, workers):
+@click.option(
+    '-d', '--debug', default=None,
+    type=click.Path(exists=False, file_okay=False, resolve_path=True, dir_okay=True),
+    help='Optional path to a debug folder. If debug folder is provided all the steps '
+    'of the simulation will be executed inside the debug folder which can be used for '
+    'furthur inspection.'
+)
+def run(recipe_name, inputs, project_folder, workers, debug):
     """Run a recipe that is installed within the lbt-recipes package.
 
     \b
@@ -51,14 +58,14 @@ def run(recipe_name, inputs, project_folder, workers):
             data = json.load(inf)
         for inp_name, inp_val in data.items():
             recipe.input_value_by_name(inp_name, inp_val)
-        
+
         # create the run settings from the other inputs
         settings = RecipeSettings(workers=workers)
         if project_folder is not None:
             settings.folder = project_folder
-        
+
         # run the recipe
-        recipe.run(settings, queenbee_path='queenbee')
+        recipe.run(settings, queenbee_path='queenbee', debug_folder=debug)
     except Exception as e:
         _logger.exception('Failed to execute {} recipe.\n{}'.format(recipe_name, e))
         sys.exit(1)
