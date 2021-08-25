@@ -38,7 +38,7 @@ class LetPointInTimeViewFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [point_in_time_view_workerbee._Main_71e443fdOrchestrator(_input_params=self._input_params)]
+        yield [point_in_time_view_workerbee._Main_cdeec518Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

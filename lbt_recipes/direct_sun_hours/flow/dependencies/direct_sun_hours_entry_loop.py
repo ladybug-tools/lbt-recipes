@@ -80,9 +80,6 @@ class DirectSunlightLoop(luigi.Task):
         except TypeError:
             # optional artifact
             return None
-        except KeyError:
-            # optional artifact from an optional output artifact
-            return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -245,7 +242,8 @@ class MergeCumulativeSunHours(QueenbeeTask):
             {
                 'name': 'result-file', 'from': '{name}{extension}'.format(name=self.name, extension=self.extension),
                 'to': pathlib.Path(self.execution_folder, '../../results/cumulative/{name}.res'.format(name=self.name)).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -306,7 +304,8 @@ class MergeDirectSunHours(QueenbeeTask):
             {
                 'name': 'result-file', 'from': '{name}{extension}'.format(name=self.name, extension=self.extension),
                 'to': pathlib.Path(self.execution_folder, '../../results/direct_sun_hours/{name}.ill'.format(name=self.name)).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -366,7 +365,8 @@ class SplitGrid(QueenbeeTask):
             {
                 'name': 'output-folder', 'from': 'output',
                 'to': pathlib.Path(self.execution_folder, 'sub_grids').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             }]
 
     @property

@@ -85,7 +85,8 @@ class MergeResults(QueenbeeTask):
             {
                 'name': 'result-file', 'from': '{name}{extension}'.format(name=self.name, extension=self.extension),
                 'to': pathlib.Path(self.execution_folder, '../../results/{name}.res'.format(name=self.name)).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -120,9 +121,6 @@ class RayTracingLoop(QueenbeeTask):
             pathlib.Path(self._input_params['bsdfs'])
         except TypeError:
             # optional artifact
-            return None
-        except KeyError:
-            # optional artifact from an optional output artifact
             return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
@@ -172,7 +170,8 @@ class RayTracingLoop(QueenbeeTask):
             {
                 'name': 'result', 'from': 'grid.res',
                 'to': pathlib.Path(self.execution_folder, '{item_name}.res'.format(item_name=self.item['name'])).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -278,7 +277,8 @@ class SplitGrid(QueenbeeTask):
             {
                 'name': 'output-folder', 'from': 'output',
                 'to': pathlib.Path(self.execution_folder, 'sub_grids').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             }]
 
     @property
@@ -286,7 +286,7 @@ class SplitGrid(QueenbeeTask):
         return [{'name': 'grids-list', 'from': 'output/grids_info.json', 'to': pathlib.Path(self.params_folder, 'output/grids_info.json').resolve().as_posix()}]
 
 
-class _SkyViewRayTracing_8fe88f6eOrchestrator(luigi.WrapperTask):
+class _SkyViewRayTracing_236d9e12Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

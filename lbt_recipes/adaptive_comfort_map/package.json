@@ -292,7 +292,16 @@
           "platform": [
             "grasshopper"
           ],
-          "handler": [],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.runperiod",
+              "function": "run_period_to_str",
+              "index": 0
+            }
+          ],
           "default": "",
           "required": false,
           "spec": null

@@ -23,7 +23,7 @@ _default_inputs = {   'bsdfs': None,
     'octree_file': None,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -aa 0.25 -ad 512 -ar 16',
-    'resolution': 512,
+    'resolution': 800,
     'simulation_folder': '.',
     'skip_overture': 'overture',
     'view': None,
@@ -92,7 +92,8 @@ class MergeResults(QueenbeeTask):
             {
                 'name': 'result-image', 'from': '{name}.HDR'.format(name=self.name),
                 'to': pathlib.Path(self.execution_folder, '../../results/{name}.HDR'.format(name=self.name)).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -126,9 +127,6 @@ class RayTracingLoop(QueenbeeTask):
         except TypeError:
             # optional artifact
             return None
-        except KeyError:
-            # optional artifact from an optional output artifact
-            return None
         value = pathlib.Path(self.input()['SplitView']['ambient_cache'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -151,9 +149,6 @@ class RayTracingLoop(QueenbeeTask):
             pathlib.Path(self._input_params['bsdfs'])
         except TypeError:
             # optional artifact
-            return None
-        except KeyError:
-            # optional artifact from an optional output artifact
             return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
@@ -204,7 +199,8 @@ class RayTracingLoop(QueenbeeTask):
             {
                 'name': 'result-image', 'from': 'view.HDR',
                 'to': pathlib.Path(self.execution_folder, '{item_name}.unf'.format(item_name=self.item['name'])).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -290,9 +286,6 @@ class SplitView(QueenbeeTask):
         except TypeError:
             # optional artifact
             return None
-        except KeyError:
-            # optional artifact from an optional output artifact
-            return None
         value = pathlib.Path(self._input_params['octree_file'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -303,9 +296,6 @@ class SplitView(QueenbeeTask):
             pathlib.Path(self._input_params['bsdfs'])
         except TypeError:
             # optional artifact
-            return None
-        except KeyError:
-            # optional artifact from an optional output artifact
             return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
@@ -332,6 +322,10 @@ class SplitView(QueenbeeTask):
             'output_folder': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'sub_views').resolve().as_posix()
             ),
+            
+            'ambient_cache': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'sub_views/view.amb').resolve().as_posix()
+            ),
             'views_list': luigi.LocalTarget(
                 pathlib.Path(
                     self.params_folder,
@@ -352,13 +346,15 @@ class SplitView(QueenbeeTask):
             {
                 'name': 'output-folder', 'from': 'output',
                 'to': pathlib.Path(self.execution_folder, 'sub_views').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             },
                 
             {
                 'name': 'ambient-cache', 'from': 'output/view.amb',
                 'to': pathlib.Path(self.execution_folder, 'sub_views/view.amb').resolve().as_posix(),
-                'optional': True
+                'optional': True,
+                'type': 'file'
             }]
 
     @property
@@ -366,7 +362,7 @@ class SplitView(QueenbeeTask):
         return [{'name': 'views-list', 'from': 'output/views_info.json', 'to': pathlib.Path(self.params_folder, 'output/views_info.json').resolve().as_posix()}]
 
 
-class _PointInTimeViewRayTracing_71e443fdOrchestrator(luigi.WrapperTask):
+class _PointInTimeViewRayTracing_cdeec518Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
