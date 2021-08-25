@@ -89,9 +89,6 @@ class DirectSkyLoop(QueenbeeTask):
         except TypeError:
             # optional artifact
             return None
-        except KeyError:
-            # optional artifact from an optional output artifact
-            return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -142,7 +139,8 @@ class DirectSkyLoop(QueenbeeTask):
             {
                 'name': 'result-file', 'from': 'results.ill',
                 'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -245,9 +243,6 @@ class DirectSunlightLoop(QueenbeeTask):
         except TypeError:
             # optional artifact
             return None
-        except KeyError:
-            # optional artifact from an optional output artifact
-            return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -297,7 +292,8 @@ class DirectSunlightLoop(QueenbeeTask):
             {
                 'name': 'result-file', 'from': 'results.ill',
                 'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -405,7 +401,8 @@ class MergeRawResults(QueenbeeTask):
             {
                 'name': 'result-file', 'from': '{name}{extension}'.format(name=self.name, extension=self.extension),
                 'to': pathlib.Path(self.execution_folder, '../../results/{name}.ill'.format(name=self.name)).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -486,7 +483,8 @@ class OutputMatrixMathLoop(QueenbeeTask):
             {
                 'name': 'results-file', 'from': 'final.ill',
                 'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -592,7 +590,8 @@ class SplitGrid(QueenbeeTask):
             {
                 'name': 'output-folder', 'from': 'output',
                 'to': pathlib.Path(self.execution_folder, 'sub_grids').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             }]
 
     @property
@@ -656,9 +655,6 @@ class TotalSkyLoop(QueenbeeTask):
         except TypeError:
             # optional artifact
             return None
-        except KeyError:
-            # optional artifact from an optional output artifact
-            return None
         value = pathlib.Path(self._input_params['bsdfs'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -709,7 +705,8 @@ class TotalSkyLoop(QueenbeeTask):
             {
                 'name': 'result-file', 'from': 'results.ill',
                 'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -759,7 +756,7 @@ class TotalSky(luigi.Task):
         }
 
 
-class _AnnualDaylightRayTracing_5cabed59Orchestrator(luigi.WrapperTask):
+class _AnnualDaylightRayTracing_4fe81c3cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

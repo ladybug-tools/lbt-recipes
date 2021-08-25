@@ -111,19 +111,22 @@ class ComputeTcpLoop(QueenbeeTask):
             {
                 'name': 'tcp', 'from': 'output/tcp.csv',
                 'to': pathlib.Path(self.execution_folder, 'TCP/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             },
                 
             {
                 'name': 'hsp', 'from': 'output/hsp.csv',
                 'to': pathlib.Path(self.execution_folder, 'HSP/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             },
                 
             {
                 'name': 'csp', 'from': 'output/csp.csv',
                 'to': pathlib.Path(self.execution_folder, 'CSP/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -238,31 +241,36 @@ class CopyGridInfo(QueenbeeTask):
             {
                 'name': 'dst-1', 'from': 'input_path',
                 'to': pathlib.Path(self.execution_folder, 'results/condition/grids_info.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             },
                 
             {
                 'name': 'dst-2', 'from': 'input_path',
                 'to': pathlib.Path(self.execution_folder, 'results/condition_intensity/grids_info.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             },
                 
             {
                 'name': 'dst-3', 'from': 'input_path',
                 'to': pathlib.Path(self.execution_folder, 'metrics/TCP/grids_info.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             },
                 
             {
                 'name': 'dst-4', 'from': 'input_path',
                 'to': pathlib.Path(self.execution_folder, 'metrics/HSP/grids_info.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             },
                 
             {
                 'name': 'dst-5', 'from': 'input_path',
                 'to': pathlib.Path(self.execution_folder, 'metrics/CSP/grids_info.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             }]
 
 
@@ -321,7 +329,8 @@ class CreateModelOccSchedules(QueenbeeTask):
             {
                 'name': 'occ-schedule-json', 'from': 'occ_schedules.json',
                 'to': pathlib.Path(self.execution_folder, 'metrics/occupancy_schedules.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -380,19 +389,22 @@ class CreateResultInfo(QueenbeeTask):
             {
                 'name': 'temperature-info', 'from': 'output/temperature.json',
                 'to': pathlib.Path(self.execution_folder, 'results/temperature/results_info.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             },
                 
             {
                 'name': 'condition-info', 'from': 'output/condition.json',
                 'to': pathlib.Path(self.execution_folder, 'results/condition/results_info.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             },
                 
             {
                 'name': 'condition-intensity-info', 'from': 'output/condition_intensity.json',
                 'to': pathlib.Path(self.execution_folder, 'results/condition_intensity/results_info.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -452,7 +464,8 @@ class CreateSimPar(QueenbeeTask):
             {
                 'name': 'sim-par-json', 'from': 'sim_par.json',
                 'to': pathlib.Path(self.execution_folder, 'energy/simulation_parameter.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -508,7 +521,8 @@ class CreateWea(QueenbeeTask):
             {
                 'name': 'wea', 'from': 'weather.wea',
                 'to': pathlib.Path(self.execution_folder, 'in.wea').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -570,13 +584,15 @@ class GetEnclosureInfo(QueenbeeTask):
             {
                 'name': 'output-folder', 'from': 'output',
                 'to': pathlib.Path(self.execution_folder, 'radiance/enclosures').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             },
                 
             {
                 'name': 'enclosure-list-file', 'from': 'enclosure_list.json',
                 'to': pathlib.Path(self.execution_folder, 'results/temperature/grids_info.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
     @property
@@ -639,7 +655,8 @@ class MirrorSensorGrids(QueenbeeTask):
             {
                 'name': 'new-model', 'from': 'new_model.hbjson',
                 'to': pathlib.Path(self.execution_folder, 'radiance/hbjson/2_mirrored_grids.hbjson').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -776,19 +793,22 @@ class RunComfortMapLoop(QueenbeeTask):
             {
                 'name': 'temperature-map', 'from': 'output/temperature.csv',
                 'to': pathlib.Path(self.execution_folder, 'temperature/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             },
                 
             {
                 'name': 'condition-map', 'from': 'output/condition.csv',
                 'to': pathlib.Path(self.execution_folder, 'condition/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             },
                 
             {
                 'name': 'pmv-map', 'from': 'output/condition_intensity.csv',
                 'to': pathlib.Path(self.execution_folder, 'condition_intensity/{item_id}.csv'.format(item_id=self.item['id'])).resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -866,9 +886,6 @@ class RunEnergySimulation(QueenbeeTask):
         except TypeError:
             # optional artifact
             return None
-        except KeyError:
-            # optional artifact from an optional output artifact
-            return None
         value = pathlib.Path(self.input()['CreateSimPar']['sim_par_json'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -911,7 +928,8 @@ class RunEnergySimulation(QueenbeeTask):
             {
                 'name': 'sql', 'from': 'output/run/eplusout.sql',
                 'to': pathlib.Path(self.execution_folder, 'energy/eplusout.sql').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -1049,7 +1067,8 @@ class SetModifiersFromConstructions(QueenbeeTask):
             {
                 'name': 'new-model', 'from': 'new_model.hbjson',
                 'to': pathlib.Path(self.execution_folder, 'radiance/hbjson/1_energy_modifiers.hbjson').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 

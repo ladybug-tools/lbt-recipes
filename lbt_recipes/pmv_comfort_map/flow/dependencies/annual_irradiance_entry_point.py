@@ -103,9 +103,6 @@ class AnnualIrradianceRaytracingLoop(luigi.Task):
         except TypeError:
             # optional artifact
             return None
-        except KeyError:
-            # optional artifact from an optional output artifact
-            return None
         value = pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -264,7 +261,8 @@ class CopyGridInfo(QueenbeeTask):
             {
                 'name': 'dst', 'from': 'input_path',
                 'to': pathlib.Path(self.execution_folder, 'results/total/grids_info.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             }]
 
 
@@ -317,7 +315,8 @@ class CopySunUpHours(QueenbeeTask):
             {
                 'name': 'dst', 'from': 'input_path',
                 'to': pathlib.Path(self.execution_folder, 'results/direct/sun-up-hours.txt').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             }]
 
 
@@ -387,7 +386,8 @@ class CreateDirectSky(QueenbeeTask):
             {
                 'name': 'sky-matrix', 'from': 'sky.mtx',
                 'to': pathlib.Path(self.execution_folder, 'resources/sky_direct.mtx').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -444,7 +444,8 @@ class CreateOctree(QueenbeeTask):
             {
                 'name': 'scene-file', 'from': 'scene.oct',
                 'to': pathlib.Path(self.execution_folder, 'resources/scene.oct').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -508,7 +509,8 @@ class CreateOctreeWithSuns(QueenbeeTask):
             {
                 'name': 'scene-file', 'from': 'scene.oct',
                 'to': pathlib.Path(self.execution_folder, 'resources/scene_with_suns.oct').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -551,6 +553,10 @@ class CreateRadFolder(QueenbeeTask):
                 pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
             ),
             
+            'bsdf_folder': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
+            ),
+            
             'sensor_grids_file': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'results/direct/grids_info.json').resolve().as_posix()
             ),
@@ -572,19 +578,22 @@ class CreateRadFolder(QueenbeeTask):
             {
                 'name': 'model-folder', 'from': 'model',
                 'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             },
                 
             {
                 'name': 'bsdf-folder', 'from': 'model/bsdf',
                 'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix(),
-                'optional': True
+                'optional': True,
+                'type': 'folder'
             },
                 
             {
                 'name': 'sensor-grids-file', 'from': 'model/grid/_info.json',
                 'to': pathlib.Path(self.execution_folder, 'results/direct/grids_info.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
     @property
@@ -629,7 +638,8 @@ class CreateSkyDome(QueenbeeTask):
             {
                 'name': 'sky-dome', 'from': 'rflux_sky.sky',
                 'to': pathlib.Path(self.execution_folder, 'resources/sky.dome').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -697,7 +707,8 @@ class CreateTotalSky(QueenbeeTask):
             {
                 'name': 'sky-matrix', 'from': 'sky.mtx',
                 'to': pathlib.Path(self.execution_folder, 'resources/sky.mtx').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -759,13 +770,15 @@ class GenerateSunpath(QueenbeeTask):
             {
                 'name': 'sunpath', 'from': 'sunpath.mtx',
                 'to': pathlib.Path(self.execution_folder, 'resources/sunpath.mtx').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             },
                 
             {
                 'name': 'sun-modifiers', 'from': 'suns.mod',
                 'to': pathlib.Path(self.execution_folder, 'resources/suns.mod').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -818,7 +831,8 @@ class ParseSunUpHours(QueenbeeTask):
             {
                 'name': 'sun-up-hours', 'from': 'sun-up-hours.txt',
                 'to': pathlib.Path(self.execution_folder, 'results/total/sun-up-hours.txt').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 

@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.sky_view_ray_tracing import _SkyViewRayTracing_8fe88f6eOrchestrator as SkyViewRayTracing_8fe88f6eWorkerbee
+from .dependencies.sky_view_ray_tracing import _SkyViewRayTracing_236d9e12Orchestrator as SkyViewRayTracing_236d9e12Workerbee
 
 
 _default_inputs = {   'cloudy_sky': 'uniform',
@@ -88,7 +88,8 @@ class CreateOctree(QueenbeeTask):
             {
                 'name': 'scene-file', 'from': 'scene.oct',
                 'to': pathlib.Path(self.execution_folder, 'resources/scene.oct').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -131,6 +132,10 @@ class CreateRadFolder(QueenbeeTask):
                 pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
             ),
             
+            'bsdf_folder': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
+            ),
+            
             'model_sensor_grids_file': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix()
             ),
@@ -152,19 +157,22 @@ class CreateRadFolder(QueenbeeTask):
             {
                 'name': 'model-folder', 'from': 'model',
                 'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             },
                 
             {
                 'name': 'bsdf-folder', 'from': 'model/bsdf',
                 'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix(),
-                'optional': True
+                'optional': True,
+                'type': 'folder'
             },
                 
             {
                 'name': 'model-sensor-grids-file', 'from': 'model/grid/_model_grids_info.json',
                 'to': pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
     @property
@@ -217,7 +225,8 @@ class GenerateSky(QueenbeeTask):
             {
                 'name': 'sky', 'from': 'output.sky',
                 'to': pathlib.Path(self.execution_folder, 'resources/input.sky').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -258,9 +267,6 @@ class SkyViewRayTracingLoop(luigi.Task):
             pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
         except TypeError:
             # optional artifact
-            return None
-        except KeyError:
-            # optional artifact from an optional output artifact
             return None
         value = pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
         return value.as_posix() if value.is_absolute() \
@@ -305,7 +311,7 @@ class SkyViewRayTracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [SkyViewRayTracing_8fe88f6eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [SkyViewRayTracing_236d9e12Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'sky_view_ray_tracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -365,7 +371,7 @@ class SkyViewRayTracing(luigi.Task):
         }
 
 
-class _Main_8fe88f6eOrchestrator(luigi.WrapperTask):
+class _Main_236d9e12Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

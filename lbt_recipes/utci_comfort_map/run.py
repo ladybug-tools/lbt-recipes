@@ -41,7 +41,7 @@ class LetUtciComfortMapFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [utci_comfort_map_workerbee._Main_181c6e3cOrchestrator(_input_params=self._input_params)]
+        yield [utci_comfort_map_workerbee._Main_a0493847Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

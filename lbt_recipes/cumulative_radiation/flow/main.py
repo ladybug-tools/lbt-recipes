@@ -80,7 +80,8 @@ class CopyGridInfo(QueenbeeTask):
             {
                 'name': 'dst', 'from': 'input_path',
                 'to': pathlib.Path(self.execution_folder, 'results/cumulative_radiation/grids_info.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             }]
 
 
@@ -137,7 +138,8 @@ class CreateOctree(QueenbeeTask):
             {
                 'name': 'scene-file', 'from': 'scene.oct',
                 'to': pathlib.Path(self.execution_folder, 'resources/scene.oct').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -180,6 +182,10 @@ class CreateRadFolder(QueenbeeTask):
                 pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
             ),
             
+            'bsdf_folder': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
+            ),
+            
             'sensor_grids_file': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'results/average_irradiance/grids_info.json').resolve().as_posix()
             ),
@@ -201,19 +207,22 @@ class CreateRadFolder(QueenbeeTask):
             {
                 'name': 'model-folder', 'from': 'model',
                 'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'folder'
             },
                 
             {
                 'name': 'bsdf-folder', 'from': 'model/bsdf',
                 'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix(),
-                'optional': True
+                'optional': True,
+                'type': 'folder'
             },
                 
             {
                 'name': 'sensor-grids-file', 'from': 'model/grid/_info.json',
                 'to': pathlib.Path(self.execution_folder, 'results/average_irradiance/grids_info.json').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
     @property
@@ -293,7 +302,8 @@ class CreateSky(QueenbeeTask):
             {
                 'name': 'sky-matrix', 'from': 'sky.mtx',
                 'to': pathlib.Path(self.execution_folder, 'resources/sky.mtx').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -336,7 +346,8 @@ class CreateSkyDome(QueenbeeTask):
             {
                 'name': 'sky-dome', 'from': 'rflux_sky.sky',
                 'to': pathlib.Path(self.execution_folder, 'resources/sky.dome').resolve().as_posix(),
-                'optional': False
+                'optional': False,
+                'type': 'file'
             }]
 
 
@@ -399,9 +410,6 @@ class SkyRadiationRaytracingLoop(luigi.Task):
             pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
         except TypeError:
             # optional artifact
-            return None
-        except KeyError:
-            # optional artifact from an optional output artifact
             return None
         value = pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
         return value.as_posix() if value.is_absolute() \

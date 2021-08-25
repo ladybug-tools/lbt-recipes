@@ -35,7 +35,7 @@ class LetSkyViewFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [sky_view_workerbee._Main_8fe88f6eOrchestrator(_input_params=self._input_params)]
+        yield [sky_view_workerbee._Main_236d9e12Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

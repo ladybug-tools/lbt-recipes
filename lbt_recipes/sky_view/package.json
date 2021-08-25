@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "sky-view",
-    "tag": "0.1.0",
+    "tag": "1.0.1",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -36,7 +36,7 @@
     "sources": [
       "https://hub.docker.com/r/ladybugtools/honeybee-radiance"
     ],
-    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/dfrecipe.png",
+    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/skyviewrecipe.png",
     "deprecated": null,
     "description": "Recipe for computing sky view, sky exposure, and spherical (outdoor) exposure.",
     "license": {
