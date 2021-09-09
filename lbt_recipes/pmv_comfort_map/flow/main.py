@@ -16,7 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.annual_irradiance_entry_point import _AnnualIrradianceEntryPoint_6d4da049Orchestrator as AnnualIrradianceEntryPoint_6d4da049Workerbee
+from .dependencies.annual_irradiance_entry_point import _AnnualIrradianceEntryPoint_34bf01fdOrchestrator as AnnualIrradianceEntryPoint_34bf01fdWorkerbee
 
 
 _default_inputs = {   'comfort_parameters': '--ppd-threshold 10',
@@ -78,7 +78,7 @@ class ComputeTcpLoop(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort map tcp {condition_csv} {enclosure_info} --occ-schedule-json "{occ_schedule_json}" --folder output'.format(condition_csv=self.condition_csv, enclosure_info=self.enclosure_info, occ_schedule_json=self.occ_schedule_json)
+        return 'ladybug-comfort map tcp condition.csv enclosure_info.json --occ-schedule-json occ_schedule.json --folder output'
 
     def requires(self):
         return {'CreateModelOccSchedules': CreateModelOccSchedules(_input_params=self._input_params), 'GetEnclosureInfo': GetEnclosureInfo(_input_params=self._input_params), 'RunComfortMap': RunComfortMap(_input_params=self._input_params)}
@@ -998,7 +998,7 @@ class RunIrradianceSimulation(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [AnnualIrradianceEntryPoint_6d4da049Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualIrradianceEntryPoint_34bf01fdWorkerbee(_input_params=self.map_dag_inputs)]
         os.makedirs(self.execution_folder, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -1072,7 +1072,7 @@ class SetModifiersFromConstructions(QueenbeeTask):
             }]
 
 
-class _Main_6d4da049Orchestrator(luigi.WrapperTask):
+class _Main_34bf01fdOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
