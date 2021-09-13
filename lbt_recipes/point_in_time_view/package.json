@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "point-in-time-view",
-    "tag": "0.2.6",
+    "tag": "0.2.7",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -259,7 +259,7 @@
       "type": "DAGStringInput",
       "annotations": {},
       "name": "view-filter",
-      "description": "Text for a view identifer or a pattern to filter the views of the model that are simulated. For instance, first_floor_* will simulate only the views that have an identifier that starts with first_floor_. By default, all views in the model will be simulated.",
+      "description": "Text for a view identifier or a pattern to filter the views of the model that are simulated. For instance, first_floor_* will simulate only the views that have an identifier that starts with first_floor_. By default, all views in the model will be simulated.",
       "default": "*",
       "alias": [],
       "required": false,
