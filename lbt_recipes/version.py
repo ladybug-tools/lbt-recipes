@@ -30,7 +30,10 @@ def check_openstudio_version():
     assert energy_folders.openstudio_path is not None, \
         'No OpenStudio installation was found on this machine.\n{}'.format(in_msg)
     os_version = energy_folders.openstudio_version
-    assert os_version is not None and os_version >= OS_VERSION, \
+    assert os_version is not None, 'The installed version of OpenStudio could not be ' \
+        'verified.\nThis can result from encoding errors as a result of your ' \
+        'operating system language settings.'
+    assert os_version >= OS_VERSION, \
         'The installed OpenStudio is {}.\nMust be version {} or greater.\n{}'.format(
             '.'.join(str(v) for v in os_version),
             '.'.join(str(v) for v in OS_VERSION), in_msg)
