@@ -23,12 +23,13 @@ from queenbee_local import local_scheduler, _copy_artifacts, update_params, pars
 import flow.main as annual_daylight_workerbee
 
 
-_recipe_default_inputs = {   'grid_filter': '*',
+_recipe_default_inputs = {   'cpu_count': 50,
+    'grid_filter': '*',
+    'min_sensor_count': 1,
     'model': None,
     'north': 0.0,
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
     'schedule': None,
-    'sensor_count': 200,
     'thresholds': '-t 300 -lt 100 -ut 3000',
     'wea': None}
 
@@ -38,7 +39,7 @@ class LetAnnualDaylightFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [annual_daylight_workerbee._Main_4fe81c3cOrchestrator(_input_params=self._input_params)]
+        yield [annual_daylight_workerbee._Main_877ed6d8Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

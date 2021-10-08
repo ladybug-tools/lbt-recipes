@@ -174,7 +174,7 @@ class Recipe(object):
         for inp in self._inputs:
             inp.handle_value()
 
-    def write_inputs_json(self, project_folder=None, indent=4):
+    def write_inputs_json(self, project_folder=None, indent=4, cpu_count=None):
         """Write the inputs.json file that gets passed to queenbee luigi.
 
         Note that running this method will automatically handle all of the inputs.
@@ -184,6 +184,10 @@ class Recipe(object):
                 written. If None, the default_project_folder on this recipe
                 will be used.
             indent: The indent at which the JSON will be written (Default: 4).
+            cpu_count: An optional integer to override any inputs that are
+                named "cpu-count". This can be used to coordinate such recipe
+                inputs with the number of workers specified in recipe settings.
+                If None, no overriding will happen. (Default: None).
         """
         # create setup the project folder in which the inputs json will be written
         p_fold = project_folder if project_folder else self.default_project_folder
@@ -209,6 +213,8 @@ class Recipe(object):
             elif inp.is_path and (inp.value is None or inp.value == ''):
                 # conditional artifact; ignore it
                 pass
+            elif inp.name == 'cpu-count' and cpu_count is not None:
+                inp_dict[inp.name] = cpu_count
             else:
                 inp_dict[inp.name] = inp.value
         # write the inputs dictionary to a file
@@ -278,7 +284,7 @@ class Recipe(object):
                 nukedir(wf_folder, rmdir=True)
 
         # write the inputs JSON for the recipe and set up the environment variables
-        inputs_json = self.write_inputs_json(folder)
+        inputs_json = self.write_inputs_json(folder, cpu_count=settings.workers)
         genv = {}
         genv['PATH'] = rad_folders.radbin_path
         genv['RAYPATH'] = rad_folders.radlib_path
@@ -469,6 +475,11 @@ class RecipeInput(_RecipeParameter):
         self._value, self._default_value = None, None
         if 'default' in input_dict and input_dict['default'] is not None:
             self._default_value = input_dict['default']
+        if 'alias' in input_dict:
+            for al in input_dict['alias']:
+                if 'grasshopper' in al['platform']:
+                    if 'default' in al and al['default'] is not None:
+                        self._default_value = al['default']
         self._is_required = input_dict['required']
         self._is_handled = True  # will be set to false if a user specifies a value
 
