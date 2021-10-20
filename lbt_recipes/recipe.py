@@ -479,7 +479,11 @@ class RecipeInput(_RecipeParameter):
             for al in input_dict['alias']:
                 if 'grasshopper' in al['platform']:
                     if 'default' in al and al['default'] is not None:
-                        self._default_value = al['default']
+                        d_val = al['default']
+                        if self._handlers is not None:
+                            for handler in self._handlers:
+                                d_val = handler(d_val)
+                        self._default_value = self._type(d_val)
         self._is_required = input_dict['required']
         self._is_handled = True  # will be set to false if a user specifies a value
 
