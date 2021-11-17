@@ -23,11 +23,12 @@ from queenbee_local import local_scheduler, _copy_artifacts, update_params, pars
 import flow.main as annual_irradiance_workerbee
 
 
-_recipe_default_inputs = {   'grid_filter': '*',
+_recipe_default_inputs = {   'cpu_count': 50,
+    'grid_filter': '*',
+    'min_sensor_count': 1,
     'model': None,
     'north': 0.0,
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
-    'sensor_count': 200,
     'timestep': 1,
     'wea': None}
 
@@ -37,7 +38,7 @@ class LetAnnualIrradianceFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [annual_irradiance_workerbee._Main_d86d65fcOrchestrator(_input_params=self._input_params)]
+        yield [annual_irradiance_workerbee._Main_87db8806Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

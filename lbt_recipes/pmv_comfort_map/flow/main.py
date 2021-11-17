@@ -16,18 +16,19 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.annual_irradiance_entry_point import _AnnualIrradianceEntryPoint_34bf01fdOrchestrator as AnnualIrradianceEntryPoint_34bf01fdWorkerbee
+from .dependencies.annual_irradiance_entry_point import _AnnualIrradianceEntryPoint_dfe2196eOrchestrator as AnnualIrradianceEntryPoint_dfe2196eWorkerbee
 
 
 _default_inputs = {   'comfort_parameters': '--ppd-threshold 10',
+    'cpu_count': 50,
     'ddy': None,
     'epw': None,
+    'min_sensor_count': 1,
     'model': None,
     'north': 0.0,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
     'run_period': '',
-    'sensor_count': 200,
     'simulation_folder': '.',
     'solarcal_parameters': '--posture seated --sharp 135 --absorptivity 0.7 '
                            '--emissivity 0.95',
@@ -78,7 +79,7 @@ class ComputeTcpLoop(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort map tcp condition.csv enclosure_info.json --occ-schedule-json occ_schedule.json --folder output'
+        return 'ladybug-comfort map tcp {condition_csv} {enclosure_info} --occ-schedule-json "{occ_schedule_json}" --folder output'.format(condition_csv=self.condition_csv, enclosure_info=self.enclosure_info, occ_schedule_json=self.occ_schedule_json)
 
     def requires(self):
         return {'CreateModelOccSchedules': CreateModelOccSchedules(_input_params=self._input_params), 'GetEnclosureInfo': GetEnclosureInfo(_input_params=self._input_params), 'RunComfortMap': RunComfortMap(_input_params=self._input_params)}
@@ -867,6 +868,10 @@ class RunEnergySimulation(QueenbeeTask):
     # Task inputs
     additional_string = luigi.Parameter(default='')
 
+    report_units = luigi.Parameter(default='none')
+
+    viz_variables = luigi.Parameter(default='')
+
     @property
     def model(self):
         value = pathlib.Path(self._input_params['model'])
@@ -903,7 +908,7 @@ class RunEnergySimulation(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-energy simulate model model.hbjson weather.epw --sim-par-json sim-par.json --additional-string "{additional_string}" --folder output'.format(additional_string=self.additional_string)
+        return 'honeybee-energy simulate model model.hbjson weather.epw --sim-par-json sim-par.json --measures measures --additional-string "{additional_string}" --report-units {report_units} --folder output {viz_variables}'.format(additional_string=self.additional_string, report_units=self.report_units, viz_variables=self.viz_variables)
 
     def requires(self):
         return {'CreateSimPar': CreateSimPar(_input_params=self._input_params)}
@@ -945,8 +950,12 @@ class RunIrradianceSimulation(QueenbeeTask):
         return self._input_params['north']
 
     @property
-    def sensor_count(self):
-        return self._input_params['sensor_count']
+    def cpu_count(self):
+        return self._input_params['cpu_count']
+
+    @property
+    def min_sensor_count(self):
+        return self._input_params['min_sensor_count']
 
     @property
     def radiance_parameters(self):
@@ -986,7 +995,8 @@ class RunIrradianceSimulation(QueenbeeTask):
             'model': self.model,
             'wea': self.wea,
             'north': self.north,
-            'sensor_count': self.sensor_count,
+            'cpu_count': self.cpu_count,
+            'min_sensor_count': self.min_sensor_count,
             'radiance_parameters': self.radiance_parameters
         }
         try:
@@ -998,7 +1008,7 @@ class RunIrradianceSimulation(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [AnnualIrradianceEntryPoint_34bf01fdWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualIrradianceEntryPoint_dfe2196eWorkerbee(_input_params=self.map_dag_inputs)]
         os.makedirs(self.execution_folder, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -1072,7 +1082,7 @@ class SetModifiersFromConstructions(QueenbeeTask):
             }]
 
 
-class _Main_34bf01fdOrchestrator(luigi.WrapperTask):
+class _Main_dfe2196eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

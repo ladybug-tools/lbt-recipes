@@ -25,13 +25,14 @@ import flow.main as adaptive_comfort_map_workerbee
 
 _recipe_default_inputs = {   'air_speed': '0.1',
     'comfort_parameters': '--standard ASHRAE-55',
+    'cpu_count': 50,
     'ddy': None,
     'epw': None,
+    'min_sensor_count': 1,
     'model': None,
     'north': 0.0,
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
     'run_period': '',
-    'sensor_count': 200,
     'solarcal_parameters': '--posture seated --sharp 135 --absorptivity 0.7 '
                            '--emissivity 0.95'}
 
@@ -41,7 +42,7 @@ class LetAdaptiveComfortMapFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [adaptive_comfort_map_workerbee._Main_a6294367Orchestrator(_input_params=self._input_params)]
+        yield [adaptive_comfort_map_workerbee._Main_7a3b9508Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
