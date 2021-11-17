@@ -24,7 +24,7 @@ _default_inputs = {   'bsdfs': None,
     'octree_file_with_suns': None,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2',
-    'sensor_count': 200,
+    'sensor_count': None,
     'sensor_grid': None,
     'simulation_folder': '.',
     'sky_dome': None,
@@ -33,7 +33,7 @@ _default_inputs = {   'bsdfs': None,
     'sun_modifiers': None}
 
 
-class DirectSkyLoop(QueenbeeTask):
+class DirectSky(QueenbeeTask):
     """Calculate daylight coefficient for a grid of sensors from a sky matrix."""
 
     # DAG Input parameters
@@ -50,7 +50,7 @@ class DirectSkyLoop(QueenbeeTask):
 
     @property
     def sensor_count(self):
-        return self.item['count']
+        return self._input_params['sensor_count']
 
     @property
     def conversion(self):
@@ -74,7 +74,7 @@ class DirectSkyLoop(QueenbeeTask):
 
     @property
     def sensor_grid(self):
-        value = pathlib.Path(self.input()['SplitGrid']['output_folder'].path, self.item['path'])
+        value = pathlib.Path(self._input_params['sensor_grid'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -95,15 +95,9 @@ class DirectSkyLoop(QueenbeeTask):
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
-    # get item for loop
-    try:
-        item = luigi.DictParameter()
-    except Exception:
-        item = luigi.Parameter()
-
     @property
     def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder'], 'direct_sky').resolve().as_posix()
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
@@ -116,13 +110,10 @@ class DirectSkyLoop(QueenbeeTask):
     def command(self):
         return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by}'.format(sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format, order_by=self.order_by)
 
-    def requires(self):
-        return {'SplitGrid': SplitGrid(_input_params=self._input_params)}
-
     def output(self):
         return {
             'result_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'direct_sky.ill').resolve().as_posix()
             )
         }
 
@@ -140,59 +131,13 @@ class DirectSkyLoop(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'direct_sky.ill').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
 
 
-class DirectSky(luigi.Task):
-    """Calculate daylight coefficient for a grid of sensors from a sky matrix."""
-    # global parameters
-    _input_params = luigi.DictParameter()
-    @property
-    def grids_list(self):
-        value = pathlib.Path(self.input()['SplitGrid']['grids_list'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def items(self):
-        try:
-            # assume the input is a file
-            return QueenbeeTask.load_input_param(self.grids_list)
-        except:
-            # it is a parameter
-            return pathlib.Path(self.input()['SplitGrid']['grids_list'].path).as_posix()
-
-    def run(self):
-        yield [DirectSkyLoop(item=item, _input_params=self._input_params) for item in self.items]
-        done_file = pathlib.Path(self.execution_folder, 'direct_sky.done')
-        done_file.parent.mkdir(parents=True, exist_ok=True)
-        done_file.write_text('done!')
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def requires(self):
-        return {'SplitGrid': SplitGrid(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'direct_sky.done').resolve().as_posix())
-        }
-
-
-class DirectSunLoop(QueenbeeTask):
+class DirectSun(QueenbeeTask):
     """Calculate daylight contribution for a grid of sensors from a series of modifiers
     using rcontrib command."""
 
@@ -200,6 +145,10 @@ class DirectSunLoop(QueenbeeTask):
     _input_params = luigi.DictParameter()
 
     # Task inputs
+    @property
+    def name(self):
+        return self._input_params['grid_name']
+
     @property
     def radiance_parameters(self):
         return self._input_params['radiance_parameters']
@@ -210,7 +159,7 @@ class DirectSunLoop(QueenbeeTask):
 
     @property
     def sensor_count(self):
-        return self.item['count']
+        return self._input_params['sensor_count']
 
     @property
     def conversion(self):
@@ -232,7 +181,7 @@ class DirectSunLoop(QueenbeeTask):
 
     @property
     def sensor_grid(self):
-        value = pathlib.Path(self.input()['SplitGrid']['output_folder'].path, self.item['path'])
+        value = pathlib.Path(self._input_params['sensor_grid'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -253,15 +202,9 @@ class DirectSunLoop(QueenbeeTask):
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
-    # get item for loop
-    try:
-        item = luigi.DictParameter()
-    except Exception:
-        item = luigi.Parameter()
-
     @property
     def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder'], 'direct_sun').resolve().as_posix()
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
@@ -274,13 +217,10 @@ class DirectSunLoop(QueenbeeTask):
     def command(self):
         return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by}'.format(calculate_values=self.calculate_values, sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format, order_by=self.order_by)
 
-    def requires(self):
-        return {'SplitGrid': SplitGrid(_input_params=self._input_params)}
-
     def output(self):
         return {
             'result_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix()
+                pathlib.Path(self.execution_folder, '../final/direct/{name}.ill'.format(name=self.name)).resolve().as_posix()
             )
         }
 
@@ -297,190 +237,23 @@ class DirectSunLoop(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, '../final/direct/{name}.ill'.format(name=self.name)).resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
 
 
-class DirectSun(luigi.Task):
-    """Calculate daylight contribution for a grid of sensors from a series of modifiers
-    using rcontrib command."""
-    # global parameters
-    _input_params = luigi.DictParameter()
-    @property
-    def grids_list(self):
-        value = pathlib.Path(self.input()['SplitGrid']['grids_list'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def items(self):
-        try:
-            # assume the input is a file
-            return QueenbeeTask.load_input_param(self.grids_list)
-        except:
-            # it is a parameter
-            return pathlib.Path(self.input()['SplitGrid']['grids_list'].path).as_posix()
-
-    def run(self):
-        yield [DirectSunLoop(item=item, _input_params=self._input_params) for item in self.items]
-        done_file = pathlib.Path(self.execution_folder, 'direct_sun.done')
-        done_file.parent.mkdir(parents=True, exist_ok=True)
-        done_file.write_text('done!')
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def requires(self):
-        return {'SplitGrid': SplitGrid(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'direct_sun.done').resolve().as_posix())
-        }
-
-
-class MergeDirectResults(QueenbeeTask):
-    """Merge several files with similar starting name into one."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def name(self):
-        return self._input_params['grid_name']
-
-    @property
-    def extension(self):
-        return '.ill'
-
-    @property
-    def folder(self):
-        value = pathlib.Path('direct_sun')
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'honeybee-radiance grid merge input_folder grid  {extension} --name {name}'.format(extension=self.extension, name=self.name)
-
-    def requires(self):
-        return {'OutputMatrixMath': OutputMatrixMath(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'result_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '../../results/direct/{name}.ill'.format(name=self.name)).resolve().as_posix()
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'folder', 'to': 'input_folder', 'from': self.folder, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'result-file', 'from': '{name}{extension}'.format(name=self.name, extension=self.extension),
-                'to': pathlib.Path(self.execution_folder, '../../results/direct/{name}.ill'.format(name=self.name)).resolve().as_posix(),
-                'optional': False,
-                'type': 'file'
-            }]
-
-
-class MergeTotalResults(QueenbeeTask):
-    """Merge several files with similar starting name into one."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def name(self):
-        return self._input_params['grid_name']
-
-    @property
-    def extension(self):
-        return '.ill'
-
-    @property
-    def folder(self):
-        value = pathlib.Path('final')
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'honeybee-radiance grid merge input_folder grid  {extension} --name {name}'.format(extension=self.extension, name=self.name)
-
-    def requires(self):
-        return {'OutputMatrixMath': OutputMatrixMath(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'result_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '../../results/total/{name}.ill'.format(name=self.name)).resolve().as_posix()
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'folder', 'to': 'input_folder', 'from': self.folder, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'result-file', 'from': '{name}{extension}'.format(name=self.name, extension=self.extension),
-                'to': pathlib.Path(self.execution_folder, '../../results/total/{name}.ill'.format(name=self.name)).resolve().as_posix(),
-                'optional': False,
-                'type': 'file'
-            }]
-
-
-class OutputMatrixMathLoop(QueenbeeTask):
+class OutputMatrixMath(QueenbeeTask):
     """Remove direct sky from total sky and add direct sun."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
 
     # Task inputs
+    @property
+    def name(self):
+        return self._input_params['grid_name']
+
     conversion = luigi.Parameter(default=' ')
 
     header = luigi.Parameter(default='remove')
@@ -489,31 +262,25 @@ class OutputMatrixMathLoop(QueenbeeTask):
 
     @property
     def direct_sky_matrix(self):
-        value = pathlib.Path('direct_sky/{item_name}.ill'.format(item_name=self.item['name']))
+        value = pathlib.Path(self.input()['DirectSky']['result_file'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def total_sky_matrix(self):
-        value = pathlib.Path('total_sky/{item_name}.ill'.format(item_name=self.item['name']))
+        value = pathlib.Path(self.input()['TotalSky']['result_file'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def sunlight_matrix(self):
-        value = pathlib.Path('direct_sun/{item_name}.ill'.format(item_name=self.item['name']))
+        value = pathlib.Path(self.input()['DirectSun']['result_file'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
-    # get item for loop
-    try:
-        item = luigi.DictParameter()
-    except Exception:
-        item = luigi.Parameter()
-
     @property
     def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder'], 'final').resolve().as_posix()
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
@@ -527,12 +294,12 @@ class OutputMatrixMathLoop(QueenbeeTask):
         return 'honeybee-radiance mtxop operate-three sky.ill sky_dir.ill sun.ill --operator-one "-" --operator-two "+" --{header}-header --conversion "{conversion}" --output-mtx final.ill --output-format {output_format}'.format(header=self.header, conversion=self.conversion, output_format=self.output_format)
 
     def requires(self):
-        return {'SplitGrid': SplitGrid(_input_params=self._input_params), 'DirectSun': DirectSun(_input_params=self._input_params), 'TotalSky': TotalSky(_input_params=self._input_params), 'DirectSky': DirectSky(_input_params=self._input_params)}
+        return {'DirectSun': DirectSun(_input_params=self._input_params), 'TotalSky': TotalSky(_input_params=self._input_params), 'DirectSky': DirectSky(_input_params=self._input_params)}
 
     def output(self):
         return {
             'results_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix()
+                pathlib.Path(self.execution_folder, '../final/total/{name}.ill'.format(name=self.name)).resolve().as_posix()
             )
         }
 
@@ -548,124 +315,13 @@ class OutputMatrixMathLoop(QueenbeeTask):
         return [
             {
                 'name': 'results-file', 'from': 'final.ill',
-                'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, '../final/total/{name}.ill'.format(name=self.name)).resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
 
 
-class OutputMatrixMath(luigi.Task):
-    """Remove direct sky from total sky and add direct sun."""
-    # global parameters
-    _input_params = luigi.DictParameter()
-    @property
-    def grids_list(self):
-        value = pathlib.Path(self.input()['SplitGrid']['grids_list'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def items(self):
-        try:
-            # assume the input is a file
-            return QueenbeeTask.load_input_param(self.grids_list)
-        except:
-            # it is a parameter
-            return pathlib.Path(self.input()['SplitGrid']['grids_list'].path).as_posix()
-
-    def run(self):
-        yield [OutputMatrixMathLoop(item=item, _input_params=self._input_params) for item in self.items]
-        done_file = pathlib.Path(self.execution_folder, 'output_matrix_math.done')
-        done_file.parent.mkdir(parents=True, exist_ok=True)
-        done_file.write_text('done!')
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def requires(self):
-        return {'SplitGrid': SplitGrid(_input_params=self._input_params), 'DirectSun': DirectSun(_input_params=self._input_params), 'TotalSky': TotalSky(_input_params=self._input_params), 'DirectSky': DirectSky(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'output_matrix_math.done').resolve().as_posix())
-        }
-
-
-class SplitGrid(QueenbeeTask):
-    """Split a single sensor grid file into multiple smaller grids."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def sensor_count(self):
-        return self._input_params['sensor_count']
-
-    @property
-    def input_grid(self):
-        value = pathlib.Path(self._input_params['sensor_grid'])
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'honeybee-radiance grid split grid.pts {sensor_count} --folder output --log-file output/grids_info.json'.format(sensor_count=self.sensor_count)
-
-    def output(self):
-        return {
-            
-            'output_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '00_sub_grids').resolve().as_posix()
-            ),
-            'grids_list': luigi.LocalTarget(
-                pathlib.Path(
-                    self.params_folder,
-                    'output/grids_info.json').resolve().as_posix()
-                )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'input_grid', 'to': 'grid.pts', 'from': self.input_grid, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'output-folder', 'from': 'output',
-                'to': pathlib.Path(self.execution_folder, '00_sub_grids').resolve().as_posix(),
-                'optional': False,
-                'type': 'folder'
-            }]
-
-    @property
-    def output_parameters(self):
-        return [{'name': 'grids-list', 'from': 'output/grids_info.json', 'to': pathlib.Path(self.params_folder, 'output/grids_info.json').resolve().as_posix()}]
-
-
-class TotalSkyLoop(QueenbeeTask):
+class TotalSky(QueenbeeTask):
     """Calculate daylight coefficient for a grid of sensors from a sky matrix."""
 
     # DAG Input parameters
@@ -682,7 +338,7 @@ class TotalSkyLoop(QueenbeeTask):
 
     @property
     def sensor_count(self):
-        return self.item['count']
+        return self._input_params['sensor_count']
 
     @property
     def conversion(self):
@@ -706,7 +362,7 @@ class TotalSkyLoop(QueenbeeTask):
 
     @property
     def sensor_grid(self):
-        value = pathlib.Path(self.input()['SplitGrid']['output_folder'].path, self.item['path'])
+        value = pathlib.Path(self._input_params['sensor_grid'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -727,15 +383,9 @@ class TotalSkyLoop(QueenbeeTask):
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
-    # get item for loop
-    try:
-        item = luigi.DictParameter()
-    except Exception:
-        item = luigi.Parameter()
-
     @property
     def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder'], 'total_sky').resolve().as_posix()
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
@@ -748,13 +398,10 @@ class TotalSkyLoop(QueenbeeTask):
     def command(self):
         return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by}'.format(sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format, order_by=self.order_by)
 
-    def requires(self):
-        return {'SplitGrid': SplitGrid(_input_params=self._input_params)}
-
     def output(self):
         return {
             'result_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'total_sky.ill').resolve().as_posix()
             )
         }
 
@@ -772,59 +419,13 @@ class TotalSkyLoop(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, '{item_name}.ill'.format(item_name=self.item['name'])).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'total_sky.ill').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
 
 
-class TotalSky(luigi.Task):
-    """Calculate daylight coefficient for a grid of sensors from a sky matrix."""
-    # global parameters
-    _input_params = luigi.DictParameter()
-    @property
-    def grids_list(self):
-        value = pathlib.Path(self.input()['SplitGrid']['grids_list'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def items(self):
-        try:
-            # assume the input is a file
-            return QueenbeeTask.load_input_param(self.grids_list)
-        except:
-            # it is a parameter
-            return pathlib.Path(self.input()['SplitGrid']['grids_list'].path).as_posix()
-
-    def run(self):
-        yield [TotalSkyLoop(item=item, _input_params=self._input_params) for item in self.items]
-        done_file = pathlib.Path(self.execution_folder, 'total_sky.done')
-        done_file.parent.mkdir(parents=True, exist_ok=True)
-        done_file.write_text('done!')
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def requires(self):
-        return {'SplitGrid': SplitGrid(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'total_sky.done').resolve().as_posix())
-        }
-
-
-class _AnnualIrradianceRayTracing_34bf01fdOrchestrator(luigi.WrapperTask):
+class _AnnualIrradianceRayTracing_dfe2196eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -836,4 +437,4 @@ class _AnnualIrradianceRayTracing_34bf01fdOrchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [MergeDirectResults(_input_params=self.input_values), MergeTotalResults(_input_params=self.input_values)]
+        yield [OutputMatrixMath(_input_params=self.input_values)]

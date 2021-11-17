@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "utci-comfort-map",
-    "tag": "0.3.4",
+    "tag": "0.3.5",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -68,6 +68,33 @@
       "spec": null
     },
     {
+      "type": "DAGIntegerInput",
+      "annotations": {},
+      "name": "cpu-count",
+      "description": "The maximum number of CPUs for parallel execution. This will be used to determine the number of sensors run by each worker.",
+      "default": 50,
+      "alias": [
+        {
+          "type": "DAGIntegerInputAlias",
+          "annotations": {},
+          "name": "cpu_count",
+          "description": "The maximum number of CPUs for parallel execution. For local simulation, this value is ignored and the cpu_count is automatically set to be equal to the number of workers tasked to the run. For cloud-based runs, this input can be used to control the resources used for the simulation and, if unspecified, the default value of 50 will be used.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": 50,
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    {
       "type": "DAGFileInput",
       "annotations": {},
       "name": "ddy",
@@ -115,6 +142,33 @@
       "extensions": [
         "epw"
       ]
+    },
+    {
+      "type": "DAGIntegerInput",
+      "annotations": {},
+      "name": "min-sensor-count",
+      "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids. The default value is set to 1, which means that the cpu_count is always respected.",
+      "default": 1,
+      "alias": [
+        {
+          "type": "DAGIntegerInputAlias",
+          "annotations": {},
+          "name": "min_sen_count",
+          "description": "Positive integer for the minimum number of sensors in each grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids that increase overhead. (Default: 200).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": 200,
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": {
+        "type": "integer",
+        "minimum": 1
+      }
     },
     {
       "type": "DAGFileInput",
@@ -276,33 +330,6 @@
       ],
       "required": false,
       "spec": null
-    },
-    {
-      "type": "DAGIntegerInput",
-      "annotations": {},
-      "name": "sensor-count",
-      "description": "The maximum number of grid points per parallel execution.",
-      "default": 200,
-      "alias": [
-        {
-          "type": "DAGIntegerInputAlias",
-          "annotations": {},
-          "name": "sensor_count",
-          "description": "Positive integer for the number of sensor grid points per parallel execution. Lower numbers will result in sensor grids being split into more pieces and, since each grid piece is run by a separate worker, this can mean a faster simulation on machines with several CPUs. However ,If the number is too low, the overhad of splitting the grid will not be worth the time gained through parallelization. (Default: 200).",
-          "platform": [
-            "grasshopper"
-          ],
-          "handler": [],
-          "default": 200,
-          "required": false,
-          "spec": null
-        }
-      ],
-      "required": false,
-      "spec": {
-        "type": "integer",
-        "minimum": 1
-      }
     },
     {
       "type": "DAGStringInput",

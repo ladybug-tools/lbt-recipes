@@ -26,14 +26,15 @@ import flow.main as pmv_comfort_map_workerbee
 _recipe_default_inputs = {   'air_speed': '0.1',
     'clo_value': '0.7',
     'comfort_parameters': '--ppd-threshold 10',
+    'cpu_count': 50,
     'ddy': None,
     'epw': None,
     'met_rate': '1.1',
+    'min_sensor_count': 1,
     'model': None,
     'north': 0.0,
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
     'run_period': '',
-    'sensor_count': 200,
     'solarcal_parameters': '--posture seated --sharp 135 --absorptivity 0.7 '
                            '--emissivity 0.95',
     'write_set_map': 'write-op-map'}
@@ -44,7 +45,7 @@ class LetPmvComfortMapFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [pmv_comfort_map_workerbee._Main_34bf01fdOrchestrator(_input_params=self._input_params)]
+        yield [pmv_comfort_map_workerbee._Main_dfe2196eOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
