@@ -23,10 +23,11 @@ from queenbee_local import local_scheduler, _copy_artifacts, update_params, pars
 import flow.main as daylight_factor_workerbee
 
 
-_recipe_default_inputs = {   'grid_filter': '*',
+_recipe_default_inputs = {   'cpu_count': 50,
+    'grid_filter': '*',
+    'min_sensor_count': 1,
     'model': None,
-    'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64',
-    'sensor_count': 200}
+    'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64'}
 
 
 class LetDaylightFactorFly(luigi.WrapperTask):
@@ -34,7 +35,7 @@ class LetDaylightFactorFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [daylight_factor_workerbee._Main_28174b46Orchestrator(_input_params=self._input_params)]
+        yield [daylight_factor_workerbee._Main_c4ed2ed7Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

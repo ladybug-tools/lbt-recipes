@@ -20,7 +20,6 @@ def test_recipe_init():
     # pass the model to the recipe
     recipe = Recipe('daylight_factor')
     recipe.input_value_by_name('model', model)
-    recipe.input_value_by_name('sensor-count', 30)
     recipe.input_value_by_name('radiance-parameters', None)
 
     # set the default project folder based on the model name if available
@@ -51,7 +50,6 @@ def test_recipe_run():
     # pass the model to the recipe
     recipe = Recipe('daylight_factor')
     recipe.input_value_by_name('model', model)
-    recipe.input_value_by_name('sensor-count', 30)
     recipe.input_value_by_name('radiance-parameters', None)
 
     # run the recipe

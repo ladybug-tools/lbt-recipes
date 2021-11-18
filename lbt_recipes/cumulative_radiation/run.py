@@ -23,11 +23,12 @@ from queenbee_local import local_scheduler, _copy_artifacts, update_params, pars
 import flow.main as cumulative_radiation_workerbee
 
 
-_recipe_default_inputs = {   'grid_filter': '*',
+_recipe_default_inputs = {   'cpu_count': 50,
+    'grid_filter': '*',
+    'min_sensor_count': 1,
     'model': None,
     'north': 0.0,
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
-    'sensor_count': 200,
     'sky_density': 1,
     'timestep': 1,
     'wea': None}
@@ -38,7 +39,7 @@ class LetCumulativeRadiationFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [cumulative_radiation_workerbee._Main_eb7cd2d1Orchestrator(_input_params=self._input_params)]
+        yield [cumulative_radiation_workerbee._Main_e9c43459Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

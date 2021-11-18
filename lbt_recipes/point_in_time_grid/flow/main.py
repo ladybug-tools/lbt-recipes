@@ -16,15 +16,15 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.point_in_time_grid_ray_tracing import _PointInTimeGridRayTracing_727059dcOrchestrator as PointInTimeGridRayTracing_727059dcWorkerbee
 
 
-_default_inputs = {   'grid_filter': '*',
+_default_inputs = {   'cpu_count': 50,
+    'grid_filter': '*',
     'metric': 'illuminance',
+    'min_sensor_count': 1,
     'model': None,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64',
-    'sensor_count': 200,
     'simulation_folder': '.',
     'sky': None}
 
@@ -286,17 +286,13 @@ class GenerateSky(QueenbeeTask):
             }]
 
 
-class PointInTimeGridRayTracingLoop(luigi.Task):
-    """No description is provided."""
+class PointInTimeGridRayTracingLoop(QueenbeeTask):
+    """Run ray-tracing and post-process the results for a point-in-time simulation."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
 
     # Task inputs
-    @property
-    def sensor_count(self):
-        return self._input_params['sensor_count']
-
     @property
     def radiance_parameters(self):
         return self._input_params['radiance_parameters']
@@ -305,24 +301,22 @@ class PointInTimeGridRayTracingLoop(luigi.Task):
     def metric(self):
         return self._input_params['metric']
 
-    @property
-    def grid_name(self):
-        return self.item['full_id']
+    fixed_radiance_parameters = luigi.Parameter(default='-h')
 
     @property
-    def octree_file(self):
+    def scene_file(self):
         value = pathlib.Path(self.input()['CreateOctree']['scene_file'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
-    def sensor_grid(self):
-        value = pathlib.Path(self.input()['CreateRadFolder']['model_folder'].path, 'grid/{item_full_id}.pts'.format(item_full_id=self.item['full_id']))
+    def grid(self):
+        value = pathlib.Path(self.input()['SplitGridFolder']['output_folder'].path, '{item_full_id}.pts'.format(item_full_id=self.item['full_id']))
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
-    def bsdfs(self):
+    def bsdf_folder(self):
         try:
             pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
         except TypeError:
@@ -340,7 +334,7 @@ class PointInTimeGridRayTracingLoop(luigi.Task):
 
     @property
     def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder'], 'initial_results/{item_name}'.format(item_name=self.item['name'])).resolve().as_posix()
+        return pathlib.Path(self._input_params['simulation_folder'], 'initial_results/{item_full_id}'.format(item_full_id=self.item['full_id'])).resolve().as_posix()
 
     @property
     def initiation_folder(self):
@@ -350,49 +344,44 @@ class PointInTimeGridRayTracingLoop(luigi.Task):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
-    @property
-    def map_dag_inputs(self):
-        """Map task inputs to DAG inputs."""
-        inputs = {
-            'simulation_folder': self.execution_folder,
-            'sensor_count': self.sensor_count,
-            'radiance_parameters': self.radiance_parameters,
-            'metric': self.metric,
-            'octree_file': self.octree_file,
-            'grid_name': self.grid_name,
-            'sensor_grid': self.sensor_grid,
-            'bsdfs': self.bsdfs
-        }
-        try:
-            inputs['__debug__'] = self._input_params['__debug__']
-        except KeyError:
-            # not debug mode
-            pass
-
-        return inputs
-
-    def run(self):
-        yield [PointInTimeGridRayTracing_727059dcWorkerbee(_input_params=self.map_dag_inputs)]
-        done_file = pathlib.Path(self.execution_folder, 'point_in_time_grid_ray_tracing.done')
-        done_file.parent.mkdir(parents=True, exist_ok=True)
-        done_file.write_text('done!')
+    def command(self):
+        return 'honeybee-radiance raytrace point-in-time scene.oct grid.pts --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --metric {metric} --output grid.res'.format(radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, metric=self.metric)
 
     def requires(self):
-        return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params), 'CreateOctree': CreateOctree(_input_params=self._input_params)}
+        return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params), 'SplitGridFolder': SplitGridFolder(_input_params=self._input_params), 'CreateOctree': CreateOctree(_input_params=self._input_params)}
 
     def output(self):
         return {
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'point_in_time_grid_ray_tracing.done').resolve().as_posix())
+            'result': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, '../{item_name}.res'.format(item_name=self.item['name'])).resolve().as_posix()
+            )
         }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False},
+            {'name': 'grid', 'to': 'grid.pts', 'from': self.grid, 'optional': False},
+            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': True}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'result', 'from': 'grid.res',
+                'to': pathlib.Path(self.execution_folder, '../{item_name}.res'.format(item_name=self.item['name'])).resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
+            }]
 
 
 class PointInTimeGridRayTracing(luigi.Task):
-    """No description is provided."""
+    """Run ray-tracing and post-process the results for a point-in-time simulation."""
     # global parameters
     _input_params = luigi.DictParameter()
     @property
     def sensor_grids(self):
-        value = pathlib.Path(self.input()['CreateRadFolder']['sensor_grids'].path)
+        value = pathlib.Path(self.input()['SplitGridFolder']['sensor_grids'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -403,7 +392,7 @@ class PointInTimeGridRayTracing(luigi.Task):
             return QueenbeeTask.load_input_param(self.sensor_grids)
         except:
             # it is a parameter
-            return pathlib.Path(self.input()['CreateRadFolder']['sensor_grids'].path).as_posix()
+            return pathlib.Path(self.input()['SplitGridFolder']['sensor_grids'].path).as_posix()
 
     def run(self):
         yield [PointInTimeGridRayTracingLoop(item=item, _input_params=self._input_params) for item in self.items]
@@ -424,7 +413,7 @@ class PointInTimeGridRayTracing(luigi.Task):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def requires(self):
-        return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params), 'CreateOctree': CreateOctree(_input_params=self._input_params)}
+        return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params), 'SplitGridFolder': SplitGridFolder(_input_params=self._input_params), 'CreateOctree': CreateOctree(_input_params=self._input_params)}
 
     def output(self):
         return {
@@ -432,7 +421,157 @@ class PointInTimeGridRayTracing(luigi.Task):
         }
 
 
-class _Main_727059dcOrchestrator(luigi.WrapperTask):
+class RestructureResults(QueenbeeTask):
+    """Restructure files in a distributed folder."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+
+    # Task inputs
+    @property
+    def extension(self):
+        return 'res'
+
+    @property
+    def input_folder(self):
+        value = pathlib.Path('initial_results')
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def execution_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def initiation_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def params_folder(self):
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    def command(self):
+        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension}'.format(extension=self.extension)
+
+    def requires(self):
+        return {'PointInTimeGridRayTracing': PointInTimeGridRayTracing(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            'output_folder': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'results').resolve().as_posix()
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'input_folder', 'to': 'input_folder', 'from': self.input_folder, 'optional': False}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'output-folder', 'from': 'output_folder',
+                'to': pathlib.Path(self.execution_folder, 'results').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
+            }]
+
+
+class SplitGridFolder(QueenbeeTask):
+    """Create new sensor grids folder with evenly distributed sensors.
+
+    This function creates a new folder with evenly distributed sensor grids. The folder
+    will include a ``_redist_info.json`` file which has the information to recreate the
+    original input files from this folder and the results generated based on the grids
+    in this folder."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+
+    # Task inputs
+    @property
+    def cpu_count(self):
+        return self._input_params['cpu_count']
+
+    @property
+    def cpus_per_grid(self):
+        return '1'
+
+    @property
+    def min_sensor_count(self):
+        return self._input_params['min_sensor_count']
+
+    @property
+    def input_folder(self):
+        value = pathlib.Path(self.input()['CreateRadFolder']['model_folder'].path, 'grid')
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def execution_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def initiation_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def params_folder(self):
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    def command(self):
+        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(cpu_count=self.cpu_count, cpus_per_grid=self.cpus_per_grid, min_sensor_count=self.min_sensor_count)
+
+    def requires(self):
+        return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            
+            'output_folder': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'resources/grid').resolve().as_posix()
+            ),
+            
+            'dist_info': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'initial_results/_redist_info.json').resolve().as_posix()
+            ),
+            'sensor_grids': luigi.LocalTarget(
+                pathlib.Path(
+                    self.params_folder,
+                    'output_folder/_info.json').resolve().as_posix()
+                )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'input_folder', 'to': 'input_folder', 'from': self.input_folder, 'optional': False}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'output-folder', 'from': 'output_folder',
+                'to': pathlib.Path(self.execution_folder, 'resources/grid').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
+            },
+                
+            {
+                'name': 'dist-info', 'from': 'output_folder/_redist_info.json',
+                'to': pathlib.Path(self.execution_folder, 'initial_results/_redist_info.json').resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
+            }]
+
+    @property
+    def output_parameters(self):
+        return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
+
+
+class _Main_d3f8d86cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -444,4 +583,4 @@ class _Main_727059dcOrchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [PointInTimeGridRayTracing(_input_params=self.input_values)]
+        yield [RestructureResults(_input_params=self.input_values)]

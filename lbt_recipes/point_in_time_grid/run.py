@@ -23,11 +23,12 @@ from queenbee_local import local_scheduler, _copy_artifacts, update_params, pars
 import flow.main as point_in_time_grid_workerbee
 
 
-_recipe_default_inputs = {   'grid_filter': '*',
+_recipe_default_inputs = {   'cpu_count': 50,
+    'grid_filter': '*',
     'metric': 'illuminance',
+    'min_sensor_count': 1,
     'model': None,
     'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64',
-    'sensor_count': 200,
     'sky': None}
 
 
@@ -36,7 +37,7 @@ class LetPointInTimeGridFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [point_in_time_grid_workerbee._Main_727059dcOrchestrator(_input_params=self._input_params)]
+        yield [point_in_time_grid_workerbee._Main_d3f8d86cOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

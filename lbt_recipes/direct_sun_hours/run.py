@@ -23,10 +23,11 @@ from queenbee_local import local_scheduler, _copy_artifacts, update_params, pars
 import flow.main as direct_sun_hours_workerbee
 
 
-_recipe_default_inputs = {   'grid_filter': '*',
+_recipe_default_inputs = {   'cpu_count': 50,
+    'grid_filter': '*',
+    'min_sensor_count': 1,
     'model': None,
     'north': 0.0,
-    'sensor_count': 200,
     'timestep': 1,
     'wea': None}
 
@@ -36,7 +37,7 @@ class LetDirectSunHoursFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [direct_sun_hours_workerbee._Main_04f49a1bOrchestrator(_input_params=self._input_params)]
+        yield [direct_sun_hours_workerbee._Main_e39a9104Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

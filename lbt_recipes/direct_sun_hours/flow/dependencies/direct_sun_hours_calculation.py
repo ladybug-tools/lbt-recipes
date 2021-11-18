@@ -22,7 +22,7 @@ _default_inputs = {   'bsdfs': None,
     'grid_name': None,
     'octree_file': None,
     'params_folder': '__params',
-    'sensor_count': 200,
+    'sensor_count': None,
     'sensor_grid': None,
     'simulation_folder': '.',
     'sun_modifiers': None,
@@ -56,7 +56,7 @@ class CalculateCumulativeHours(QueenbeeTask):
 
     @property
     def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder'], 'cumulative-sun-hours').resolve().as_posix()
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
@@ -75,7 +75,7 @@ class CalculateCumulativeHours(QueenbeeTask):
     def output(self):
         return {
             'output_mtx': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '{grid_name}.res'.format(grid_name=self.grid_name)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, '../cumulative/{grid_name}.res'.format(grid_name=self.grid_name)).resolve().as_posix()
             )
         }
 
@@ -89,7 +89,7 @@ class CalculateCumulativeHours(QueenbeeTask):
         return [
             {
                 'name': 'output-mtx', 'from': 'sum.mtx',
-                'to': pathlib.Path(self.execution_folder, '{grid_name}.res'.format(grid_name=self.grid_name)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, '../cumulative/{grid_name}.res'.format(grid_name=self.grid_name)).resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -128,7 +128,7 @@ class ConvertToSunHours(QueenbeeTask):
 
     @property
     def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder'], 'direct-sun-hours').resolve().as_posix()
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
@@ -147,7 +147,7 @@ class ConvertToSunHours(QueenbeeTask):
     def output(self):
         return {
             'output_mtx': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '{grid_name}.ill'.format(grid_name=self.grid_name)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, '../direct_sun_hours/{grid_name}.ill'.format(grid_name=self.grid_name)).resolve().as_posix()
             )
         }
 
@@ -161,7 +161,7 @@ class ConvertToSunHours(QueenbeeTask):
         return [
             {
                 'name': 'output-mtx', 'from': 'binary.mtx',
-                'to': pathlib.Path(self.execution_folder, '{grid_name}.ill'.format(grid_name=self.grid_name)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, '../direct_sun_hours/{grid_name}.ill'.format(grid_name=self.grid_name)).resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -230,7 +230,7 @@ class DirectIrradianceCalculation(QueenbeeTask):
 
     @property
     def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder'], 'direct-irradiance').resolve().as_posix()
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
     @property
     def initiation_folder(self):
@@ -269,7 +269,7 @@ class DirectIrradianceCalculation(QueenbeeTask):
             }]
 
 
-class _DirectSunHoursCalculation_04f49a1bOrchestrator(luigi.WrapperTask):
+class _DirectSunHoursCalculation_e39a9104Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
