@@ -57,6 +57,17 @@ class MergeResults(QueenbeeTask):
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
+    def original_view(self):
+        try:
+            pathlib.Path(self._input_params['view'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['view'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
     def execution_folder(self):
         return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
@@ -66,10 +77,10 @@ class MergeResults(QueenbeeTask):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance view merge input_folder view {extension} --scale-factor {scale_factor} --name {name}'.format(extension=self.extension, scale_factor=self.scale_factor, name=self.name)
+        return 'honeybee-radiance view merge input_folder view {extension} --scale-factor {scale_factor} --name {name} --view original-view.vf'.format(extension=self.extension, scale_factor=self.scale_factor, name=self.name)
 
     def requires(self):
         return {'RayTracing': RayTracing(_input_params=self._input_params)}
@@ -84,7 +95,8 @@ class MergeResults(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'folder', 'to': 'input_folder', 'from': self.folder, 'optional': False}]
+            {'name': 'folder', 'to': 'input_folder', 'from': self.folder, 'optional': False},
+            {'name': 'original_view', 'to': 'original-view.vf', 'from': self.original_view, 'optional': True}]
 
     @property
     def output_artifacts(self):
@@ -170,7 +182,7 @@ class RayTracingLoop(QueenbeeTask):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance rpict rpict scene.oct view.vf --rad-params "{radiance_parameters}" --metric {metric} --resolution {resolution} --scale-factor {scale_factor} --output view.HDR'.format(radiance_parameters=self.radiance_parameters, metric=self.metric, resolution=self.resolution, scale_factor=self.scale_factor)
@@ -239,7 +251,7 @@ class RayTracing(luigi.Task):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def requires(self):
         return {'SplitView': SplitView(_input_params=self._input_params)}
@@ -311,7 +323,7 @@ class SplitView(QueenbeeTask):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance view split view.vf {view_count} --resolution {resolution} --{overture} --octree {scene_file} --rad-params "{radiance_parameters}" --folder output --log-file output/views_info.json'.format(view_count=self.view_count, resolution=self.resolution, overture=self.overture, scene_file=self.scene_file, radiance_parameters=self.radiance_parameters)
@@ -362,7 +374,7 @@ class SplitView(QueenbeeTask):
         return [{'name': 'views-list', 'from': 'output/views_info.json', 'to': pathlib.Path(self.params_folder, 'output/views_info.json').resolve().as_posix()}]
 
 
-class _PointInTimeViewRayTracing_2da91d1cOrchestrator(luigi.WrapperTask):
+class _PointInTimeViewRayTracing_f677f6a5Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "point-in-time-view",
-    "tag": "0.2.7",
+    "tag": "0.3.1",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -46,6 +46,33 @@
   },
   "source": null,
   "inputs": [
+    {
+      "type": "DAGIntegerInput",
+      "annotations": {},
+      "name": "cpu-count",
+      "description": "The number of CPUs for parallel execution. This will be used to determine the number of times that views are subdivided.",
+      "default": 12,
+      "alias": [
+        {
+          "type": "DAGIntegerInputAlias",
+          "annotations": {},
+          "name": "cpu_count",
+          "description": "The maximum number of CPUs for parallel execution. For local simulation, this value is ignored and the cpu_count is automatically set to be equal to the number of workers tasked to the run. For cloud-based runs, this input can be used to control the resources used for the simulation and, if unspecified, the default value of 12 will be used.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": 12,
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
     {
       "type": "DAGStringInput",
       "annotations": {},
@@ -241,19 +268,6 @@
       "alias": [],
       "required": true,
       "spec": null
-    },
-    {
-      "type": "DAGIntegerInput",
-      "annotations": {},
-      "name": "view-count",
-      "description": "Number of views into which each Model view will be subdivided for parallelized calculation.",
-      "default": 2,
-      "alias": [],
-      "required": false,
-      "spec": {
-        "type": "integer",
-        "minimum": 1
-      }
     },
     {
       "type": "DAGStringInput",
