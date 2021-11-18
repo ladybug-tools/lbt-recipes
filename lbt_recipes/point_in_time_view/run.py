@@ -23,13 +23,13 @@ from queenbee_local import local_scheduler, _copy_artifacts, update_params, pars
 import flow.main as point_in_time_view_workerbee
 
 
-_recipe_default_inputs = {   'metric': 'luminance',
+_recipe_default_inputs = {   'cpu_count': 12,
+    'metric': 'luminance',
     'model': None,
     'radiance_parameters': '-ab 2 -aa 0.25 -ad 512 -ar 16',
     'resolution': 800,
     'skip_overture': 'overture',
     'sky': None,
-    'view_count': 2,
     'view_filter': '*'}
 
 
@@ -38,7 +38,7 @@ class LetPointInTimeViewFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [point_in_time_view_workerbee._Main_2da91d1cOrchestrator(_input_params=self._input_params)]
+        yield [point_in_time_view_workerbee._Main_f677f6a5Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
