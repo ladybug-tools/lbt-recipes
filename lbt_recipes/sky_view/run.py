@@ -24,10 +24,11 @@ import flow.main as sky_view_workerbee
 
 
 _recipe_default_inputs = {   'cloudy_sky': 'uniform',
+    'cpu_count': 50,
     'grid_filter': '*',
+    'min_sensor_count': 1,
     'model': None,
-    'radiance_parameters': '-aa 0.1 -ad 2048 -ar 64',
-    'sensor_count': 200}
+    'radiance_parameters': '-aa 0.1 -ad 2048 -ar 64'}
 
 
 class LetSkyViewFly(luigi.WrapperTask):
@@ -35,7 +36,7 @@ class LetSkyViewFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [sky_view_workerbee._Main_236d9e12Orchestrator(_input_params=self._input_params)]
+        yield [sky_view_workerbee._Main_b8492043Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
