@@ -16,7 +16,8 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.annual_irradiance_entry_point import _AnnualIrradianceEntryPoint_7f8b9e60Orchestrator as AnnualIrradianceEntryPoint_7f8b9e60Workerbee
+from queenbee_local import load_input_param as qb_load_input_param
+from .dependencies.annual_irradiance_entry_point import _AnnualIrradianceEntryPoint_7d81ce6cOrchestrator as AnnualIrradianceEntryPoint_7d81ce6cWorkerbee
 
 
 _default_inputs = {   'comfort_parameters': '--cold 9 --heat 26',
@@ -144,7 +145,7 @@ class ComputeTcp(luigi.Task):
     def items(self):
         try:
             # assume the input is a file
-            return QueenbeeTask.load_input_param(self.enclosure_list)
+            return qb_load_input_param(self.enclosure_list)
         except:
             # it is a parameter
             return pathlib.Path(self.input()['GetEnclosureInfo']['enclosure_list'].path).as_posix()
@@ -812,7 +813,7 @@ class RunComfortMap(luigi.Task):
     def items(self):
         try:
             # assume the input is a file
-            return QueenbeeTask.load_input_param(self.enclosure_list)
+            return qb_load_input_param(self.enclosure_list)
         except:
             # it is a parameter
             return pathlib.Path(self.input()['GetEnclosureInfo']['enclosure_list'].path).as_posix()
@@ -993,7 +994,7 @@ class RunIrradianceSimulation(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [AnnualIrradianceEntryPoint_7f8b9e60Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualIrradianceEntryPoint_7d81ce6cWorkerbee(_input_params=self.map_dag_inputs)]
         os.makedirs(self.execution_folder, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -1067,7 +1068,7 @@ class SetModifiersFromConstructions(QueenbeeTask):
             }]
 
 
-class _Main_7f8b9e60Orchestrator(luigi.WrapperTask):
+class _Main_7d81ce6cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
