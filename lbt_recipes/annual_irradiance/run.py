@@ -38,7 +38,7 @@ class LetAnnualIrradianceFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [annual_irradiance_workerbee._Main_87db8806Orchestrator(_input_params=self._input_params)]
+        yield [annual_irradiance_workerbee._Main_d75637b2Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

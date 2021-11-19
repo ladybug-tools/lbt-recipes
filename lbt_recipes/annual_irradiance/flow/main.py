@@ -16,7 +16,8 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.annual_irradiance_ray_tracing import _AnnualIrradianceRayTracing_87db8806Orchestrator as AnnualIrradianceRayTracing_87db8806Workerbee
+from queenbee_local import load_input_param as qb_load_input_param
+from .dependencies.annual_irradiance_ray_tracing import _AnnualIrradianceRayTracing_d75637b2Orchestrator as AnnualIrradianceRayTracing_d75637b2Workerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -154,7 +155,7 @@ class AnnualIrradianceRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualIrradianceRayTracing_87db8806Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualIrradianceRayTracing_d75637b2Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_irradiance_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -182,7 +183,7 @@ class AnnualIrradianceRaytracing(luigi.Task):
     def items(self):
         try:
             # assume the input is a file
-            return QueenbeeTask.load_input_param(self.sensor_grids)
+            return qb_load_input_param(self.sensor_grids)
         except:
             # it is a parameter
             return pathlib.Path(self.input()['SplitGridFolder']['sensor_grids'].path).as_posix()
@@ -468,14 +469,18 @@ class CreateDirectSky(QueenbeeTask):
         return 'sun-only'
 
     @property
+    def output_type(self):
+        return 'solar'
+
+    @property
+    def output_format(self):
+        return 'ASCII'
+
+    @property
     def sun_up_hours(self):
         return 'sun-up-hours'
 
     cumulative = luigi.Parameter(default='hourly')
-
-    output_format = luigi.Parameter(default='ASCII')
-
-    output_type = luigi.Parameter(default='visible')
 
     sky_density = luigi.Parameter(default='1')
 
@@ -787,18 +792,24 @@ class CreateTotalSky(QueenbeeTask):
         return self._input_params['north']
 
     @property
+    def sky_type(self):
+        return 'total'
+
+    @property
+    def output_type(self):
+        return 'solar'
+
+    @property
+    def output_format(self):
+        return 'ASCII'
+
+    @property
     def sun_up_hours(self):
         return 'sun-up-hours'
 
     cumulative = luigi.Parameter(default='hourly')
 
-    output_format = luigi.Parameter(default='ASCII')
-
-    output_type = luigi.Parameter(default='visible')
-
     sky_density = luigi.Parameter(default='1')
-
-    sky_type = luigi.Parameter(default='total')
 
     @property
     def wea(self):
@@ -1176,7 +1187,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_87db8806Orchestrator(luigi.WrapperTask):
+class _Main_d75637b2Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
