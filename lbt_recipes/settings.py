@@ -154,10 +154,10 @@ class RecipeSettings(object):
 
     def __repr__(self):
         """RecipeSettings representation."""
-        rep_str = '--folder "{}" '.format(self.folder) if self.folder is not None else ''
-        rep_str += ' --workers {} '.format(self.workers)
+        rep_str = '--folder "{}"'.format(self.folder) if self.folder is not None else ''
+        rep_str += ' --workers {}'.format(self.workers)
         if self.reload_old:
-            rep_str += '--reload-old'
+            rep_str += ' --reload-old'
         if self.report_out:
-            rep_str += '--report-out'
+            rep_str += ' --report-out'
         return rep_str
