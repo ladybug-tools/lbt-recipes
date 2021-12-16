@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "utci-comfort-map",
-    "tag": "0.4.1",
+    "tag": "0.4.3",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -336,7 +336,7 @@
       "annotations": {},
       "name": "solarcal-parameters",
       "description": "A SolarCalParameter string to customize the assumptions of the SolarCal model.",
-      "default": "--posture seated --sharp 135 --absorptivity 0.7 --emissivity 0.95",
+      "default": "--posture standing --sharp 135 --absorptivity 0.7 --emissivity 0.95",
       "alias": [
         {
           "type": "DAGStringInputAlias",
@@ -359,7 +359,7 @@
       "type": "DAGStringInput",
       "annotations": {},
       "name": "wind-speed",
-      "description": "A single number for meteorological wind speed in m/s or a string of a JSON array with numbers that align with the result-sql reporting period. This will be used for all indoor comfort evaluation while the EPW wind speed will be used for the outdoors.",
+      "description": "A single number for meteorological wind speed in m/s or a string of a JSON array with numbers that align with the input run period. This will be used for all indoor comfort evaluation while the EPW wind speed will be used for the outdoors.",
       "default": "0.5",
       "alias": [
         {

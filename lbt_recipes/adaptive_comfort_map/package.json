@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "adaptive-comfort-map",
-    "tag": "0.4.1",
+    "tag": "0.4.3",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -47,7 +47,7 @@
       "type": "DAGStringInput",
       "annotations": {},
       "name": "air-speed",
-      "description": "A single number for air speed in m/s or a string of a JSON array with numbers that align with the result-sql reporting period. This will be used for all indoor comfort evaluation.",
+      "description": "A single number for air speed in m/s or a string of a JSON array with numbers that align with run period. This will be used for all indoor comfort evaluation.",
       "default": "0.1",
       "alias": [
         {
