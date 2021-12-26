@@ -1,4 +1,7 @@
 """Methods to check whether an installed engine version is compatible with recipes."""
+import os
+import subprocess
+
 from honeybee_radiance.config import folders as rad_folders
 from honeybee_energy.config import folders as energy_folders
 
@@ -19,11 +22,18 @@ def check_radiance_date():
         'No Radiance installation was found on this machine.\n{}'.format(rad_msg)
     rad_version = rad_folders.radiance_version_date
     if rad_version is None:
-        msg = 'The installed version of Radiance could not be verified.\n' \
-            'This can result from limitations of your group policy and you should ' \
-            'talk to your administrator.'
-        print(msg)
-        return msg
+        rad_exe = os.path.join(rad_folders.radbin_path, 'rtrace.exe') if os.name == 'nt' \
+            else os.path.join(self.radbin_path, 'rtrace')
+        cmds = [rad_exe, '-version']
+        use_shell = True if os.name == 'nt' else False
+        process = subprocess.Popen(cmds, stderr=subprocess.PIPE, shell=use_shell)
+        _, stderr = process.communicate()
+        if stderr not in ('', b''):
+            msg = 'A Radiance installation was found at {}\n' \
+            'but the Radiance executables are not accessible.\n{}'.format(
+                rad_folders.radbin_path, stderr)
+            raise ValueError(msg)
+        return None  # in case the issue was specifically with mkmap
     assert rad_version >= RADIANCE_DATE, \
         'The installed Radiance is from {}.\n Must be from from {} or later.\n{}'.format(
             '/'.join(str(v) for v in rad_version),
@@ -38,11 +48,14 @@ def check_openstudio_version():
         'No OpenStudio installation was found on this machine.\n{}'.format(in_msg)
     os_version = energy_folders.openstudio_version
     if os_version is None:
-        msg = 'The installed version of OpenStudio could not be verified.\n' \
-            'This can result from limitations of your group policy and you should ' \
-            'talk to your administrator.'
-        print(msg)
-        return msg
+        cmds = [energy_folders.openstudio_exe, 'openstudio_version']
+        use_shell = True if os.name == 'nt' else False
+        process = subprocess.Popen(cmds, stderr=subprocess.PIPE, shell=use_shell)
+        _, stderr = process.communicate()
+        msg = 'An OpenStudio installation was found at {}\n' \
+            'but the OpenStudio executable is not accessible.\n{}'.format(
+                energy_folders.openstudio_exe, stderr)
+        raise ValueError(msg)
     assert os_version >= OS_VERSION, \
         'The installed OpenStudio is {}.\nMust be version {} or greater.\n{}'.format(
             '.'.join(str(v) for v in os_version),
@@ -58,11 +71,14 @@ def check_energyplus_version():
         'No EnergyPlus installation was found on this machine.\n{}'.format(in_msg)
     ep_version = energy_folders.energyplus_version
     if ep_version is None:
-        msg = 'The installed version of EnergyPlus could not be verified.\n' \
-            'This can result from limitations of your group policy and you should ' \
-            'talk to your administrator.'
-        print(msg)
-        return msg
+        cmds = [energy_folders.energyplus_exe, '--version']
+        use_shell = True if os.name == 'nt' else False
+        process = subprocess.Popen(cmds, stderr=subprocess.PIPE, shell=use_shell)
+        _, stderr = process.communicate()
+        msg = 'An EnergyPlus installation was found at {}\n' \
+            'but the EnergyPlus executable is not accessible.\n{}'.format(
+                energy_folders.energyplus_exe, stderr)
+        raise ValueError(msg)
     assert ep_version is not None and ep_version >= EP_VERSION, \
         'The installed EnergyPlus is {}.\nMust be version {} or greater.\n{}'.format(
             '.'.join(str(v) for v in ep_version),
