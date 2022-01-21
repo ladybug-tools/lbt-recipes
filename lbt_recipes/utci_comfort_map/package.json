@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "utci-comfort-map",
-    "tag": "0.4.3",
+    "tag": "0.5.2",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -332,6 +332,43 @@
       "spec": null
     },
     {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "schedule",
+      "description": "An optional path to a CSV file to specify the relevant times during which comfort should be evaluated. If specified, this will be used for all sensors. Values should be 0-1 separated by new line.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "schedule",
+          "description": "A schedule to specify the relevant times during which comfort should be evaluated. This must either be a Ladybug Hourly Data Collection that aligns with the input run_period or the path to a CSV file with a number of rows equal to the length of the run_period. If unspecified, it will be assumed that all times are relevant for outdoor sensors and the energy model occupancy schedules will be used for indoor sensors.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.schedule",
+              "function": "data_to_csv",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": null,
+      "extensions": [
+        "txt",
+        "csv"
+      ]
+    },
+    {
       "type": "DAGStringInput",
       "annotations": {},
       "name": "solarcal-parameters",
@@ -359,14 +396,14 @@
       "type": "DAGStringInput",
       "annotations": {},
       "name": "wind-speed",
-      "description": "A single number for meteorological wind speed in m/s or a string of a JSON array with numbers that align with the input run period. This will be used for all indoor comfort evaluation while the EPW wind speed will be used for the outdoors.",
-      "default": "0.5",
+      "description": "A single number for meteorological wind speed in m/s or a string of a JSON array with numbers that align with the input run period. This will be used for all outdoor comfort evaluation. Note that all sensors on the indoors will always use a wind speed of 0.5 m/s, which is the lowest acceptable value for the UTCI model. If None, the EPW wind speed will be used for all outdoor sensors.",
+      "default": "None",
       "alias": [
         {
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "wind_speed",
-          "description": "A single number for meteorological wind speed in m/s or an hourly data collection of wind speeds that align with the input run period. This will be used for all indoor comfort evaluation. Note that the EPW wind speed will be used for any outdoor sensors. (Default: 0.5).",
+          "description": "A single number for meteorological wind speed in m/s or an hourly data collection of wind speeds that align with the input run period. This will be used for all outdoor comfort evaluation. Note that all sensors on the indoors will always use a wind speed of 0.5 m/s, which is the lowest acceptable value for the UTCI model. If unspecified, the EPW wind speed will be used for all outdoor sensors.",
           "platform": [
             "grasshopper"
           ],
@@ -380,7 +417,7 @@
               "index": 0
             }
           ],
-          "default": "0.5",
+          "default": "None",
           "required": false,
           "spec": null
         }

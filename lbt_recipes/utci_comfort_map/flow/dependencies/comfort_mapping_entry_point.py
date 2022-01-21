@@ -31,6 +31,7 @@ _default_inputs = {   'comfort_parameters': '--cold 9 --heat 26',
     'ref_irradiance': None,
     'result_sql': None,
     'run_period': '',
+    'schedule': None,
     'simulation_folder': '.',
     'solarcal_parameters': '--posture standing --sharp 135 --absorptivity 0.7 '
                            '--emissivity 0.95',
@@ -68,6 +69,17 @@ class ComputeTcp(QueenbeeTask):
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
+    def schedule(self):
+        try:
+            pathlib.Path(self._input_params['schedule'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['schedule'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
     def execution_folder(self):
         return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
@@ -80,7 +92,7 @@ class ComputeTcp(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort map tcp condition.csv enclosure_info.json --occ-schedule-json occ_schedule.json --folder output'
+        return 'ladybug-comfort map tcp condition.csv enclosure_info.json --schedule schedule.txt --occ-schedule-json occ_schedule.json --folder output'
 
     def requires(self):
         return {'ProcessUtciMatrix': ProcessUtciMatrix(_input_params=self._input_params)}
@@ -105,7 +117,8 @@ class ComputeTcp(QueenbeeTask):
         return [
             {'name': 'condition_csv', 'to': 'condition.csv', 'from': self.condition_csv, 'optional': False},
             {'name': 'enclosure_info', 'to': 'enclosure_info.json', 'from': self.enclosure_info, 'optional': False},
-            {'name': 'occ_schedule_json', 'to': 'occ_schedule.json', 'from': self.occ_schedule_json, 'optional': False}]
+            {'name': 'occ_schedule_json', 'to': 'occ_schedule.json', 'from': self.occ_schedule_json, 'optional': False},
+            {'name': 'schedule', 'to': 'schedule.txt', 'from': self.schedule, 'optional': True}]
 
     @property
     def output_artifacts(self):
@@ -145,6 +158,10 @@ class CreateAirSpeedJson(QueenbeeTask):
 
     @property
     def indoor_air_speed(self):
+        return '0.5'
+
+    @property
+    def outdoor_air_speed(self):
         return self._input_params['wind_speed']
 
     @property
@@ -180,7 +197,7 @@ class CreateAirSpeedJson(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort epw air-speed-json weather.epw enclosure_info.json --multiply-by {multiply_by} --indoor-air-speed "{indoor_air_speed}" --run-period "{run_period}" --output-file air_speed.json'.format(multiply_by=self.multiply_by, indoor_air_speed=self.indoor_air_speed, run_period=self.run_period)
+        return 'ladybug-comfort epw air-speed-json weather.epw enclosure_info.json --multiply-by {multiply_by} --indoor-air-speed "{indoor_air_speed}" --outdoor-air-speed "{outdoor_air_speed}" --run-period "{run_period}" --output-file air_speed.json'.format(multiply_by=self.multiply_by, indoor_air_speed=self.indoor_air_speed, outdoor_air_speed=self.outdoor_air_speed, run_period=self.run_period)
 
     def output(self):
         return {
@@ -652,7 +669,7 @@ class ProcessUtciMatrix(QueenbeeTask):
             }]
 
 
-class _ComfortMappingEntryPoint_063607b6Orchestrator(luigi.WrapperTask):
+class _ComfortMappingEntryPoint_a3b56281Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
