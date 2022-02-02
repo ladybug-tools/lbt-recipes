@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "adaptive-comfort-map",
-    "tag": "0.4.3",
+    "tag": "0.5.2",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -44,17 +44,17 @@
   "source": null,
   "inputs": [
     {
-      "type": "DAGStringInput",
+      "type": "DAGFileInput",
       "annotations": {},
       "name": "air-speed",
-      "description": "A single number for air speed in m/s or a string of a JSON array with numbers that align with run period. This will be used for all indoor comfort evaluation.",
-      "default": "0.1",
+      "description": "A CSV file containing a single number for air speed in m/s or several rows of air speeds that align with the length of the run period. This will be used for all indoor comfort evaluation.",
+      "default": null,
       "alias": [
         {
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "air_speed",
-          "description": "A single number for air speed in m/s or an hourly data collection of air speeds that align with the input run_period. This will be used for all indoor comfort evaluation. Note that the EPW wind speed will be used for any outdoor sensors. (Default: 0.1).",
+          "description": "A single number for air speed in m/s or an hourly data collection of air speeds that align with the input run_period. This can also be a CSV file with one air speed per row for each step of the analysis. These values will be used for all indoor comfort evaluation. Note that the EPW wind speed will be used for any outdoor sensors. (Default: 0.1).",
           "platform": [
             "grasshopper"
           ],
@@ -64,17 +64,21 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.data",
-              "function": "value_or_data_to_str",
+              "function": "value_or_data_to_air_speed_file",
               "index": 0
             }
           ],
-          "default": "0.1",
+          "default": null,
           "required": false,
           "spec": null
         }
       ],
       "required": false,
-      "spec": null
+      "spec": null,
+      "extensions": [
+        "txt",
+        "csv"
+      ]
     },
     {
       "type": "DAGStringInput",

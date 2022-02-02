@@ -36,7 +36,8 @@ _default_inputs = {   'comfort_parameters': '--cold 9 --heat 26',
     'solarcal_parameters': '--posture standing --sharp 135 --absorptivity 0.7 '
                            '--emissivity 0.95',
     'sun_up_hours': None,
-    'view_factors': None}
+    'view_factors': None,
+    'wind_speed': None}
 
 
 class ComputeTcp(QueenbeeTask):
@@ -157,14 +158,6 @@ class CreateAirSpeedJson(QueenbeeTask):
         return '1.0'
 
     @property
-    def indoor_air_speed(self):
-        return '0.5'
-
-    @property
-    def outdoor_air_speed(self):
-        return self._input_params['wind_speed']
-
-    @property
     def run_period(self):
         return self._input_params['run_period']
 
@@ -185,6 +178,17 @@ class CreateAirSpeedJson(QueenbeeTask):
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
+    def outdoor_air_speed(self):
+        try:
+            pathlib.Path(self._input_params['wind_speed'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['wind_speed'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
     def execution_folder(self):
         return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
@@ -197,7 +201,7 @@ class CreateAirSpeedJson(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort epw air-speed-json weather.epw enclosure_info.json --multiply-by {multiply_by} --indoor-air-speed "{indoor_air_speed}" --outdoor-air-speed "{outdoor_air_speed}" --run-period "{run_period}" --output-file air_speed.json'.format(multiply_by=self.multiply_by, indoor_air_speed=self.indoor_air_speed, outdoor_air_speed=self.outdoor_air_speed, run_period=self.run_period)
+        return 'ladybug-comfort epw air-speed-json weather.epw enclosure_info.json --multiply-by {multiply_by} --indoor-air-speed in_speed.txt --outdoor-air-speed out_speed.txt --run-period "{run_period}" --output-file air_speed.json'.format(multiply_by=self.multiply_by, run_period=self.run_period)
 
     def output(self):
         return {
@@ -210,7 +214,8 @@ class CreateAirSpeedJson(QueenbeeTask):
     def input_artifacts(self):
         return [
             {'name': 'epw', 'to': 'weather.epw', 'from': self.epw, 'optional': False},
-            {'name': 'enclosure_info', 'to': 'enclosure_info.json', 'from': self.enclosure_info, 'optional': False}]
+            {'name': 'enclosure_info', 'to': 'enclosure_info.json', 'from': self.enclosure_info, 'optional': False},
+            {'name': 'outdoor_air_speed', 'to': 'out_speed.txt', 'from': self.outdoor_air_speed, 'optional': True}]
 
     @property
     def output_artifacts(self):
@@ -669,7 +674,7 @@ class ProcessUtciMatrix(QueenbeeTask):
             }]
 
 
-class _ComfortMappingEntryPoint_a3b56281Orchestrator(luigi.WrapperTask):
+class _ComfortMappingEntryPoint_921cb50eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

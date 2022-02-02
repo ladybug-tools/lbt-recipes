@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "pmv-comfort-map",
-    "tag": "0.4.3",
+    "tag": "0.5.4",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -44,17 +44,17 @@
   "source": null,
   "inputs": [
     {
-      "type": "DAGStringInput",
+      "type": "DAGFileInput",
       "annotations": {},
       "name": "air-speed",
-      "description": "A single number for air speed in m/s or a string of a JSON array with numbers that align with the result-sql reporting period. This will be used for all indoor comfort evaluation.",
-      "default": "0.1",
+      "description": "A CSV file containing a single number for air speed in m/s or several rows of air speeds that align with the length of the run period. This will be used for all indoor comfort evaluation.",
+      "default": null,
       "alias": [
         {
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "air_speed",
-          "description": "A single number for air speed in m/s or an hourly data collection of air speeds that align with the input run_period. This will be used for all indoor comfort evaluation. Note that the EPW wind speed will be used for any outdoor sensors. (Default: 0.1).",
+          "description": "A single number for air speed in m/s or an hourly data collection of air speeds that align with the input run_period. This can also be a CSV file with one air speed per row for each step of the analysis. These values will be used for all indoor comfort evaluation. Note that the EPW wind speed will be used for any outdoor sensors. (Default: 0.1).",
           "platform": [
             "grasshopper"
           ],
@@ -64,30 +64,34 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.data",
-              "function": "value_or_data_to_str",
+              "function": "value_or_data_to_air_speed_file",
               "index": 0
             }
           ],
-          "default": "0.1",
+          "default": null,
           "required": false,
           "spec": null
         }
       ],
       "required": false,
-      "spec": null
+      "spec": null,
+      "extensions": [
+        "txt",
+        "csv"
+      ]
     },
     {
-      "type": "DAGStringInput",
+      "type": "DAGFileInput",
       "annotations": {},
       "name": "clo-value",
-      "description": "A single number for clothing level in clo or a string of a JSON array with numbers that align with the result-sql reporting period.",
-      "default": "0.7",
+      "description": "A CSV file containing a single number for clothing level in clo or several rows of clo values that align with the length of the run period.",
+      "default": null,
       "alias": [
         {
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "clo_value",
-          "description": "A single number for clothing level in clo or an hourly data collection of clothing levels that align with the run period. (Default: 0.7, for pants and a long sleeve shirt).",
+          "description": "A single number for clothing level in clo or an hourly data collection of clothing levels that align with the run period. This can also be a CSV file with one clothing value per row for each step of the analysis.(Default: 0.7, for pants and a long sleeve shirt).",
           "platform": [
             "grasshopper"
           ],
@@ -97,17 +101,21 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.data",
-              "function": "value_or_data_to_str",
+              "function": "value_or_data_to_clo_file",
               "index": 0
             }
           ],
-          "default": "0.7",
+          "default": null,
           "required": false,
           "spec": null
         }
       ],
       "required": false,
-      "spec": null
+      "spec": null,
+      "extensions": [
+        "txt",
+        "csv"
+      ]
     },
     {
       "type": "DAGStringInput",
@@ -210,17 +218,17 @@
       ]
     },
     {
-      "type": "DAGStringInput",
+      "type": "DAGFileInput",
       "annotations": {},
       "name": "met-rate",
-      "description": "A single number for metabolic rate in met or a string of a JSON array with numbers that align with the result-sql reporting period.",
-      "default": "1.1",
+      "description": "A CSV file containing a single number for metabolic rate in met or several rows of met values that align with the length of the run period.",
+      "default": null,
       "alias": [
         {
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "met_rate",
-          "description": "A single number for metabolic rate in met or an hourly data collection of met rates that align with the run period. (Default: 1.1, for seated, typing).",
+          "description": "A single number for metabolic rate in met or an hourly data collection of met rates that align with the run period. This can also be a CSV file with one met rate per row for each step of the analysis. (Default: 1.1, for seated, typing).",
           "platform": [
             "grasshopper"
           ],
@@ -230,17 +238,21 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.data",
-              "function": "value_or_data_to_str",
+              "function": "value_or_data_to_met_file",
               "index": 0
             }
           ],
-          "default": "1.1",
+          "default": null,
           "required": false,
           "spec": null
         }
       ],
       "required": false,
-      "spec": null
+      "spec": null,
+      "extensions": [
+        "txt",
+        "csv"
+      ]
     },
     {
       "type": "DAGIntegerInput",

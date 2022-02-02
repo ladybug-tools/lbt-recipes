@@ -23,7 +23,7 @@ from queenbee_local import local_scheduler, _copy_artifacts, update_params, pars
 import flow.main as adaptive_comfort_map_workerbee
 
 
-_recipe_default_inputs = {   'air_speed': '0.1',
+_recipe_default_inputs = {   'air_speed': None,
     'comfort_parameters': '--standard ASHRAE-55',
     'cpu_count': 50,
     'ddy': None,
@@ -42,7 +42,7 @@ class LetAdaptiveComfortMapFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [adaptive_comfort_map_workerbee._Main_b31f28ceOrchestrator(_input_params=self._input_params)]
+        yield [adaptive_comfort_map_workerbee._Main_119480b7Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -62,8 +62,8 @@ def start(project_folder, user_values, workers):
         simulation_folder = input_params['simulation_folder']
 
     # copy project folder content to simulation folder
-    artifacts = ['ddy', 'epw', 'model']
-    optional_artifacts = []
+    artifacts = ['air_speed', 'ddy', 'epw', 'model']
+    optional_artifacts = ['air_speed']
     for artifact in artifacts:
         value = input_params[artifact]
         if value is None:

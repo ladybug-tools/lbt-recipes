@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "utci-comfort-map",
-    "tag": "0.5.2",
+    "tag": "0.6.1",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -393,17 +393,17 @@
       "spec": null
     },
     {
-      "type": "DAGStringInput",
+      "type": "DAGFileInput",
       "annotations": {},
       "name": "wind-speed",
-      "description": "A single number for meteorological wind speed in m/s or a string of a JSON array with numbers that align with the input run period. This will be used for all outdoor comfort evaluation. Note that all sensors on the indoors will always use a wind speed of 0.5 m/s, which is the lowest acceptable value for the UTCI model. If None, the EPW wind speed will be used for all outdoor sensors.",
-      "default": "None",
+      "description": "A CSV file containing a single number for meteorological wind speed in m/s or several rows of wind speeds that align with the length of the run period. This will be used for all outdoor comfort evaluation. Note that all sensors on the indoors will always use a wind speed of 0.1 m/s, which is the lowest acceptable value for the UTCI model. If None, the EPW wind speed will be used for all outdoor sensors.",
+      "default": null,
       "alias": [
         {
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "wind_speed",
-          "description": "A single number for meteorological wind speed in m/s or an hourly data collection of wind speeds that align with the input run period. This will be used for all outdoor comfort evaluation. Note that all sensors on the indoors will always use a wind speed of 0.5 m/s, which is the lowest acceptable value for the UTCI model. If unspecified, the EPW wind speed will be used for all outdoor sensors.",
+          "description": "A single number for meteorological wind speed in m/s or an hourly data collection of wind speeds that align with the input run period. This can also be a CSV file with one wind speed per row for each step of the analysis.These values will be used for all outdoor comfort evaluation. Note that all sensors on the indoors will always use a wind speed of 0.5 m/s, which is the lowest acceptable value for the UTCI model. If unspecified, the EPW wind speed will be used for all outdoor sensors.",
           "platform": [
             "grasshopper"
           ],
@@ -413,17 +413,21 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.data",
-              "function": "value_or_data_to_str",
+              "function": "value_or_data_to_air_speed_file",
               "index": 0
             }
           ],
-          "default": "None",
+          "default": null,
           "required": false,
           "spec": null
         }
       ],
       "required": false,
-      "spec": null
+      "spec": null,
+      "extensions": [
+        "txt",
+        "csv"
+      ]
     }
   ],
   "outputs": [
