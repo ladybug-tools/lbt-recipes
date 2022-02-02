@@ -23,13 +23,13 @@ from queenbee_local import local_scheduler, _copy_artifacts, update_params, pars
 import flow.main as pmv_comfort_map_workerbee
 
 
-_recipe_default_inputs = {   'air_speed': '0.1',
-    'clo_value': '0.7',
+_recipe_default_inputs = {   'air_speed': None,
+    'clo_value': None,
     'comfort_parameters': '--ppd-threshold 10',
     'cpu_count': 50,
     'ddy': None,
     'epw': None,
-    'met_rate': '1.1',
+    'met_rate': None,
     'min_sensor_count': 1,
     'model': None,
     'north': 0.0,
@@ -45,7 +45,7 @@ class LetPmvComfortMapFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [pmv_comfort_map_workerbee._Main_1c5c7571Orchestrator(_input_params=self._input_params)]
+        yield [pmv_comfort_map_workerbee._Main_49c8215fOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -65,8 +65,8 @@ def start(project_folder, user_values, workers):
         simulation_folder = input_params['simulation_folder']
 
     # copy project folder content to simulation folder
-    artifacts = ['ddy', 'epw', 'model']
-    optional_artifacts = []
+    artifacts = ['air_speed', 'clo_value', 'ddy', 'epw', 'met_rate', 'model']
+    optional_artifacts = ['air_speed', 'clo_value', 'met_rate']
     for artifact in artifacts:
         value = input_params[artifact]
         if value is None:

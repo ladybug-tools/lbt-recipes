@@ -17,8 +17,8 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_a3b56281Orchestrator as ComfortMappingEntryPoint_a3b56281Workerbee
-from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_a3b56281Orchestrator as RadianceMappingEntryPoint_a3b56281Workerbee
+from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_921cb50eOrchestrator as ComfortMappingEntryPoint_921cb50eWorkerbee
+from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_921cb50eOrchestrator as RadianceMappingEntryPoint_921cb50eWorkerbee
 
 
 _default_inputs = {   'comfort_parameters': '--cold 9 --heat 26',
@@ -34,7 +34,8 @@ _default_inputs = {   'comfort_parameters': '--cold 9 --heat 26',
     'schedule': None,
     'simulation_folder': '.',
     'solarcal_parameters': '--posture standing --sharp 135 --absorptivity 0.7 '
-                           '--emissivity 0.95'}
+                           '--emissivity 0.95',
+    'wind_speed': None}
 
 
 class CopyGridInfo(QueenbeeTask):
@@ -1442,10 +1443,6 @@ class RunComfortMapLoop(luigi.Task):
         return self._input_params['run_period']
 
     @property
-    def wind_speed(self):
-        return self._input_params['wind_speed']
-
-    @property
     def solarcal_par(self):
         return self._input_params['solarcal_parameters']
 
@@ -1528,6 +1525,17 @@ class RunComfortMapLoop(luigi.Task):
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
+    @property
+    def wind_speed(self):
+        try:
+            pathlib.Path(self._input_params['wind_speed'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['wind_speed'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
     # get item for loop
     try:
         item = luigi.DictParameter()
@@ -1577,7 +1585,7 @@ class RunComfortMapLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [ComfortMappingEntryPoint_a3b56281Workerbee(_input_params=self.map_dag_inputs)]
+        yield [ComfortMappingEntryPoint_921cb50eWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_comfort_map.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -1852,7 +1860,7 @@ class RunRadianceSimulationLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [RadianceMappingEntryPoint_a3b56281Workerbee(_input_params=self.map_dag_inputs)]
+        yield [RadianceMappingEntryPoint_921cb50eWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_simulation.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -2063,7 +2071,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_a3b56281Orchestrator(luigi.WrapperTask):
+class _Main_921cb50eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
