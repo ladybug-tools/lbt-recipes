@@ -28,6 +28,7 @@ _recipe_default_inputs = {   'cpu_count': 50,
     'min_sensor_count': 1,
     'model': None,
     'north': 0.0,
+    'output_type': 'solar',
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
     'timestep': 1,
     'wea': None}
@@ -38,7 +39,7 @@ class LetAnnualIrradianceFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [annual_irradiance_workerbee._Main_d75637b2Orchestrator(_input_params=self._input_params)]
+        yield [annual_irradiance_workerbee._Main_2c2db9eeOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

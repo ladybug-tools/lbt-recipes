@@ -16,8 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.annual_irradiance_ray_tracing import _AnnualIrradianceRayTracing_d75637b2Orchestrator as AnnualIrradianceRayTracing_d75637b2Workerbee
+from .dependencies.annual_irradiance_ray_tracing import _AnnualIrradianceRayTracing_2c2db9eeOrchestrator as AnnualIrradianceRayTracing_2c2db9eeWorkerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -25,6 +24,7 @@ _default_inputs = {   'cpu_count': 50,
     'min_sensor_count': 1,
     'model': None,
     'north': 0.0,
+    'output_type': 'solar',
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
     'simulation_folder': '.',
@@ -155,7 +155,7 @@ class AnnualIrradianceRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualIrradianceRayTracing_d75637b2Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualIrradianceRayTracing_2c2db9eeWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_irradiance_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -183,7 +183,7 @@ class AnnualIrradianceRaytracing(luigi.Task):
     def items(self):
         try:
             # assume the input is a file
-            return qb_load_input_param(self.sensor_grids)
+            return QueenbeeTask.load_input_param(self.sensor_grids)
         except:
             # it is a parameter
             return pathlib.Path(self.input()['SplitGridFolder']['sensor_grids'].path).as_posix()
@@ -470,17 +470,15 @@ class CreateDirectSky(QueenbeeTask):
 
     @property
     def output_type(self):
-        return 'solar'
-
-    @property
-    def output_format(self):
-        return 'ASCII'
+        return self._input_params['output_type']
 
     @property
     def sun_up_hours(self):
         return 'sun-up-hours'
 
     cumulative = luigi.Parameter(default='hourly')
+
+    output_format = luigi.Parameter(default='ASCII')
 
     sky_density = luigi.Parameter(default='1')
 
@@ -797,17 +795,15 @@ class CreateTotalSky(QueenbeeTask):
 
     @property
     def output_type(self):
-        return 'solar'
-
-    @property
-    def output_format(self):
-        return 'ASCII'
+        return self._input_params['output_type']
 
     @property
     def sun_up_hours(self):
         return 'sun-up-hours'
 
     cumulative = luigi.Parameter(default='hourly')
+
+    output_format = luigi.Parameter(default='ASCII')
 
     sky_density = luigi.Parameter(default='1')
 
@@ -856,7 +852,7 @@ class CreateTotalSky(QueenbeeTask):
 
 
 class GenerateSunpath(QueenbeeTask):
-    """Generate a Radiance sun matrix (AKA sun-path)."""
+    """Generate a Radiance sun matrix using honeybee-radiance methods."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
@@ -868,7 +864,7 @@ class GenerateSunpath(QueenbeeTask):
 
     @property
     def output_type(self):
-        return '1'
+        return self._input_params['output_type']
 
     @property
     def wea(self):
@@ -889,7 +885,7 @@ class GenerateSunpath(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'gendaymtx -n -D sunpath.mtx -M suns.mod -O{output_type} -r {north} -v sky.wea'.format(output_type=self.output_type, north=self.north)
+        return 'honeybee-radiance sunpath radiance sky.wea --name sunpath --{output_type} --north {north}'.format(output_type=self.output_type, north=self.north)
 
     def output(self):
         return {
@@ -898,7 +894,7 @@ class GenerateSunpath(QueenbeeTask):
             ),
             
             'sun_modifiers': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'resources/suns.mod').resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'resources/sunpath.mod').resolve().as_posix()
             )
         }
 
@@ -918,8 +914,8 @@ class GenerateSunpath(QueenbeeTask):
             },
                 
             {
-                'name': 'sun-modifiers', 'from': 'suns.mod',
-                'to': pathlib.Path(self.execution_folder, 'resources/suns.mod').resolve().as_posix(),
+                'name': 'sun-modifiers', 'from': 'sunpath.mod',
+                'to': pathlib.Path(self.execution_folder, 'resources/sunpath.mod').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -1009,7 +1005,7 @@ class RestructureDirectResults(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension}'.format(extension=self.extension)
+        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
     def requires(self):
         return {'AnnualIrradianceRaytracing': AnnualIrradianceRaytracing(_input_params=self._input_params)}
@@ -1067,7 +1063,7 @@ class RestructureTotalResults(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension}'.format(extension=self.extension)
+        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
     def requires(self):
         return {'AnnualIrradianceRaytracing': AnnualIrradianceRaytracing(_input_params=self._input_params)}
@@ -1187,7 +1183,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_d75637b2Orchestrator(luigi.WrapperTask):
+class _Main_2c2db9eeOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
