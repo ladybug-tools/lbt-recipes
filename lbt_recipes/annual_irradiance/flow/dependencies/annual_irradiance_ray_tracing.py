@@ -16,7 +16,6 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from queenbee_local import load_input_param as qb_load_input_param
 
 
 _default_inputs = {   'bsdfs': None,
@@ -47,7 +46,7 @@ class DirectSky(QueenbeeTask):
 
     @property
     def fixed_radiance_parameters(self):
-        return '-aa 0.0 -I -ab 1 -c 1'
+        return '-aa 0.0 -I -ab 1 -c 1 -faf'
 
     @property
     def sensor_count(self):
@@ -56,6 +55,8 @@ class DirectSky(QueenbeeTask):
     @property
     def conversion(self):
         return '0.265 0.670 0.065'
+
+    header = luigi.Parameter(default='keep')
 
     order_by = luigi.Parameter(default='sensor')
 
@@ -109,7 +110,7 @@ class DirectSky(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by}'.format(sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format, order_by=self.order_by)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format, order_by=self.order_by, header=self.header)
 
     def output(self):
         return {
@@ -172,6 +173,8 @@ class DirectSun(QueenbeeTask):
 
     calculate_values = luigi.Parameter(default='value')
 
+    header = luigi.Parameter(default='keep')
+
     order_by = luigi.Parameter(default='sensor')
 
     @property
@@ -216,7 +219,7 @@ class DirectSun(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by}'.format(calculate_values=self.calculate_values, sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format, order_by=self.order_by)
+        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(calculate_values=self.calculate_values, sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format, order_by=self.order_by, header=self.header)
 
     def output(self):
         return {
@@ -335,7 +338,7 @@ class TotalSky(QueenbeeTask):
 
     @property
     def fixed_radiance_parameters(self):
-        return '-aa 0.0 -I -c 1'
+        return '-aa 0.0 -I -c 1 -faf'
 
     @property
     def sensor_count(self):
@@ -344,6 +347,8 @@ class TotalSky(QueenbeeTask):
     @property
     def conversion(self):
         return '0.265 0.670 0.065'
+
+    header = luigi.Parameter(default='keep')
 
     order_by = luigi.Parameter(default='sensor')
 
@@ -397,7 +402,7 @@ class TotalSky(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by}'.format(sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format, order_by=self.order_by)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format, order_by=self.order_by, header=self.header)
 
     def output(self):
         return {
@@ -426,7 +431,7 @@ class TotalSky(QueenbeeTask):
             }]
 
 
-class _AnnualIrradianceRayTracing_d75637b2Orchestrator(luigi.WrapperTask):
+class _AnnualIrradianceRayTracing_2c2db9eeOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

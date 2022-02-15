@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "annual-irradiance",
-    "tag": "0.2.2",
+    "tag": "0.2.4",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -225,6 +225,45 @@
         "type": "number",
         "minimum": -360,
         "maximum": 360
+      }
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "output-type",
+      "description": "Text for the type of irradiance output, which can be solar or visible. Note that the output values will still be irradiance (W/m2) when visible is selected but these irradiance values will be just for the visible portion of the electromagnetic spectrum. The visible irradiance values can be converted into illuminance by multiplying them by the Radiance luminous efficacy factor of 179.",
+      "default": "solar",
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "visible",
+          "description": "Text for the type of irradiance output, which can be solar (False) or visible (True). Note that the output values will still be irradiance (W/m2) when visible is selected but these irradiance values will be just for the visible portion of the electromagnetic spectrum. The visible irradiance values can be converted into illuminance by multiplying them by the Radiance luminous efficacy factor of 179. (Default: False).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.bool_options",
+              "function": "visible_vs_solar_to_str",
+              "index": 0
+            }
+          ],
+          "default": "False",
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": {
+        "type": "string",
+        "enum": [
+          "visible",
+          "solar"
+        ]
       }
     },
     {
