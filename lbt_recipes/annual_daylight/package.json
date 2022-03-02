@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "annual-daylight",
-    "tag": "0.8.9",
+    "tag": "0.8.13",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -487,7 +487,7 @@
       "type": "DAGFolderOutput",
       "annotations": {},
       "name": "results",
-      "description": "Folder with raw result files (.ill) that contain illuminance matrices.",
+      "description": "Folder with raw result files (.ill) that contain illuminance matrices for each sensor at each timestep of the analysis.",
       "from": {
         "type": "FolderReference",
         "annotations": {},
@@ -499,6 +499,39 @@
           "annotations": {},
           "name": "results",
           "description": "Raw result files (.ill) that contain illuminance matrices.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "sort_ill_from_folder",
+              "index": 0
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "results-direct",
+      "description": "Folder with raw result files (.ill) that contain matrices for just the direct illuminance.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "results/direct"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "results_direct",
+          "description": "Raw result files (.ill) that contain matrices for just the direct illuminance.",
           "platform": [
             "grasshopper"
           ],
