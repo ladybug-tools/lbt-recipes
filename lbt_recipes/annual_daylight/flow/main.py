@@ -17,7 +17,7 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_f5da0c9fOrchestrator as AnnualDaylightRayTracing_f5da0c9fWorkerbee
+from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_ca03d759Orchestrator as AnnualDaylightRayTracing_ca03d759Workerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -156,7 +156,7 @@ class AnnualDaylightRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightRayTracing_f5da0c9fWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightRayTracing_ca03d759Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_daylight_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -992,7 +992,7 @@ class RestructureDirectResults(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension}'.format(extension=self.extension)
+        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
     def requires(self):
         return {'AnnualDaylightRaytracing': AnnualDaylightRaytracing(_input_params=self._input_params)}
@@ -1050,7 +1050,7 @@ class RestructureResults(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension}'.format(extension=self.extension)
+        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
     def requires(self):
         return {'AnnualDaylightRaytracing': AnnualDaylightRaytracing(_input_params=self._input_params)}
@@ -1170,7 +1170,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_f5da0c9fOrchestrator(luigi.WrapperTask):
+class _Main_ca03d759Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
