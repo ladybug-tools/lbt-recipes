@@ -23,7 +23,8 @@ from queenbee_local import local_scheduler, _copy_artifacts, update_params, pars
 import flow.main as adaptive_comfort_map_workerbee
 
 
-_recipe_default_inputs = {   'air_speed': None,
+_recipe_default_inputs = {   'additional_idf': None,
+    'air_speed': None,
     'comfort_parameters': '--standard ASHRAE-55',
     'cpu_count': 50,
     'ddy': None,
@@ -42,7 +43,7 @@ class LetAdaptiveComfortMapFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [adaptive_comfort_map_workerbee._Main_119480b7Orchestrator(_input_params=self._input_params)]
+        yield [adaptive_comfort_map_workerbee._Main_5e24b5e4Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -62,8 +63,8 @@ def start(project_folder, user_values, workers):
         simulation_folder = input_params['simulation_folder']
 
     # copy project folder content to simulation folder
-    artifacts = ['air_speed', 'ddy', 'epw', 'model']
-    optional_artifacts = ['air_speed']
+    artifacts = ['additional_idf', 'air_speed', 'ddy', 'epw', 'model']
+    optional_artifacts = ['additional_idf', 'air_speed']
     for artifact in artifacts:
         value = input_params[artifact]
         if value is None:
@@ -82,12 +83,16 @@ def start(project_folder, user_values, workers):
     with cfg_file.open('w') as lf:
         lf.write(LOGS_CONFIG.replace('WORKFLOW.LOG', log_file))
 
-    luigi.build(
+    summary = luigi.build(
         [LetAdaptiveComfortMapFly(_input_params=input_params)],
         local_scheduler=local_scheduler(),
         workers=workers,
+        detailed_summary=True,
         logging_conf_file=cfg_file.as_posix()
     )
+
+    print(summary.summary_text)
+    print(f'More info:\n{log_file}')
 
 
 if __name__ == '__main__':

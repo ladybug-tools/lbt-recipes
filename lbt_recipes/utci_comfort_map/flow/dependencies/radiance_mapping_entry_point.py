@@ -730,7 +730,7 @@ class TotalSky(QueenbeeTask):
             }]
 
 
-class _RadianceMappingEntryPoint_921cb50eOrchestrator(luigi.WrapperTask):
+class _RadianceMappingEntryPoint_912d6202Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
