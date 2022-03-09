@@ -17,9 +17,9 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_97d86f51Orchestrator as ComfortMappingEntryPoint_97d86f51Workerbee
-from .dependencies.dynamic_contribution_entry_point import _DynamicContributionEntryPoint_97d86f51Orchestrator as DynamicContributionEntryPoint_97d86f51Workerbee
-from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_97d86f51Orchestrator as RadianceMappingEntryPoint_97d86f51Workerbee
+from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_e67309aaOrchestrator as ComfortMappingEntryPoint_e67309aaWorkerbee
+from .dependencies.dynamic_contribution_entry_point import _DynamicContributionEntryPoint_e67309aaOrchestrator as DynamicContributionEntryPoint_e67309aaWorkerbee
+from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_e67309aaOrchestrator as RadianceMappingEntryPoint_e67309aaWorkerbee
 
 
 _default_inputs = {   'additional_idf': None,
@@ -96,7 +96,7 @@ class CopyGridInfo(QueenbeeTask):
             ),
             
             'dst_6': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'initial_results/conditions/_redist_info.json').resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'initial_results/conditions/grids_info.json').resolve().as_posix()
             )
         }
 
@@ -145,7 +145,7 @@ class CopyGridInfo(QueenbeeTask):
                 
             {
                 'name': 'dst-6', 'from': 'input_path',
-                'to': pathlib.Path(self.execution_folder, 'initial_results/conditions/_redist_info.json').resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'initial_results/conditions/grids_info.json').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]
@@ -1781,7 +1781,7 @@ class RunComfortMapLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [ComfortMappingEntryPoint_97d86f51Workerbee(_input_params=self.map_dag_inputs)]
+        yield [ComfortMappingEntryPoint_e67309aaWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_comfort_map.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -1984,7 +1984,7 @@ class RunRadianceDynamicContributionLoop(luigi.Task):
 
     @property
     def sensor_grid_folder(self):
-        value = pathlib.Path(self.input()['SplitGridFolder']['output_folder'].path)
+        value = pathlib.Path('radiance/shortwave/grids')
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -2070,7 +2070,7 @@ class RunRadianceDynamicContributionLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DynamicContributionEntryPoint_97d86f51Workerbee(_input_params=self.map_dag_inputs)]
+        yield [DynamicContributionEntryPoint_e67309aaWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_dynamic_contribution.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -2255,7 +2255,7 @@ class RunRadianceSimulationLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [RadianceMappingEntryPoint_97d86f51Workerbee(_input_params=self.map_dag_inputs)]
+        yield [RadianceMappingEntryPoint_e67309aaWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_simulation.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -2330,6 +2330,8 @@ class SetModifiersFromConstructions(QueenbeeTask):
     def exterior_offset(self):
         return '0.02'
 
+    dynamic_behavior = luigi.Parameter(default='dynamic')
+
     @property
     def model(self):
         value = pathlib.Path(self._input_params['model'])
@@ -2349,7 +2351,7 @@ class SetModifiersFromConstructions(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-energy edit modifiers-from-constructions model.hbjson --{use_visible} --exterior-offset {exterior_offset} --output-file new_model.hbjson'.format(use_visible=self.use_visible, exterior_offset=self.exterior_offset)
+        return 'honeybee-energy edit modifiers-from-constructions model.hbjson --{use_visible} --{dynamic_behavior}-groups --exterior-offset {exterior_offset} --output-file new_model.hbjson'.format(use_visible=self.use_visible, dynamic_behavior=self.dynamic_behavior, exterior_offset=self.exterior_offset)
 
     def output(self):
         return {
@@ -2477,7 +2479,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_97d86f51Orchestrator(luigi.WrapperTask):
+class _Main_e67309aaOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

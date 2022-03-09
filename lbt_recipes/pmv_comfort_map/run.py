@@ -46,7 +46,7 @@ class LetPmvComfortMapFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [pmv_comfort_map_workerbee._Main_97d86f51Orchestrator(_input_params=self._input_params)]
+        yield [pmv_comfort_map_workerbee._Main_e67309aaOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
