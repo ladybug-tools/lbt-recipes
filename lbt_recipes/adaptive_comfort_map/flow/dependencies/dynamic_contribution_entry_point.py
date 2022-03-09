@@ -17,8 +17,7 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.dynamic_behavior_entry_point import _DynamicBehaviorEntryPoint_5e24b5e4Orchestrator as DynamicBehaviorEntryPoint_5e24b5e4Workerbee
-from .dependencies.radiance_contrib_entry_point import _RadianceContribEntryPoint_5e24b5e4Orchestrator as RadianceContribEntryPoint_5e24b5e4Workerbee
+from .dependencies.radiance_contrib_entry_point import _RadianceContribEntryPoint_eb938b5bOrchestrator as RadianceContribEntryPoint_eb938b5bWorkerbee
 
 
 _default_inputs = {   'group_name': None,
@@ -84,165 +83,6 @@ class ReadGrids(QueenbeeTask):
         return [{'name': 'data', 'from': 'input_path', 'to': pathlib.Path(self.params_folder, 'input_path').resolve().as_posix()}]
 
 
-class RunDynamicBehaviorContribLoop(luigi.Task):
-    """No description is provided."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def aperture_id(self):
-        return self._input_params['group_name']
-
-    @property
-    def grid_name(self):
-        return self.item['full_id']
-
-    @property
-    def result_sql(self):
-        value = pathlib.Path(self._input_params['result_sql'])
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def direct_specular(self):
-        value = pathlib.Path('shortwave/dynamic/initial/{aperture_id}/direct_spec'.format(aperture_id=self.aperture_id), '{item_full_id}.ill'.format(item_full_id=self.item['full_id']))
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def indirect_specular(self):
-        value = pathlib.Path('shortwave/dynamic/initial/{aperture_id}/indirect_spec'.format(aperture_id=self.aperture_id), '{item_full_id}.ill'.format(item_full_id=self.item['full_id']))
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def ref_specular(self):
-        value = pathlib.Path('shortwave/dynamic/initial/{aperture_id}/reflected_spec'.format(aperture_id=self.aperture_id), '{item_full_id}.ill'.format(item_full_id=self.item['full_id']))
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def indirect_diffuse(self):
-        value = pathlib.Path('shortwave/dynamic/initial/{aperture_id}/total_diff'.format(aperture_id=self.aperture_id), '{item_full_id}.ill'.format(item_full_id=self.item['full_id']))
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def ref_diffuse(self):
-        value = pathlib.Path('shortwave/dynamic/initial/{aperture_id}/reflected_diff'.format(aperture_id=self.aperture_id), '{item_full_id}.ill'.format(item_full_id=self.item['full_id']))
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def sun_up_hours(self):
-        value = pathlib.Path(self._input_params['sun_up_hours'])
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    # get item for loop
-    try:
-        item = luigi.DictParameter()
-    except Exception:
-        item = luigi.Parameter()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder'], 'shortwave').resolve().as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    @property
-    def map_dag_inputs(self):
-        """Map task inputs to DAG inputs."""
-        inputs = {
-            'simulation_folder': self.execution_folder,
-            'result_sql': self.result_sql,
-            'direct_specular': self.direct_specular,
-            'indirect_specular': self.indirect_specular,
-            'ref_specular': self.ref_specular,
-            'indirect_diffuse': self.indirect_diffuse,
-            'ref_diffuse': self.ref_diffuse,
-            'sun_up_hours': self.sun_up_hours,
-            'aperture_id': self.aperture_id,
-            'grid_name': self.grid_name
-        }
-        try:
-            inputs['__debug__'] = self._input_params['__debug__']
-        except KeyError:
-            # not debug mode
-            pass
-
-        return inputs
-
-    def run(self):
-        yield [DynamicBehaviorEntryPoint_5e24b5e4Workerbee(_input_params=self.map_dag_inputs)]
-        done_file = pathlib.Path(self.execution_folder, 'run_dynamic_behavior_contrib.done')
-        done_file.parent.mkdir(parents=True, exist_ok=True)
-        done_file.write_text('done!')
-
-    def requires(self):
-        return {'ReadGrids': ReadGrids(_input_params=self._input_params), 'RunRadianceWindowContrib': RunRadianceWindowContrib(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'run_dynamic_behavior_contrib.done').resolve().as_posix())
-        }
-
-
-class RunDynamicBehaviorContrib(luigi.Task):
-    """No description is provided."""
-    # global parameters
-    _input_params = luigi.DictParameter()
-    @property
-    def data(self):
-        value = pathlib.Path(self.input()['ReadGrids']['data'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def items(self):
-        try:
-            # assume the input is a file
-            return qb_load_input_param(self.data)
-        except:
-            # it is a parameter
-            return self.input()['ReadGrids']['data'].path
-
-    def run(self):
-        yield [RunDynamicBehaviorContribLoop(item=item, _input_params=self._input_params) for item in self.items]
-        done_file = pathlib.Path(self.execution_folder, 'run_dynamic_behavior_contrib.done')
-        done_file.parent.mkdir(parents=True, exist_ok=True)
-        done_file.write_text('done!')
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def requires(self):
-        return {'ReadGrids': ReadGrids(_input_params=self._input_params), 'RunRadianceWindowContrib': RunRadianceWindowContrib(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'run_dynamic_behavior_contrib.done').resolve().as_posix())
-        }
-
-
 class RunRadianceWindowContribLoop(luigi.Task):
     """No description is provided."""
 
@@ -291,6 +131,12 @@ class RunRadianceWindowContribLoop(luigi.Task):
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
+    def ref_sensor_grid(self):
+        value = pathlib.Path(self._input_params['sensor_grid_folder'], '{item_full_id}_ref.pts'.format(item_full_id=self.item['full_id']))
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
     def sky_dome(self):
         value = pathlib.Path(self._input_params['sky_dome'])
         return value.as_posix() if value.is_absolute() \
@@ -311,6 +157,18 @@ class RunRadianceWindowContribLoop(luigi.Task):
     @property
     def sun_modifiers(self):
         value = pathlib.Path(self._input_params['sun_modifiers'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def result_sql(self):
+        value = pathlib.Path(self._input_params['result_sql'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def sun_up_hours(self):
+        value = pathlib.Path(self._input_params['sun_up_hours'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -344,11 +202,14 @@ class RunRadianceWindowContribLoop(luigi.Task):
             'group_name': self.group_name,
             'grid_name': self.grid_name,
             'sensor_grid': self.sensor_grid,
+            'ref_sensor_grid': self.ref_sensor_grid,
             'sensor_count': self.sensor_count,
             'sky_dome': self.sky_dome,
             'sky_matrix': self.sky_matrix,
             'sky_matrix_direct': self.sky_matrix_direct,
-            'sun_modifiers': self.sun_modifiers
+            'sun_modifiers': self.sun_modifiers,
+            'result_sql': self.result_sql,
+            'sun_up_hours': self.sun_up_hours
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -359,7 +220,7 @@ class RunRadianceWindowContribLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [RadianceContribEntryPoint_5e24b5e4Workerbee(_input_params=self.map_dag_inputs)]
+        yield [RadianceContribEntryPoint_eb938b5bWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_window_contrib.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -419,7 +280,7 @@ class RunRadianceWindowContrib(luigi.Task):
         }
 
 
-class _DynamicContributionEntryPoint_5e24b5e4Orchestrator(luigi.WrapperTask):
+class _DynamicContributionEntryPoint_eb938b5bOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -431,4 +292,4 @@ class _DynamicContributionEntryPoint_5e24b5e4Orchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [RunDynamicBehaviorContrib(_input_params=self.input_values)]
+        yield [RunRadianceWindowContrib(_input_params=self.input_values)]

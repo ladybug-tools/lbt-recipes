@@ -26,13 +26,120 @@ _default_inputs = {   'grid_name': None,
     'octree_file_with_suns': None,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
+    'ref_sensor_grid': None,
+    'result_sql': None,
     'sensor_count': None,
     'sensor_grid': None,
     'simulation_folder': '.',
     'sky_dome': None,
     'sky_matrix': None,
     'sky_matrix_direct': None,
-    'sun_modifiers': None}
+    'sun_modifiers': None,
+    'sun_up_hours': None}
+
+
+class CreateIrradianceContribMap(QueenbeeTask):
+    """Get .ill files with maps of irradiance contributions from dynamic windows."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+
+    # Task inputs
+    @property
+    def aperture_id(self):
+        return self._input_params['group_name']
+
+    @property
+    def grid(self):
+        return self._input_params['grid_name']
+
+    @property
+    def result_sql(self):
+        value = pathlib.Path(self._input_params['result_sql'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def direct_specular(self):
+        value = pathlib.Path(self.input()['DirectSunGroup']['result_file'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def indirect_specular(self):
+        value = pathlib.Path(self.input()['OutputMatrixMathGroup']['results_file'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def ref_specular(self):
+        value = pathlib.Path(self.input()['GroundReflectedSkySpecGroup']['result_file'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def indirect_diffuse(self):
+        value = pathlib.Path(self.input()['TotalSkyDiffGroup']['result_file'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def ref_diffuse(self):
+        value = pathlib.Path(self.input()['GroundReflectedSkyDiffGroup']['result_file'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def sun_up_hours(self):
+        value = pathlib.Path(self._input_params['sun_up_hours'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def execution_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def initiation_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def params_folder(self):
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    def command(self):
+        return 'ladybug-comfort map irradiance-contrib result.sql direct_spec.ill indirect_spec.ill ref_spec.ill indirect_diff.ill ref_diff.ill sun-up-hours.txt --aperture-id "{aperture_id}" --folder output'.format(aperture_id=self.aperture_id)
+
+    def requires(self):
+        return {'DirectSunGroup': DirectSunGroup(_input_params=self._input_params), 'OutputMatrixMathGroup': OutputMatrixMathGroup(_input_params=self._input_params), 'GroundReflectedSkySpecGroup': GroundReflectedSkySpecGroup(_input_params=self._input_params), 'TotalSkyDiffGroup': TotalSkyDiffGroup(_input_params=self._input_params), 'GroundReflectedSkyDiffGroup': GroundReflectedSkyDiffGroup(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            'result_folder': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'dynamic/final/{grid}/{aperture_id}'.format(grid=self.grid, aperture_id=self.aperture_id)).resolve().as_posix()
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'result_sql', 'to': 'result.sql', 'from': self.result_sql, 'optional': False},
+            {'name': 'direct_specular', 'to': 'direct_spec.ill', 'from': self.direct_specular, 'optional': False},
+            {'name': 'indirect_specular', 'to': 'indirect_spec.ill', 'from': self.indirect_specular, 'optional': False},
+            {'name': 'ref_specular', 'to': 'ref_spec.ill', 'from': self.ref_specular, 'optional': False},
+            {'name': 'indirect_diffuse', 'to': 'indirect_diff.ill', 'from': self.indirect_diffuse, 'optional': False},
+            {'name': 'ref_diffuse', 'to': 'ref_diff.ill', 'from': self.ref_diffuse, 'optional': False},
+            {'name': 'sun_up_hours', 'to': 'sun-up-hours.txt', 'from': self.sun_up_hours, 'optional': False}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'result-folder', 'from': 'output',
+                'to': pathlib.Path(self.execution_folder, 'dynamic/final/{grid}/{aperture_id}'.format(grid=self.grid, aperture_id=self.aperture_id)).resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
+            }]
 
 
 class DirectSkyGroup(QueenbeeTask):
@@ -43,11 +150,11 @@ class DirectSkyGroup(QueenbeeTask):
 
     # Task inputs
     @property
-    def name(self):
+    def grid(self):
         return self._input_params['grid_name']
 
     @property
-    def group_name(self):
+    def group(self):
         return self._input_params['group_name']
 
     @property
@@ -86,7 +193,7 @@ class DirectSkyGroup(QueenbeeTask):
 
     @property
     def sensor_grid(self):
-        value = pathlib.Path('grids/{name}.pts'.format(name=self.name))
+        value = pathlib.Path(self._input_params['sensor_grid'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -114,7 +221,7 @@ class DirectSkyGroup(QueenbeeTask):
     def output(self):
         return {
             'result_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'dynamic/initial/{group_name}/direct_sky/{name}.ill'.format(group_name=self.group_name, name=self.name)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'dynamic/initial/{group}/direct_sky/{grid}.ill'.format(group=self.group, grid=self.grid)).resolve().as_posix()
             )
         }
 
@@ -131,7 +238,7 @@ class DirectSkyGroup(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, 'dynamic/initial/{group_name}/direct_sky/{name}.ill'.format(group_name=self.group_name, name=self.name)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'dynamic/initial/{group}/direct_sky/{grid}.ill'.format(group=self.group, grid=self.grid)).resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -146,11 +253,11 @@ class DirectSunGroup(QueenbeeTask):
 
     # Task inputs
     @property
-    def name(self):
+    def grid(self):
         return self._input_params['grid_name']
 
     @property
-    def group_name(self):
+    def group(self):
         return self._input_params['group_name']
 
     @property
@@ -189,7 +296,7 @@ class DirectSunGroup(QueenbeeTask):
 
     @property
     def sensor_grid(self):
-        value = pathlib.Path('grids/{name}.pts'.format(name=self.name))
+        value = pathlib.Path(self._input_params['sensor_grid'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -217,7 +324,7 @@ class DirectSunGroup(QueenbeeTask):
     def output(self):
         return {
             'result_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'dynamic/initial/{group_name}/direct_spec/{name}.ill'.format(group_name=self.group_name, name=self.name)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'dynamic/initial/{group}/direct_spec/{grid}.ill'.format(group=self.group, grid=self.grid)).resolve().as_posix()
             )
         }
 
@@ -233,7 +340,7 @@ class DirectSunGroup(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, 'dynamic/initial/{group_name}/direct_spec/{name}.ill'.format(group_name=self.group_name, name=self.name)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'dynamic/initial/{group}/direct_spec/{grid}.ill'.format(group=self.group, grid=self.grid)).resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -247,11 +354,11 @@ class GroundReflectedSkyDiffGroup(QueenbeeTask):
 
     # Task inputs
     @property
-    def name(self):
+    def grid(self):
         return self._input_params['grid_name']
 
     @property
-    def g_name(self):
+    def group(self):
         return self._input_params['group_name']
 
     @property
@@ -294,7 +401,7 @@ class GroundReflectedSkyDiffGroup(QueenbeeTask):
 
     @property
     def sensor_grid(self):
-        value = pathlib.Path('grids/{name}_ref.pts'.format(name=self.name))
+        value = pathlib.Path(self._input_params['ref_sensor_grid'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -322,7 +429,7 @@ class GroundReflectedSkyDiffGroup(QueenbeeTask):
     def output(self):
         return {
             'result_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'dynamic/initial/{g_name}/reflected_diff/{name}.ill'.format(g_name=self.g_name, name=self.name)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'dynamic/initial/{group}/reflected_diff/{grid}.ill'.format(group=self.group, grid=self.grid)).resolve().as_posix()
             )
         }
 
@@ -339,7 +446,7 @@ class GroundReflectedSkyDiffGroup(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, 'dynamic/initial/{g_name}/reflected_diff/{name}.ill'.format(g_name=self.g_name, name=self.name)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'dynamic/initial/{group}/reflected_diff/{grid}.ill'.format(group=self.group, grid=self.grid)).resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -353,11 +460,11 @@ class GroundReflectedSkySpecGroup(QueenbeeTask):
 
     # Task inputs
     @property
-    def name(self):
+    def grid(self):
         return self._input_params['grid_name']
 
     @property
-    def g_name(self):
+    def group(self):
         return self._input_params['group_name']
 
     @property
@@ -400,7 +507,7 @@ class GroundReflectedSkySpecGroup(QueenbeeTask):
 
     @property
     def sensor_grid(self):
-        value = pathlib.Path('grids/{name}_ref.pts'.format(name=self.name))
+        value = pathlib.Path(self._input_params['ref_sensor_grid'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -428,7 +535,7 @@ class GroundReflectedSkySpecGroup(QueenbeeTask):
     def output(self):
         return {
             'result_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'dynamic/initial/{g_name}/reflected_spec/{name}.ill'.format(g_name=self.g_name, name=self.name)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'dynamic/initial/{group}/reflected_spec/{grid}.ill'.format(group=self.group, grid=self.grid)).resolve().as_posix()
             )
         }
 
@@ -445,7 +552,7 @@ class GroundReflectedSkySpecGroup(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, 'dynamic/initial/{g_name}/reflected_spec/{name}.ill'.format(g_name=self.g_name, name=self.name)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'dynamic/initial/{group}/reflected_spec/{grid}.ill'.format(group=self.group, grid=self.grid)).resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -459,11 +566,11 @@ class OutputMatrixMathGroup(QueenbeeTask):
 
     # Task inputs
     @property
-    def name(self):
+    def grid(self):
         return self._input_params['grid_name']
 
     @property
-    def g_name(self):
+    def group(self):
         return self._input_params['group_name']
 
     conversion = luigi.Parameter(default=' ')
@@ -505,7 +612,7 @@ class OutputMatrixMathGroup(QueenbeeTask):
     def output(self):
         return {
             'results_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'dynamic/initial/{g_name}/indirect_spec/{name}.ill'.format(g_name=self.g_name, name=self.name)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'dynamic/initial/{group}/indirect_spec/{grid}.ill'.format(group=self.group, grid=self.grid)).resolve().as_posix()
             )
         }
 
@@ -520,7 +627,7 @@ class OutputMatrixMathGroup(QueenbeeTask):
         return [
             {
                 'name': 'results-file', 'from': 'final.ill',
-                'to': pathlib.Path(self.execution_folder, 'dynamic/initial/{g_name}/indirect_spec/{name}.ill'.format(g_name=self.g_name, name=self.name)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'dynamic/initial/{group}/indirect_spec/{grid}.ill'.format(group=self.group, grid=self.grid)).resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -534,11 +641,11 @@ class TotalSkyDiffGroup(QueenbeeTask):
 
     # Task inputs
     @property
-    def name(self):
+    def grid(self):
         return self._input_params['grid_name']
 
     @property
-    def group_name(self):
+    def group(self):
         return self._input_params['group_name']
 
     @property
@@ -581,7 +688,7 @@ class TotalSkyDiffGroup(QueenbeeTask):
 
     @property
     def sensor_grid(self):
-        value = pathlib.Path('grids/{name}.pts'.format(name=self.name))
+        value = pathlib.Path(self._input_params['sensor_grid'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -609,7 +716,7 @@ class TotalSkyDiffGroup(QueenbeeTask):
     def output(self):
         return {
             'result_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'dynamic/initial/{group_name}/total_diff/{name}.ill'.format(group_name=self.group_name, name=self.name)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'dynamic/initial/{group}/total_diff/{grid}.ill'.format(group=self.group, grid=self.grid)).resolve().as_posix()
             )
         }
 
@@ -626,7 +733,7 @@ class TotalSkyDiffGroup(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, 'dynamic/initial/{group_name}/total_diff/{name}.ill'.format(group_name=self.group_name, name=self.name)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'dynamic/initial/{group}/total_diff/{grid}.ill'.format(group=self.group, grid=self.grid)).resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -640,11 +747,11 @@ class TotalSkySpecGroup(QueenbeeTask):
 
     # Task inputs
     @property
-    def name(self):
+    def grid(self):
         return self._input_params['grid_name']
 
     @property
-    def group_name(self):
+    def group(self):
         return self._input_params['group_name']
 
     @property
@@ -683,7 +790,7 @@ class TotalSkySpecGroup(QueenbeeTask):
 
     @property
     def sensor_grid(self):
-        value = pathlib.Path('grids/{name}.pts'.format(name=self.name))
+        value = pathlib.Path(self._input_params['sensor_grid'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -711,7 +818,7 @@ class TotalSkySpecGroup(QueenbeeTask):
     def output(self):
         return {
             'result_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'dynamic/initial/{group_name}/total_sky/{name}.ill'.format(group_name=self.group_name, name=self.name)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'dynamic/initial/{group}/total_sky/{grid}.ill'.format(group=self.group, grid=self.grid)).resolve().as_posix()
             )
         }
 
@@ -728,13 +835,13 @@ class TotalSkySpecGroup(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, 'dynamic/initial/{group_name}/total_sky/{name}.ill'.format(group_name=self.group_name, name=self.name)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'dynamic/initial/{group}/total_sky/{grid}.ill'.format(group=self.group, grid=self.grid)).resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
 
 
-class _RadianceContribEntryPoint_5e24b5e4Orchestrator(luigi.WrapperTask):
+class _RadianceContribEntryPoint_eb938b5bOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -746,4 +853,4 @@ class _RadianceContribEntryPoint_5e24b5e4Orchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [DirectSunGroup(_input_params=self.input_values), GroundReflectedSkyDiffGroup(_input_params=self.input_values), GroundReflectedSkySpecGroup(_input_params=self.input_values), OutputMatrixMathGroup(_input_params=self.input_values), TotalSkyDiffGroup(_input_params=self.input_values)]
+        yield [CreateIrradianceContribMap(_input_params=self.input_values)]
