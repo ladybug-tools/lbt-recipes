@@ -533,7 +533,7 @@ class CreateShortwaveMrtMap(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort map shortwave-mrt weather.epw indirect.ill direct.ill ref.ill sun-up-hours.txt --solarcal-par "{solarcal_par}" --run-period "{run_period}" --{indirect_is_total} --output-file shortwave.csv'.format(solarcal_par=self.solarcal_par, run_period=self.run_period, indirect_is_total=self.indirect_is_total)
+        return 'ladybug-comfort map shortwave-mrt weather.epw indirect.ill direct.ill ref.ill sun-up-hours.txt --contributions dynamic --solarcal-par "{solarcal_par}" --run-period "{run_period}" --{indirect_is_total} --output-file shortwave.csv'.format(solarcal_par=self.solarcal_par, run_period=self.run_period, indirect_is_total=self.indirect_is_total)
 
     def output(self):
         return {
@@ -674,7 +674,7 @@ class ProcessUtciMatrix(QueenbeeTask):
             }]
 
 
-class _ComfortMappingEntryPoint_921cb50eOrchestrator(luigi.WrapperTask):
+class _ComfortMappingEntryPoint_912d6202Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

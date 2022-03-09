@@ -23,7 +23,8 @@ from queenbee_local import local_scheduler, _copy_artifacts, update_params, pars
 import flow.main as pmv_comfort_map_workerbee
 
 
-_recipe_default_inputs = {   'air_speed': None,
+_recipe_default_inputs = {   'additional_idf': None,
+    'air_speed': None,
     'clo_value': None,
     'comfort_parameters': '--ppd-threshold 10',
     'cpu_count': 50,
@@ -45,7 +46,7 @@ class LetPmvComfortMapFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [pmv_comfort_map_workerbee._Main_49c8215fOrchestrator(_input_params=self._input_params)]
+        yield [pmv_comfort_map_workerbee._Main_97d86f51Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -65,8 +66,8 @@ def start(project_folder, user_values, workers):
         simulation_folder = input_params['simulation_folder']
 
     # copy project folder content to simulation folder
-    artifacts = ['air_speed', 'clo_value', 'ddy', 'epw', 'met_rate', 'model']
-    optional_artifacts = ['air_speed', 'clo_value', 'met_rate']
+    artifacts = ['additional_idf', 'air_speed', 'clo_value', 'ddy', 'epw', 'met_rate', 'model']
+    optional_artifacts = ['additional_idf', 'air_speed', 'clo_value', 'met_rate']
     for artifact in artifacts:
         value = input_params[artifact]
         if value is None:
@@ -85,12 +86,16 @@ def start(project_folder, user_values, workers):
     with cfg_file.open('w') as lf:
         lf.write(LOGS_CONFIG.replace('WORKFLOW.LOG', log_file))
 
-    luigi.build(
+    summary = luigi.build(
         [LetPmvComfortMapFly(_input_params=input_params)],
         local_scheduler=local_scheduler(),
         workers=workers,
+        detailed_summary=True,
         logging_conf_file=cfg_file.as_posix()
     )
+
+    print(summary.summary_text)
+    print(f'More info:\n{log_file}')
 
 
 if __name__ == '__main__':

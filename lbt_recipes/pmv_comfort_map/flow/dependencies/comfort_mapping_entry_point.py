@@ -22,6 +22,7 @@ from queenbee_local import load_input_param as qb_load_input_param
 _default_inputs = {   'air_speed': None,
     'clo_value': None,
     'comfort_parameters': '--ppd-threshold 10',
+    'contributions': None,
     'direct_irradiance': None,
     'enclosure_info': None,
     'epw': None,
@@ -511,6 +512,17 @@ class CreateShortwaveMrtMap(QueenbeeTask):
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
+    def contributions(self):
+        try:
+            pathlib.Path(self._input_params['contributions'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['contributions'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
     def execution_folder(self):
         return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
@@ -523,7 +535,7 @@ class CreateShortwaveMrtMap(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort map shortwave-mrt weather.epw indirect.ill direct.ill ref.ill sun-up-hours.txt --solarcal-par "{solarcal_par}" --run-period "{run_period}" --{indirect_is_total} --output-file shortwave.csv'.format(solarcal_par=self.solarcal_par, run_period=self.run_period, indirect_is_total=self.indirect_is_total)
+        return 'ladybug-comfort map shortwave-mrt weather.epw indirect.ill direct.ill ref.ill sun-up-hours.txt --contributions dynamic --solarcal-par "{solarcal_par}" --run-period "{run_period}" --{indirect_is_total} --output-file shortwave.csv'.format(solarcal_par=self.solarcal_par, run_period=self.run_period, indirect_is_total=self.indirect_is_total)
 
     def output(self):
         return {
@@ -539,7 +551,8 @@ class CreateShortwaveMrtMap(QueenbeeTask):
             {'name': 'indirect_irradiance', 'to': 'indirect.ill', 'from': self.indirect_irradiance, 'optional': False},
             {'name': 'direct_irradiance', 'to': 'direct.ill', 'from': self.direct_irradiance, 'optional': False},
             {'name': 'ref_irradiance', 'to': 'ref.ill', 'from': self.ref_irradiance, 'optional': False},
-            {'name': 'sun_up_hours', 'to': 'sun-up-hours.txt', 'from': self.sun_up_hours, 'optional': False}]
+            {'name': 'sun_up_hours', 'to': 'sun-up-hours.txt', 'from': self.sun_up_hours, 'optional': False},
+            {'name': 'contributions', 'to': 'dynamic', 'from': self.contributions, 'optional': True}]
 
     @property
     def output_artifacts(self):
@@ -692,7 +705,7 @@ class ProcessPmvMatrix(QueenbeeTask):
             }]
 
 
-class _ComfortMappingEntryPoint_49c8215fOrchestrator(luigi.WrapperTask):
+class _ComfortMappingEntryPoint_97d86f51Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

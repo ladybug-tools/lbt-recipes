@@ -17,8 +17,8 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_921cb50eOrchestrator as ComfortMappingEntryPoint_921cb50eWorkerbee
-from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_921cb50eOrchestrator as RadianceMappingEntryPoint_921cb50eWorkerbee
+from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_912d6202Orchestrator as ComfortMappingEntryPoint_912d6202Workerbee
+from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_912d6202Orchestrator as RadianceMappingEntryPoint_912d6202Workerbee
 
 
 _default_inputs = {   'comfort_parameters': '--cold 9 --heat 26',
@@ -89,6 +89,10 @@ class CopyGridInfo(QueenbeeTask):
             
             'dst_5': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'metrics/CSP/grids_info.json').resolve().as_posix()
+            ),
+            
+            'dst_6': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'initial_results/conditions/grids_info.json').resolve().as_posix()
             )
         }
 
@@ -131,6 +135,13 @@ class CopyGridInfo(QueenbeeTask):
             {
                 'name': 'dst-5', 'from': 'input_path',
                 'to': pathlib.Path(self.execution_folder, 'metrics/CSP/grids_info.json').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
+            },
+                
+            {
+                'name': 'dst-6', 'from': 'input_path',
+                'to': pathlib.Path(self.execution_folder, 'initial_results/conditions/grids_info.json').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]
@@ -187,6 +198,10 @@ class CopyRedistInfo(QueenbeeTask):
             
             'dst_5': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'initial_results/metrics/CSP/_redist_info.json').resolve().as_posix()
+            ),
+            
+            'dst_6': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'initial_results/conditions/_redist_info.json').resolve().as_posix()
             )
         }
 
@@ -229,6 +244,13 @@ class CopyRedistInfo(QueenbeeTask):
             {
                 'name': 'dst-5', 'from': 'input_path',
                 'to': pathlib.Path(self.execution_folder, 'initial_results/metrics/CSP/_redist_info.json').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
+            },
+                
+            {
+                'name': 'dst-6', 'from': 'input_path',
+                'to': pathlib.Path(self.execution_folder, 'initial_results/conditions/_redist_info.json').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]
@@ -1109,7 +1131,7 @@ class RestructureConditionIntensityResults(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension}'.format(extension=self.extension)
+        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
     def requires(self):
         return {'RunComfortMap': RunComfortMap(_input_params=self._input_params)}
@@ -1167,7 +1189,7 @@ class RestructureConditionResults(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension}'.format(extension=self.extension)
+        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
     def requires(self):
         return {'RunComfortMap': RunComfortMap(_input_params=self._input_params)}
@@ -1225,7 +1247,7 @@ class RestructureCspResults(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension}'.format(extension=self.extension)
+        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
     def requires(self):
         return {'RunComfortMap': RunComfortMap(_input_params=self._input_params)}
@@ -1283,7 +1305,7 @@ class RestructureHspResults(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension}'.format(extension=self.extension)
+        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
     def requires(self):
         return {'RunComfortMap': RunComfortMap(_input_params=self._input_params)}
@@ -1341,7 +1363,7 @@ class RestructureTcpResults(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension}'.format(extension=self.extension)
+        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
     def requires(self):
         return {'RunComfortMap': RunComfortMap(_input_params=self._input_params)}
@@ -1399,7 +1421,7 @@ class RestructureTemperatureResults(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension}'.format(extension=self.extension)
+        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
     def requires(self):
         return {'RunComfortMap': RunComfortMap(_input_params=self._input_params)}
@@ -1585,7 +1607,7 @@ class RunComfortMapLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [ComfortMappingEntryPoint_921cb50eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [ComfortMappingEntryPoint_912d6202Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_comfort_map.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -1616,7 +1638,7 @@ class RunComfortMap(luigi.Task):
             return qb_load_input_param(self.sensor_grids)
         except:
             # it is a parameter
-            return pathlib.Path(self.input()['SplitGridFolder']['sensor_grids'].path).as_posix()
+            return self.input()['SplitGridFolder']['sensor_grids'].path
 
     def run(self):
         yield [RunComfortMapLoop(item=item, _input_params=self._input_params) for item in self.items]
@@ -1694,7 +1716,7 @@ class RunEnergySimulation(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-energy simulate model model.hbjson weather.epw --sim-par-json sim-par.json --measures measures --additional-string "{additional_string}" --report-units {report_units} --folder output {viz_variables}'.format(additional_string=self.additional_string, report_units=self.report_units, viz_variables=self.viz_variables)
+        return 'honeybee-energy simulate model model.hbjson weather.epw --sim-par-json sim-par.json --measures measures --additional-string "{additional_string}" --additional-idf additional.idf --report-units {report_units} --folder output {viz_variables}'.format(additional_string=self.additional_string, report_units=self.report_units, viz_variables=self.viz_variables)
 
     def requires(self):
         return {'CreateSimPar': CreateSimPar(_input_params=self._input_params)}
@@ -1860,7 +1882,7 @@ class RunRadianceSimulationLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [RadianceMappingEntryPoint_921cb50eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [RadianceMappingEntryPoint_912d6202Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_simulation.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -1891,7 +1913,7 @@ class RunRadianceSimulation(luigi.Task):
             return qb_load_input_param(self.sensor_grids)
         except:
             # it is a parameter
-            return pathlib.Path(self.input()['SplitGridFolder']['sensor_grids'].path).as_posix()
+            return self.input()['SplitGridFolder']['sensor_grids'].path
 
     def run(self):
         yield [RunRadianceSimulationLoop(item=item, _input_params=self._input_params) for item in self.items]
@@ -1932,6 +1954,10 @@ class SetModifiersFromConstructions(QueenbeeTask):
         return 'solar'
 
     @property
+    def dynamic_behavior(self):
+        return 'static'
+
+    @property
     def exterior_offset(self):
         return '0.02'
 
@@ -1954,7 +1980,7 @@ class SetModifiersFromConstructions(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-energy edit modifiers-from-constructions model.hbjson --{use_visible} --exterior-offset {exterior_offset} --output-file new_model.hbjson'.format(use_visible=self.use_visible, exterior_offset=self.exterior_offset)
+        return 'honeybee-energy edit modifiers-from-constructions model.hbjson --{use_visible} --{dynamic_behavior}-groups --exterior-offset {exterior_offset} --output-file new_model.hbjson'.format(use_visible=self.use_visible, dynamic_behavior=self.dynamic_behavior, exterior_offset=self.exterior_offset)
 
     def output(self):
         return {
@@ -2037,6 +2063,10 @@ class SplitGridFolder(QueenbeeTask):
             'dist_info': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'initial_results/results/temperature/_redist_info.json').resolve().as_posix()
             ),
+            
+            'sensor_grids_file': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'radiance/grid/_split_info.json').resolve().as_posix()
+            ),
             'sensor_grids': luigi.LocalTarget(
                 pathlib.Path(
                     self.params_folder,
@@ -2064,6 +2094,13 @@ class SplitGridFolder(QueenbeeTask):
                 'to': pathlib.Path(self.execution_folder, 'initial_results/results/temperature/_redist_info.json').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
+            },
+                
+            {
+                'name': 'sensor-grids-file', 'from': 'output_folder/_info.json',
+                'to': pathlib.Path(self.execution_folder, 'radiance/grid/_split_info.json').resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
             }]
 
     @property
@@ -2071,7 +2108,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_921cb50eOrchestrator(luigi.WrapperTask):
+class _Main_912d6202Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

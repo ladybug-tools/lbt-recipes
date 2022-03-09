@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "adaptive-comfort-map",
-    "tag": "0.5.2",
+    "tag": "0.5.3",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -43,6 +43,43 @@
   },
   "source": null,
   "inputs": [
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "additional-idf",
+      "description": "An IDF file with text to be appended before simulation. This input can be used to include EnergyPlus objects that are not currently supported by honeybee.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGArrayInputAlias",
+          "annotations": {},
+          "name": "add_str",
+          "description": "THIS OPTION IS JUST FOR ADVANCED USERS OF ENERGYPLUS. An additional text string to be appended to the IDF before simulation. The input should include complete EnergyPlus objects following the IDF format. This input can be used to include EnergyPlus objects that are not currently supported by honeybee.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.simulation",
+              "function": "list_to_additional_idf",
+              "index": 0
+            }
+          ],
+          "default": [],
+          "required": false,
+          "spec": null,
+          "items_type": "String"
+        }
+      ],
+      "required": false,
+      "spec": null,
+      "extensions": [
+        "idf"
+      ]
+    },
     {
       "type": "DAGFileInput",
       "annotations": {},
@@ -505,6 +542,30 @@
     {
       "type": "DAGFolderOutput",
       "annotations": {},
+      "name": "environmental-conditions",
+      "description": "A folder containing the environmental conditions that were input to the thermal comfort model. This include the MRT, air temperature, longwave MRT and shortwave MRT delta.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "initial_results/conditions"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "env_conds",
+          "description": "A folder containing the environmental conditions that were input to the comfort model. These can be loaded into Grasshopper using the \"HB Read Environment Matrix\" component. Load-able metrics include the MRT, air temperature, longwave MRT and shortwave MRT delta.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": []
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
       "name": "hsp",
       "description": "A folder containing CSV values for Heat Sensation Percent (HSP). HSP is the percentage of occupied time where thermal conditions are hotter than what is considered acceptable/comfortable.",
       "from": {
@@ -560,19 +621,6 @@
           ]
         }
       ],
-      "required": true
-    },
-    {
-      "type": "DAGFolderOutput",
-      "annotations": {},
-      "name": "results",
-      "description": "A folder containing all results.",
-      "from": {
-        "type": "FolderReference",
-        "annotations": {},
-        "path": "results"
-      },
-      "alias": [],
       "required": true
     },
     {
