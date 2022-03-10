@@ -841,7 +841,7 @@ class TotalSkySpecGroup(QueenbeeTask):
             }]
 
 
-class _RadianceContribEntryPoint_eb938b5bOrchestrator(luigi.WrapperTask):
+class _RadianceContribEntryPoint_a0dda991Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
