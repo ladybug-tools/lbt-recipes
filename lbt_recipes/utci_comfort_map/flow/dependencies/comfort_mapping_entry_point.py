@@ -674,7 +674,7 @@ class ProcessUtciMatrix(QueenbeeTask):
             }]
 
 
-class _ComfortMappingEntryPoint_912d6202Orchestrator(luigi.WrapperTask):
+class _ComfortMappingEntryPoint_0a97de84Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

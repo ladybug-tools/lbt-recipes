@@ -17,7 +17,7 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.radiance_contrib_entry_point import _RadianceContribEntryPoint_e67309aaOrchestrator as RadianceContribEntryPoint_e67309aaWorkerbee
+from .dependencies.radiance_contrib_entry_point import _RadianceContribEntryPoint_e52ba12bOrchestrator as RadianceContribEntryPoint_e52ba12bWorkerbee
 
 
 _default_inputs = {   'group_name': None,
@@ -220,7 +220,7 @@ class RunRadianceWindowContribLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [RadianceContribEntryPoint_e67309aaWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [RadianceContribEntryPoint_e52ba12bWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_window_contrib.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -280,7 +280,7 @@ class RunRadianceWindowContrib(luigi.Task):
         }
 
 
-class _DynamicContributionEntryPoint_e67309aaOrchestrator(luigi.WrapperTask):
+class _DynamicContributionEntryPoint_e52ba12bOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

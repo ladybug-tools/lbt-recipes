@@ -17,9 +17,9 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_eb938b5bOrchestrator as ComfortMappingEntryPoint_eb938b5bWorkerbee
-from .dependencies.dynamic_contribution_entry_point import _DynamicContributionEntryPoint_eb938b5bOrchestrator as DynamicContributionEntryPoint_eb938b5bWorkerbee
-from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_eb938b5bOrchestrator as RadianceMappingEntryPoint_eb938b5bWorkerbee
+from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_a0dda991Orchestrator as ComfortMappingEntryPoint_a0dda991Workerbee
+from .dependencies.dynamic_contribution_entry_point import _DynamicContributionEntryPoint_a0dda991Orchestrator as DynamicContributionEntryPoint_a0dda991Workerbee
+from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_a0dda991Orchestrator as RadianceMappingEntryPoint_a0dda991Workerbee
 
 
 _default_inputs = {   'additional_idf': None,
@@ -252,6 +252,60 @@ class CopyRedistInfo(QueenbeeTask):
             {
                 'name': 'dst-6', 'from': 'input_path',
                 'to': pathlib.Path(self.execution_folder, 'initial_results/conditions/_redist_info.json').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
+            }]
+
+
+class CopyResultInfo(QueenbeeTask):
+    """Copy a file or folder to a destination."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+
+    # Task inputs
+    @property
+    def src(self):
+        value = pathlib.Path(self.input()['CreateResultInfo']['temperature_info'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def execution_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def initiation_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def params_folder(self):
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    def command(self):
+        return 'echo copying input path...'
+
+    def requires(self):
+        return {'CreateResultInfo': CreateResultInfo(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            'dst': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'initial_results/conditions/results_info.json').resolve().as_posix()
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'src', 'to': 'input_path', 'from': self.src, 'optional': False}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'dst', 'from': 'input_path',
+                'to': pathlib.Path(self.execution_folder, 'initial_results/conditions/results_info.json').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]
@@ -1821,7 +1875,7 @@ class RunComfortMapLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [ComfortMappingEntryPoint_eb938b5bWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [ComfortMappingEntryPoint_a0dda991Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_comfort_map.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -2110,7 +2164,7 @@ class RunRadianceDynamicContributionLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DynamicContributionEntryPoint_eb938b5bWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [DynamicContributionEntryPoint_a0dda991Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_dynamic_contribution.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -2295,7 +2349,7 @@ class RunRadianceSimulationLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [RadianceMappingEntryPoint_eb938b5bWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [RadianceMappingEntryPoint_a0dda991Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_simulation.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -2519,7 +2573,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_eb938b5bOrchestrator(luigi.WrapperTask):
+class _Main_a0dda991Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -2531,4 +2585,4 @@ class _Main_eb938b5bOrchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [CopyGridInfo(_input_params=self.input_values), CopyRedistInfo(_input_params=self.input_values), CreateResultInfo(_input_params=self.input_values), RestructureConditionIntensityResults(_input_params=self.input_values), RestructureConditionResults(_input_params=self.input_values), RestructureCspResults(_input_params=self.input_values), RestructureHspResults(_input_params=self.input_values), RestructureTcpResults(_input_params=self.input_values), RestructureTemperatureResults(_input_params=self.input_values)]
+        yield [CopyGridInfo(_input_params=self.input_values), CopyRedistInfo(_input_params=self.input_values), CopyResultInfo(_input_params=self.input_values), RestructureConditionIntensityResults(_input_params=self.input_values), RestructureConditionResults(_input_params=self.input_values), RestructureCspResults(_input_params=self.input_values), RestructureHspResults(_input_params=self.input_values), RestructureTcpResults(_input_params=self.input_values), RestructureTemperatureResults(_input_params=self.input_values)]
