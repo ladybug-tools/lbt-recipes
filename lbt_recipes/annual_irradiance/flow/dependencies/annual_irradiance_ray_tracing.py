@@ -16,6 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
+from queenbee_local import load_input_param as qb_load_input_param
 
 
 _default_inputs = {   'bsdfs': None,
@@ -431,7 +432,7 @@ class TotalSky(QueenbeeTask):
             }]
 
 
-class _AnnualIrradianceRayTracing_2c2db9eeOrchestrator(luigi.WrapperTask):
+class _AnnualIrradianceRayTracing_41c3cd0bOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

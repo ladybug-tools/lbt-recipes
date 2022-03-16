@@ -16,7 +16,8 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.annual_irradiance_ray_tracing import _AnnualIrradianceRayTracing_2c2db9eeOrchestrator as AnnualIrradianceRayTracing_2c2db9eeWorkerbee
+from queenbee_local import load_input_param as qb_load_input_param
+from .dependencies.annual_irradiance_ray_tracing import _AnnualIrradianceRayTracing_41c3cd0bOrchestrator as AnnualIrradianceRayTracing_41c3cd0bWorkerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -155,7 +156,7 @@ class AnnualIrradianceRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualIrradianceRayTracing_2c2db9eeWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualIrradianceRayTracing_41c3cd0bWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_irradiance_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -183,10 +184,10 @@ class AnnualIrradianceRaytracing(luigi.Task):
     def items(self):
         try:
             # assume the input is a file
-            return QueenbeeTask.load_input_param(self.sensor_grids)
+            return qb_load_input_param(self.sensor_grids)
         except:
             # it is a parameter
-            return pathlib.Path(self.input()['SplitGridFolder']['sensor_grids'].path).as_posix()
+            return self.input()['SplitGridFolder']['sensor_grids'].path
 
     def run(self):
         yield [AnnualIrradianceRaytracingLoop(item=item, _input_params=self._input_params) for item in self.items]
@@ -1183,7 +1184,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_2c2db9eeOrchestrator(luigi.WrapperTask):
+class _Main_41c3cd0bOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
