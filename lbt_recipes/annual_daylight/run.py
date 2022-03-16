@@ -39,7 +39,7 @@ class LetAnnualDaylightFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [annual_daylight_workerbee._Main_ca03d759Orchestrator(_input_params=self._input_params)]
+        yield [annual_daylight_workerbee._Main_4ea8b907Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -79,12 +79,16 @@ def start(project_folder, user_values, workers):
     with cfg_file.open('w') as lf:
         lf.write(LOGS_CONFIG.replace('WORKFLOW.LOG', log_file))
 
-    luigi.build(
+    summary = luigi.build(
         [LetAnnualDaylightFly(_input_params=input_params)],
         local_scheduler=local_scheduler(),
         workers=workers,
+        detailed_summary=True,
         logging_conf_file=cfg_file.as_posix()
     )
+
+    print(summary.summary_text)
+    print(f'More info:\n{log_file}')
 
 
 if __name__ == '__main__':

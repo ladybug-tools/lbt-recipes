@@ -53,9 +53,7 @@ class DirectSky(QueenbeeTask):
     def sensor_count(self):
         return self._input_params['sensor_count']
 
-    @property
-    def conversion(self):
-        return '47.4 119.9 11.6'
+    conversion = luigi.Parameter(default='')
 
     header = luigi.Parameter(default='keep')
 
@@ -149,34 +147,26 @@ class DirectSunlight(QueenbeeTask):
 
     # Task inputs
     @property
-    def name(self):
-        return self._input_params['grid_name']
-
-    @property
     def radiance_parameters(self):
         return self._input_params['radiance_parameters']
 
     @property
     def fixed_radiance_parameters(self):
-        return '-aa 0.0 -I -ab 0 -dc 1.0 -dt 0.0 -dj 0.0 -dr 0'
+        return '-aa 0.0 -I -faf -ab 0 -dc 1.0 -dt 0.0 -dj 0.0 -dr 0'
 
     @property
     def sensor_count(self):
         return self._input_params['sensor_count']
 
-    @property
-    def conversion(self):
-        return '47.4 119.9 11.6'
-
-    @property
-    def output_format(self):
-        return 'a'
-
     calculate_values = luigi.Parameter(default='value')
+
+    conversion = luigi.Parameter(default='')
 
     header = luigi.Parameter(default='keep')
 
     order_by = luigi.Parameter(default='sensor')
+
+    output_format = luigi.Parameter(default='a')
 
     @property
     def modifiers(self):
@@ -225,7 +215,7 @@ class DirectSunlight(QueenbeeTask):
     def output(self):
         return {
             'result_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '../final/direct/{name}.ill'.format(name=self.name)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'direct_sunlight.ill').resolve().as_posix()
             )
         }
 
@@ -242,7 +232,7 @@ class DirectSunlight(QueenbeeTask):
         return [
             {
                 'name': 'result-file', 'from': 'results.ill',
-                'to': pathlib.Path(self.execution_folder, '../final/direct/{name}.ill'.format(name=self.name)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'direct_sunlight.ill').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -259,7 +249,9 @@ class OutputMatrixMath(QueenbeeTask):
     def name(self):
         return self._input_params['grid_name']
 
-    conversion = luigi.Parameter(default=' ')
+    @property
+    def conversion(self):
+        return '47.4 119.9 11.6'
 
     header = luigi.Parameter(default='remove')
 
@@ -304,7 +296,7 @@ class OutputMatrixMath(QueenbeeTask):
     def output(self):
         return {
             'results_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '../final/total/{name}.ill'.format(name=self.name)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, '../final/{name}.ill'.format(name=self.name)).resolve().as_posix()
             )
         }
 
@@ -320,7 +312,7 @@ class OutputMatrixMath(QueenbeeTask):
         return [
             {
                 'name': 'results-file', 'from': 'final.ill',
-                'to': pathlib.Path(self.execution_folder, '../final/total/{name}.ill'.format(name=self.name)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, '../final/{name}.ill'.format(name=self.name)).resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -345,9 +337,7 @@ class TotalSky(QueenbeeTask):
     def sensor_count(self):
         return self._input_params['sensor_count']
 
-    @property
-    def conversion(self):
-        return '47.4 119.9 11.6'
+    conversion = luigi.Parameter(default='')
 
     header = luigi.Parameter(default='keep')
 
@@ -432,7 +422,7 @@ class TotalSky(QueenbeeTask):
             }]
 
 
-class _AnnualDaylightRayTracing_ca03d759Orchestrator(luigi.WrapperTask):
+class _AnnualDaylightRayTracing_4ea8b907Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

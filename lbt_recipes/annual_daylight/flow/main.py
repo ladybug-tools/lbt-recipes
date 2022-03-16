@@ -17,7 +17,7 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_ca03d759Orchestrator as AnnualDaylightRayTracing_ca03d759Workerbee
+from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_4ea8b907Orchestrator as AnnualDaylightRayTracing_4ea8b907Workerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -156,7 +156,7 @@ class AnnualDaylightRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightRayTracing_ca03d759Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightRayTracing_4ea8b907Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_daylight_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -187,7 +187,7 @@ class AnnualDaylightRaytracing(luigi.Task):
             return qb_load_input_param(self.sensor_grids)
         except:
             # it is a parameter
-            return pathlib.Path(self.input()['SplitGridFolder']['sensor_grids'].path).as_posix()
+            return self.input()['SplitGridFolder']['sensor_grids'].path
 
     def run(self):
         yield [AnnualDaylightRaytracingLoop(item=item, _input_params=self._input_params) for item in self.items]
@@ -229,7 +229,7 @@ class CalculateAnnualMetrics(QueenbeeTask):
 
     @property
     def folder(self):
-        value = pathlib.Path('results/total')
+        value = pathlib.Path('results')
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -281,168 +281,6 @@ class CalculateAnnualMetrics(QueenbeeTask):
             {
                 'name': 'annual-metrics', 'from': 'metrics',
                 'to': pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix(),
-                'optional': False,
-                'type': 'folder'
-            }]
-
-
-class CopyGridInfo(QueenbeeTask):
-    """Copy a file or folder to a destination."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def src(self):
-        value = pathlib.Path(self.input()['CreateRadFolder']['sensor_grids_file'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'echo copying input path...'
-
-    def requires(self):
-        return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'dst': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'results/direct/grids_info.json').resolve().as_posix()
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'src', 'to': 'input_path', 'from': self.src, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'dst', 'from': 'input_path',
-                'to': pathlib.Path(self.execution_folder, 'results/direct/grids_info.json').resolve().as_posix(),
-                'optional': False,
-                'type': 'folder'
-            }]
-
-
-class CopyRedistInfo(QueenbeeTask):
-    """Copy a file or folder to a destination."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def src(self):
-        value = pathlib.Path(self.input()['SplitGridFolder']['dist_info'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'echo copying input path...'
-
-    def requires(self):
-        return {'SplitGridFolder': SplitGridFolder(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'dst': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'initial_results/final/direct/_redist_info.json').resolve().as_posix()
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'src', 'to': 'input_path', 'from': self.src, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'dst', 'from': 'input_path',
-                'to': pathlib.Path(self.execution_folder, 'initial_results/final/direct/_redist_info.json').resolve().as_posix(),
-                'optional': False,
-                'type': 'folder'
-            }]
-
-
-class CopySunUpHours(QueenbeeTask):
-    """Copy a file or folder to a destination."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def src(self):
-        value = pathlib.Path(self.input()['ParseSunUpHours']['sun_up_hours'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'echo copying input path...'
-
-    def requires(self):
-        return {'ParseSunUpHours': ParseSunUpHours(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'dst': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'results/direct/sun-up-hours.txt').resolve().as_posix()
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'src', 'to': 'input_path', 'from': self.src, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'dst', 'from': 'input_path',
-                'to': pathlib.Path(self.execution_folder, 'results/direct/sun-up-hours.txt').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]
@@ -686,7 +524,7 @@ class CreateRadFolder(QueenbeeTask):
             ),
             
             'sensor_grids_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'results/total/grids_info.json').resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix()
             ),
             'sensor_grids': luigi.LocalTarget(
                 pathlib.Path(
@@ -719,7 +557,7 @@ class CreateRadFolder(QueenbeeTask):
                 
             {
                 'name': 'sensor-grids-file', 'from': 'model/grid/_info.json',
-                'to': pathlib.Path(self.execution_folder, 'results/total/grids_info.json').resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -942,7 +780,7 @@ class ParseSunUpHours(QueenbeeTask):
     def output(self):
         return {
             'sun_up_hours': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'results/total/sun-up-hours.txt').resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'results/sun-up-hours.txt').resolve().as_posix()
             )
         }
 
@@ -956,67 +794,9 @@ class ParseSunUpHours(QueenbeeTask):
         return [
             {
                 'name': 'sun-up-hours', 'from': 'sun-up-hours.txt',
-                'to': pathlib.Path(self.execution_folder, 'results/total/sun-up-hours.txt').resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'results/sun-up-hours.txt').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
-            }]
-
-
-class RestructureDirectResults(QueenbeeTask):
-    """Restructure files in a distributed folder."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def extension(self):
-        return 'ill'
-
-    @property
-    def input_folder(self):
-        value = pathlib.Path('initial_results/final/direct')
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
-
-    def requires(self):
-        return {'AnnualDaylightRaytracing': AnnualDaylightRaytracing(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'output_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'results/direct').resolve().as_posix()
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'input_folder', 'to': 'input_folder', 'from': self.input_folder, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'output-folder', 'from': 'output_folder',
-                'to': pathlib.Path(self.execution_folder, 'results/direct').resolve().as_posix(),
-                'optional': False,
-                'type': 'folder'
             }]
 
 
@@ -1033,7 +813,7 @@ class RestructureResults(QueenbeeTask):
 
     @property
     def input_folder(self):
-        value = pathlib.Path('initial_results/final/total')
+        value = pathlib.Path('initial_results/final')
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -1058,7 +838,7 @@ class RestructureResults(QueenbeeTask):
     def output(self):
         return {
             'output_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'results/total').resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'results').resolve().as_posix()
             )
         }
 
@@ -1072,7 +852,7 @@ class RestructureResults(QueenbeeTask):
         return [
             {
                 'name': 'output-folder', 'from': 'output_folder',
-                'to': pathlib.Path(self.execution_folder, 'results/total').resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'results').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]
@@ -1134,7 +914,7 @@ class SplitGridFolder(QueenbeeTask):
             ),
             
             'dist_info': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'initial_results/final/total/_redist_info.json').resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'initial_results/final/_redist_info.json').resolve().as_posix()
             ),
             'sensor_grids': luigi.LocalTarget(
                 pathlib.Path(
@@ -1160,7 +940,7 @@ class SplitGridFolder(QueenbeeTask):
                 
             {
                 'name': 'dist-info', 'from': 'output_folder/_redist_info.json',
-                'to': pathlib.Path(self.execution_folder, 'initial_results/final/total/_redist_info.json').resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'initial_results/final/_redist_info.json').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -1170,7 +950,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_ca03d759Orchestrator(luigi.WrapperTask):
+class _Main_4ea8b907Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -1182,4 +962,4 @@ class _Main_ca03d759Orchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [CalculateAnnualMetrics(_input_params=self.input_values), CopyGridInfo(_input_params=self.input_values), CopyRedistInfo(_input_params=self.input_values), CopySunUpHours(_input_params=self.input_values), RestructureDirectResults(_input_params=self.input_values)]
+        yield [CalculateAnnualMetrics(_input_params=self.input_values)]

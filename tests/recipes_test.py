@@ -31,8 +31,7 @@ def run_daylight_recipe(recipe_name, extension):
          '--name', name, ] + env_args
     )
     assert result.exit_code == 0
-    results_folder = os.path.join(sim_folder, 'results', 'total') \
-        if extension == 'ill' else os.path.join(sim_folder, 'results')
+    results_folder = os.path.join(sim_folder, 'results')
     assert os.path.isfile(os.path.join(results_folder, f'TestRoom_1.{extension}'))
     assert os.path.isfile(os.path.join(results_folder, f'TestRoom_2.{extension}'))
     nukedir(sim_folder, True)

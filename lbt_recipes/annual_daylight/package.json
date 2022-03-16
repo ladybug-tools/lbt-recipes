@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "annual-daylight",
-    "tag": "0.8.13",
+    "tag": "0.8.14",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -127,7 +127,7 @@
       "type": "DAGFileInput",
       "annotations": {},
       "name": "model",
-      "description": "A Honeybee model in HBJSON file format.",
+      "description": "A Honeybee Model JSON file (HBJSON) or a Model pkl (HBpkl) file. This can also be a zipped version of a Radiance folder, in which case this recipe will simply unzip the file and simulate it as-is.",
       "default": null,
       "alias": [
         {
@@ -187,7 +187,10 @@
       "spec": null,
       "extensions": [
         "json",
-        "hbjson"
+        "hbjson",
+        "pkl",
+        "hbpkl",
+        "zip"
       ]
     },
     {
@@ -491,7 +494,7 @@
       "from": {
         "type": "FolderReference",
         "annotations": {},
-        "path": "results/total"
+        "path": "results"
       },
       "alias": [
         {
@@ -499,39 +502,6 @@
           "annotations": {},
           "name": "results",
           "description": "Raw result files (.ill) that contain illuminance matrices.",
-          "platform": [
-            "grasshopper"
-          ],
-          "handler": [
-            {
-              "type": "IOAliasHandler",
-              "annotations": {},
-              "language": "python",
-              "module": "pollination_handlers.outputs.daylight",
-              "function": "sort_ill_from_folder",
-              "index": 0
-            }
-          ]
-        }
-      ],
-      "required": true
-    },
-    {
-      "type": "DAGFolderOutput",
-      "annotations": {},
-      "name": "results-direct",
-      "description": "Folder with raw result files (.ill) that contain matrices for just the direct illuminance.",
-      "from": {
-        "type": "FolderReference",
-        "annotations": {},
-        "path": "results/direct"
-      },
-      "alias": [
-        {
-          "type": "DAGGenericOutputAlias",
-          "annotations": {},
-          "name": "results_direct",
-          "description": "Raw result files (.ill) that contain matrices for just the direct illuminance.",
           "platform": [
             "grasshopper"
           ],
