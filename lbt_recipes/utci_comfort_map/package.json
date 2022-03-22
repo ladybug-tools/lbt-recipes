@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "utci-comfort-map",
-    "tag": "0.6.3",
+    "tag": "0.6.4",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -43,6 +43,16 @@
   },
   "source": null,
   "inputs": [
+    {
+      "type": "DAGFolderInput",
+      "annotations": {},
+      "name": "air-speed-matrices",
+      "description": "An optional folder with csv files that align with the model sensor grids. Each csv file should have the same name as the sensor grid identifier. Each csv file should contain a matrix of air speed values in m/s with one row per sensor and one column per timestep of the run period. Note that these values are not meteorological and should be AT HUMAN SUBJECT LEVEL. If specified, this overrides the wind speed input.",
+      "default": null,
+      "alias": [],
+      "required": false,
+      "spec": null
+    },
     {
       "type": "DAGStringInput",
       "annotations": {},

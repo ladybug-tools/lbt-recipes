@@ -17,11 +17,12 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_0a97de84Orchestrator as ComfortMappingEntryPoint_0a97de84Workerbee
-from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_0a97de84Orchestrator as RadianceMappingEntryPoint_0a97de84Workerbee
+from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_84dd66d2Orchestrator as ComfortMappingEntryPoint_84dd66d2Workerbee
+from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_84dd66d2Orchestrator as RadianceMappingEntryPoint_84dd66d2Workerbee
 
 
-_default_inputs = {   'comfort_parameters': '--cold 9 --heat 26',
+_default_inputs = {   'air_speed_matrices': None,
+    'comfort_parameters': '--cold 9 --heat 26',
     'cpu_count': 50,
     'ddy': None,
     'epw': None,
@@ -1612,6 +1613,17 @@ class RunComfortMapLoop(luigi.Task):
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
+    @property
+    def air_speed_mtx(self):
+        try:
+            pathlib.Path(self.input()['SplitAirSpeedFolder']['output_folder'].path, '{item_full_id}.csv'.format(item_full_id=self.item['full_id']))
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self.input()['SplitAirSpeedFolder']['output_folder'].path, '{item_full_id}.csv'.format(item_full_id=self.item['full_id']))
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
     # get item for loop
     try:
         item = luigi.DictParameter()
@@ -1649,6 +1661,7 @@ class RunComfortMapLoop(luigi.Task):
             'schedule': self.schedule,
             'run_period': self.run_period,
             'wind_speed': self.wind_speed,
+            'air_speed_mtx': self.air_speed_mtx,
             'solarcal_par': self.solarcal_par,
             'comfort_par': self.comfort_par
         }
@@ -1661,13 +1674,13 @@ class RunComfortMapLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [ComfortMappingEntryPoint_0a97de84Workerbee(_input_params=self.map_dag_inputs)]
+        yield [ComfortMappingEntryPoint_84dd66d2Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_comfort_map.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
 
     def requires(self):
-        return {'ParseSunUpHours': ParseSunUpHours(_input_params=self._input_params), 'CreateViewFactorModifiers': CreateViewFactorModifiers(_input_params=self._input_params), 'CreateModelOccSchedules': CreateModelOccSchedules(_input_params=self._input_params), 'RunEnergySimulation': RunEnergySimulation(_input_params=self._input_params), 'RunRadianceSimulation': RunRadianceSimulation(_input_params=self._input_params), 'SplitGridFolder': SplitGridFolder(_input_params=self._input_params)}
+        return {'ParseSunUpHours': ParseSunUpHours(_input_params=self._input_params), 'CreateViewFactorModifiers': CreateViewFactorModifiers(_input_params=self._input_params), 'CreateModelOccSchedules': CreateModelOccSchedules(_input_params=self._input_params), 'RunEnergySimulation': RunEnergySimulation(_input_params=self._input_params), 'RunRadianceSimulation': RunRadianceSimulation(_input_params=self._input_params), 'SplitGridFolder': SplitGridFolder(_input_params=self._input_params), 'SplitAirSpeedFolder': SplitAirSpeedFolder(_input_params=self._input_params)}
 
     def output(self):
         return {
@@ -1713,7 +1726,7 @@ class RunComfortMap(luigi.Task):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def requires(self):
-        return {'ParseSunUpHours': ParseSunUpHours(_input_params=self._input_params), 'CreateViewFactorModifiers': CreateViewFactorModifiers(_input_params=self._input_params), 'CreateModelOccSchedules': CreateModelOccSchedules(_input_params=self._input_params), 'RunEnergySimulation': RunEnergySimulation(_input_params=self._input_params), 'RunRadianceSimulation': RunRadianceSimulation(_input_params=self._input_params), 'SplitGridFolder': SplitGridFolder(_input_params=self._input_params)}
+        return {'ParseSunUpHours': ParseSunUpHours(_input_params=self._input_params), 'CreateViewFactorModifiers': CreateViewFactorModifiers(_input_params=self._input_params), 'CreateModelOccSchedules': CreateModelOccSchedules(_input_params=self._input_params), 'RunEnergySimulation': RunEnergySimulation(_input_params=self._input_params), 'RunRadianceSimulation': RunRadianceSimulation(_input_params=self._input_params), 'SplitGridFolder': SplitGridFolder(_input_params=self._input_params), 'SplitAirSpeedFolder': SplitAirSpeedFolder(_input_params=self._input_params)}
 
     def output(self):
         return {
@@ -1936,7 +1949,7 @@ class RunRadianceSimulationLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [RadianceMappingEntryPoint_0a97de84Workerbee(_input_params=self.map_dag_inputs)]
+        yield [RadianceMappingEntryPoint_84dd66d2Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_simulation.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -2059,6 +2072,93 @@ class SetModifiersFromConstructions(QueenbeeTask):
             }]
 
 
+class SplitAirSpeedFolder(QueenbeeTask):
+    """Split an optional folder of data using the same logic as SplitGridFolder."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+
+    # Task inputs
+    @property
+    def cpu_count(self):
+        return self._input_params['cpu_count']
+
+    @property
+    def cpus_per_grid(self):
+        return '3'
+
+    @property
+    def min_sensor_count(self):
+        return self._input_params['min_sensor_count']
+
+    @property
+    def extension(self):
+        return '.csv'
+
+    @property
+    def input_folder(self):
+        try:
+            pathlib.Path(self._input_params['air_speed_matrices'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['air_speed_matrices'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def grid_info_file(self):
+        try:
+            pathlib.Path(self.input()['CreateRadFolder']['sensor_grids_file'].path)
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self.input()['CreateRadFolder']['sensor_grids_file'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def execution_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def initiation_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def params_folder(self):
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    def command(self):
+        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} {extension} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count} --grid-info-file grid_info.json'.format(cpu_count=self.cpu_count, extension=self.extension, cpus_per_grid=self.cpus_per_grid, min_sensor_count=self.min_sensor_count)
+
+    def requires(self):
+        return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            'output_folder': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'initial_results/conditions/air_speeds').resolve().as_posix()
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'input_folder', 'to': 'input_folder', 'from': self.input_folder, 'optional': True},
+            {'name': 'grid_info_file', 'to': 'grid_info.json', 'from': self.grid_info_file, 'optional': True}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'output-folder', 'from': 'output_folder',
+                'to': pathlib.Path(self.execution_folder, 'initial_results/conditions/air_speeds').resolve().as_posix(),
+                'optional': True,
+                'type': 'folder'
+            }]
+
+
 class SplitGridFolder(QueenbeeTask):
     """Create new sensor grids folder with evenly distributed sensors.
 
@@ -2162,7 +2262,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_0a97de84Orchestrator(luigi.WrapperTask):
+class _Main_84dd66d2Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
