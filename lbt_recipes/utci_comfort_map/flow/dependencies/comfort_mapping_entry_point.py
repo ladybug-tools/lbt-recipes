@@ -19,7 +19,8 @@ from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 
 
-_default_inputs = {   'comfort_parameters': '--cold 9 --heat 26',
+_default_inputs = {   'air_speed_mtx': None,
+    'comfort_parameters': '--cold 9 --heat 26',
     'direct_irradiance': None,
     'enclosure_info': None,
     'epw': None,
@@ -608,6 +609,17 @@ class ProcessUtciMatrix(QueenbeeTask):
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
+    def air_speed_mtx(self):
+        try:
+            pathlib.Path(self._input_params['air_speed_mtx'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['air_speed_mtx'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
     def execution_folder(self):
         return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
@@ -620,7 +632,7 @@ class ProcessUtciMatrix(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort mtx utci air_temperature.csv rel_humidity.csv --rad-temperature-mtx rad_temperature.csv --rad-delta-mtx rad_delta.csv --wind-speed-json wind_speed.json --comfort-par "{comfort_par}" --folder output'.format(comfort_par=self.comfort_par)
+        return 'ladybug-comfort mtx utci air_temperature.csv rel_humidity.csv --rad-temperature-mtx rad_temperature.csv --rad-delta-mtx rad_delta.csv --wind-speed-json wind_speed.json --air-speed-mtx air_speed.csv --comfort-par "{comfort_par}" --folder output'.format(comfort_par=self.comfort_par)
 
     def requires(self):
         return {'CreateLongwaveMrtMap': CreateLongwaveMrtMap(_input_params=self._input_params), 'CreateShortwaveMrtMap': CreateShortwaveMrtMap(_input_params=self._input_params), 'CreateAirTemperatureMap': CreateAirTemperatureMap(_input_params=self._input_params), 'CreateRelHumidityMap': CreateRelHumidityMap(_input_params=self._input_params), 'CreateAirSpeedJson': CreateAirSpeedJson(_input_params=self._input_params)}
@@ -647,7 +659,8 @@ class ProcessUtciMatrix(QueenbeeTask):
             {'name': 'rel_humidity_mtx', 'to': 'rel_humidity.csv', 'from': self.rel_humidity_mtx, 'optional': False},
             {'name': 'rad_temperature_mtx', 'to': 'rad_temperature.csv', 'from': self.rad_temperature_mtx, 'optional': False},
             {'name': 'rad_delta_mtx', 'to': 'rad_delta.csv', 'from': self.rad_delta_mtx, 'optional': False},
-            {'name': 'wind_speed_json', 'to': 'wind_speed.json', 'from': self.wind_speed_json, 'optional': False}]
+            {'name': 'wind_speed_json', 'to': 'wind_speed.json', 'from': self.wind_speed_json, 'optional': False},
+            {'name': 'air_speed_mtx', 'to': 'air_speed.csv', 'from': self.air_speed_mtx, 'optional': True}]
 
     @property
     def output_artifacts(self):
@@ -674,7 +687,7 @@ class ProcessUtciMatrix(QueenbeeTask):
             }]
 
 
-class _ComfortMappingEntryPoint_0a97de84Orchestrator(luigi.WrapperTask):
+class _ComfortMappingEntryPoint_84dd66d2Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
