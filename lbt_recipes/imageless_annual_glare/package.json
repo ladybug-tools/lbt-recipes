@@ -1,0 +1,390 @@
+{
+  "type": "RecipeInterface",
+  "annotations": {},
+  "api_version": "v1beta1",
+  "metadata": {
+    "type": "MetaData",
+    "annotations": {},
+    "name": "imageless-annual-glare",
+    "tag": "0.0.5",
+    "app_version": null,
+    "keywords": [
+      "honeybee",
+      "radiance",
+      "ladybug-tools",
+      "daylight",
+      "imageless-annual-glare"
+    ],
+    "maintainers": [
+      {
+        "type": "Maintainer",
+        "annotations": {},
+        "name": "mostapha",
+        "email": "mostapha@ladybug.tools"
+      },
+      {
+        "type": "Maintainer",
+        "annotations": {},
+        "name": "ladybug-tools",
+        "email": "info@ladybug.tools"
+      }
+    ],
+    "home": "https://github.com/pollination/imageless-annual-glare",
+    "sources": [
+      "https://hub.docker.com/r/ladybugtools/honeybee-radiance"
+    ],
+    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/annualrecipe.png",
+    "deprecated": null,
+    "description": "Imageless annual glare recipe for Pollination.",
+    "license": {
+      "type": "License",
+      "annotations": {},
+      "name": "PolyForm Shield License 1.0.0",
+      "url": "https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt"
+    }
+  },
+  "source": null,
+  "inputs": [
+    {
+      "type": "DAGIntegerInput",
+      "annotations": {},
+      "name": "cpu-count",
+      "description": "The maximum number of CPUs for parallel execution. This will be used to determine the number of sensors run by each worker.",
+      "default": 50,
+      "alias": [
+        {
+          "type": "DAGIntegerInputAlias",
+          "annotations": {},
+          "name": "cpu_count",
+          "description": "The maximum number of CPUs for parallel execution. For local simulation, this value is ignored and the cpu_count is automatically set to be equal to the number of workers tasked to the run. For cloud-based runs, this input can be used to control the resources used for the simulation and, if unspecified, the default value of 50 will be used.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": 50,
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    {
+      "type": "DAGNumberInput",
+      "annotations": {},
+      "name": "glare-threshold",
+      "description": "A fractional number for the threshold of DGP above which conditions are considered to induce glare. This value is used when calculating glare autonomy (the fraction of hours in which the view is free of glare). Common values are 0.35 (Perceptible Glare), 0.4 (Disturbing Glare), and 0.45 (Intolerable Glare).",
+      "default": 0.4,
+      "alias": [],
+      "required": false,
+      "spec": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      }
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "grid-filter",
+      "description": "Text for a grid identifier or a pattern to filter the sensor grids of the model that are simulated. For instance, first_floor_* will simulate only the sensor grids that have an identifier that starts with first_floor_. By default, all grids in the model will be simulated.",
+      "default": "*",
+      "alias": [
+        {
+          "type": "DAGStringInputAlias",
+          "annotations": {},
+          "name": "grid_filter",
+          "description": "Text for a grid identifier or a pattern to filter the sensor grids of the model that are simulated. For instance, first_floor_* will simulate only the sensor grids that have an identifier that starts with first_floor_. By default, all grids in the model will be simulated.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": "*",
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": null
+    },
+    {
+      "type": "DAGIntegerInput",
+      "annotations": {},
+      "name": "min-sensor-count",
+      "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids. The default value is set to 1, which means that the cpu_count is always respected.",
+      "default": 1,
+      "alias": [
+        {
+          "type": "DAGIntegerInputAlias",
+          "annotations": {},
+          "name": "min_sen_count",
+          "description": "Positive integer for the minimum number of sensors in each grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids that increase overhead. (Default: 200).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": 200,
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "model",
+      "description": "A Honeybee model in HBJSON file format.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.model",
+              "function": "model_to_json_grid_check",
+              "index": 0
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "HBModelToJSON",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        },
+        {
+          "type": "DAGLinkedInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "This input links the model to Rhino model.",
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "RhinoHBModelToJSON",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": true,
+      "spec": null,
+      "extensions": [
+        "json",
+        "hbjson"
+      ]
+    },
+    {
+      "type": "DAGNumberInput",
+      "annotations": {},
+      "name": "north",
+      "description": "A number for rotation from north.",
+      "default": 0.0,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "north",
+          "description": "A number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees. This can also be Vector for the direction to North. (Default: 0).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.north",
+              "function": "north_vector_to_angle",
+              "index": 0
+            }
+          ],
+          "default": "0",
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 360
+      }
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "radiance-parameters",
+      "description": "The radiance parameters for ray tracing.",
+      "default": "-ab 2 -ad 5000 -lw 2e-05",
+      "alias": [
+        {
+          "type": "DAGStringInputAlias",
+          "annotations": {},
+          "name": "radiance_par",
+          "description": "Text for the radiance parameters to be used for ray tracing. (Default: -ab 2 -ad 5000 -lw 2e-05).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [],
+          "default": "-ab 2 -ad 5000 -lw 2e-05",
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": null
+    },
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "schedule",
+      "description": "Path to an annual schedule file. Values should be 0-1 separated by new line. If not provided an 8-5 annual schedule will be created.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "schedule",
+          "description": "An annual occupancy schedule, either as a path to a csv file (with 8760 rows), a Ladybug Hourly Continuous Data Collection or a HB-Energy schedule object. This can also be the identifier of a schedule in your HB-Energy schedule library. Any value in this schedule that is 0.1 or above will be considered occupied.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.schedule",
+              "function": "schedule_to_csv",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": null,
+      "extensions": [
+        "txt",
+        "csv"
+      ]
+    },
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "wea",
+      "description": "Wea file.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "wea",
+          "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.wea",
+              "function": "wea_handler_timestep_check",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": true,
+      "spec": null,
+      "extensions": [
+        "wea"
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "ga",
+      "description": "Glare autonomy results.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "metrics/ga"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "GA",
+          "description": "Glare Autonomy (GA) results in percent. GA is the percentage of occupied hours that each view is free of glare (with a DGP below the glare threshold). These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize results.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_ga_from_folder",
+              "index": 0
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFolderOutput",
+      "annotations": {},
+      "name": "results",
+      "description": "Folder with raw result files (.dgp) that contain matrices for the daylight glare probability.",
+      "from": {
+        "type": "FolderReference",
+        "annotations": {},
+        "path": "results"
+      },
+      "alias": [],
+      "required": true
+    }
+  ]
+}
