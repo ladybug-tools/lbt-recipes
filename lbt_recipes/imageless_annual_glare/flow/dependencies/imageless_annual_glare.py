@@ -20,116 +20,15 @@ from queenbee_local import load_input_param as qb_load_input_param
 
 
 _default_inputs = {   'bsdfs': None,
-    'glare_limit': 0.4,
     'grid_name': None,
     'octree_file': None,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
-    'schedule': None,
     'sensor_count': None,
     'sensor_grid': None,
     'simulation_folder': '.',
     'sky_dome': None,
     'sky_matrix': None}
-
-
-class DaylightGlareAutonomy(QueenbeeTask):
-    """Calculates daylight glare autonomy. The daylight glare autonomy is the fraction 
-    of (occupied) hours without any detected glare. The detection of glare is controlled 
-    by glare_limit."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def name(self):
-        return self._input_params['grid_name']
-
-    @property
-    def glare_limit(self):
-        return self._input_params['glare_limit']
-
-    threshold_factor = luigi.Parameter(default='2000.0')
-
-    @property
-    def dc_direct(self):
-        value = pathlib.Path(self.input()['DirectSky']['result_file'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def dc_total(self):
-        value = pathlib.Path(self.input()['TotalSky']['result_file'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def sky_vector(self):
-        value = pathlib.Path(self._input_params['sky_matrix'])
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def view_rays(self):
-        value = pathlib.Path(self._input_params['sensor_grid'])
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def schedule(self):
-        try:
-            pathlib.Path(self._input_params['schedule'])
-        except TypeError:
-            # optional artifact
-            return None
-        value = pathlib.Path(self._input_params['schedule'])
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'honeybee-radiance dcglare two-phase dc_direct.mtx dc_total.mtx sky.smx view_rays.ray --glare-limit {glare_limit} --threshold-factor {threshold_factor} --occupancy-schedule schedule.txt --output view_rays.ga'.format(glare_limit=self.glare_limit, threshold_factor=self.threshold_factor)
-
-    def requires(self):
-        return {'TotalSky': TotalSky(_input_params=self._input_params), 'DirectSky': DirectSky(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'view_rays_glare_autonomy': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '../ga/{name}.ga'.format(name=self.name)).resolve().as_posix()
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'dc_direct', 'to': 'dc_direct.mtx', 'from': self.dc_direct, 'optional': False},
-            {'name': 'dc_total', 'to': 'dc_total.mtx', 'from': self.dc_total, 'optional': False},
-            {'name': 'sky_vector', 'to': 'sky.smx', 'from': self.sky_vector, 'optional': False},
-            {'name': 'view_rays', 'to': 'view_rays.ray', 'from': self.view_rays, 'optional': False},
-            {'name': 'schedule', 'to': 'schedule.txt', 'from': self.schedule, 'optional': True}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'view-rays-glare-autonomy', 'from': 'view_rays.ga',
-                'to': pathlib.Path(self.execution_folder, '../ga/{name}.ga'.format(name=self.name)).resolve().as_posix(),
-                'optional': False,
-                'type': 'file'
-            }]
 
 
 class DaylightGlareProbability(QueenbeeTask):
@@ -173,17 +72,6 @@ class DaylightGlareProbability(QueenbeeTask):
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
-    def schedule(self):
-        try:
-            pathlib.Path(self._input_params['schedule'])
-        except TypeError:
-            # optional artifact
-            return None
-        value = pathlib.Path(self._input_params['schedule'])
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
     def execution_folder(self):
         return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
@@ -214,8 +102,7 @@ class DaylightGlareProbability(QueenbeeTask):
             {'name': 'dc_direct', 'to': 'dc_direct.mtx', 'from': self.dc_direct, 'optional': False},
             {'name': 'dc_total', 'to': 'dc_total.mtx', 'from': self.dc_total, 'optional': False},
             {'name': 'sky_vector', 'to': 'sky.smx', 'from': self.sky_vector, 'optional': False},
-            {'name': 'view_rays', 'to': 'view_rays.ray', 'from': self.view_rays, 'optional': False},
-            {'name': 'schedule', 'to': 'schedule.txt', 'from': self.schedule, 'optional': True}]
+            {'name': 'view_rays', 'to': 'view_rays.ray', 'from': self.view_rays, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -422,7 +309,7 @@ class TotalSky(QueenbeeTask):
             }]
 
 
-class _ImagelessAnnualGlare_6c61a333Orchestrator(luigi.WrapperTask):
+class _ImagelessAnnualGlare_bafe869fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -434,4 +321,4 @@ class _ImagelessAnnualGlare_6c61a333Orchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [DaylightGlareAutonomy(_input_params=self.input_values), DaylightGlareProbability(_input_params=self.input_values)]
+        yield [DaylightGlareProbability(_input_params=self.input_values)]
