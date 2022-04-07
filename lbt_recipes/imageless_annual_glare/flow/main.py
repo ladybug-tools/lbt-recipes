@@ -17,7 +17,7 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.imageless_annual_glare import _ImagelessAnnualGlare_6c61a333Orchestrator as ImagelessAnnualGlare_6c61a333Workerbee
+from .dependencies.imageless_annual_glare import _ImagelessAnnualGlare_bafe869fOrchestrator as ImagelessAnnualGlare_bafe869fWorkerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -51,10 +51,6 @@ class AnnualImagelessGlareLoop(luigi.Task):
     @property
     def sensor_count(self):
         return self.item['count']
-
-    @property
-    def glare_limit(self):
-        return self._input_params['glare_threshold']
 
     @property
     def octree_file(self):
@@ -91,17 +87,6 @@ class AnnualImagelessGlareLoop(luigi.Task):
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
-    @property
-    def schedule(self):
-        try:
-            pathlib.Path(self._input_params['schedule'])
-        except TypeError:
-            # optional artifact
-            return None
-        value = pathlib.Path(self._input_params['schedule'])
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
     # get item for loop
     try:
         item = luigi.DictParameter()
@@ -132,9 +117,7 @@ class AnnualImagelessGlareLoop(luigi.Task):
             'sensor_count': self.sensor_count,
             'sky_matrix': self.sky_matrix,
             'sky_dome': self.sky_dome,
-            'bsdfs': self.bsdfs,
-            'schedule': self.schedule,
-            'glare_limit': self.glare_limit
+            'bsdfs': self.bsdfs
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -145,7 +128,7 @@ class AnnualImagelessGlareLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [ImagelessAnnualGlare_6c61a333Workerbee(_input_params=self.map_dag_inputs)]
+        yield [ImagelessAnnualGlare_bafe869fWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_imageless_glare.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -569,6 +552,76 @@ class CreateTotalSky(QueenbeeTask):
             }]
 
 
+class DaylightGlareAutonomy(QueenbeeTask):
+    """Calculate annual glare autonomy for imageless annual glare simulation."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+
+    # Task inputs
+    @property
+    def glare_threshold(self):
+        return self._input_params['glare_threshold']
+
+    @property
+    def folder(self):
+        value = pathlib.Path(self.input()['RestructureDaylightGlareProbabilityResults']['output_folder'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def schedule(self):
+        try:
+            pathlib.Path(self._input_params['schedule'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['schedule'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def execution_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def initiation_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def params_folder(self):
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    def command(self):
+        return 'honeybee-radiance post-process annual-glare raw_results --schedule schedule.txt --glare-threshold {glare_threshold} --sub_folder ../metrics'.format(glare_threshold=self.glare_threshold)
+
+    def requires(self):
+        return {'RestructureDaylightGlareProbabilityResults': RestructureDaylightGlareProbabilityResults(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            'annual_metrics': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix()
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'folder', 'to': 'raw_results', 'from': self.folder, 'optional': False},
+            {'name': 'schedule', 'to': 'schedule.txt', 'from': self.schedule, 'optional': True}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'annual-metrics', 'from': 'metrics',
+                'to': pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
+            }]
+
+
 class GenerateSunpath(QueenbeeTask):
     """Generate a Radiance sun matrix (AKA sun-path)."""
 
@@ -738,64 +791,6 @@ class RestructureDaylightGlareProbabilityResults(QueenbeeTask):
             }]
 
 
-class RestructureGlareAutonomyResults(QueenbeeTask):
-    """Restructure files in a distributed folder."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def extension(self):
-        return 'ga'
-
-    @property
-    def input_folder(self):
-        value = pathlib.Path('initial_results/ga')
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
-
-    def requires(self):
-        return {'AnnualImagelessGlare': AnnualImagelessGlare(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'output_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'metrics/ga').resolve().as_posix()
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'input_folder', 'to': 'input_folder', 'from': self.input_folder, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'output-folder', 'from': 'output_folder',
-                'to': pathlib.Path(self.execution_folder, 'metrics/ga').resolve().as_posix(),
-                'optional': False,
-                'type': 'folder'
-            }]
-
-
 class SplitGridFolder(QueenbeeTask):
     """Create new sensor grids folder with evenly distributed sensors.
 
@@ -888,7 +883,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_6c61a333Orchestrator(luigi.WrapperTask):
+class _Main_bafe869fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -900,4 +895,4 @@ class _Main_6c61a333Orchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [CopyGridInfo(_input_params=self.input_values), CopyRedistInfo(_input_params=self.input_values), ParseSunUpHours(_input_params=self.input_values), RestructureDaylightGlareProbabilityResults(_input_params=self.input_values), RestructureGlareAutonomyResults(_input_params=self.input_values)]
+        yield [CopyGridInfo(_input_params=self.input_values), CopyRedistInfo(_input_params=self.input_values), DaylightGlareAutonomy(_input_params=self.input_values), ParseSunUpHours(_input_params=self.input_values)]

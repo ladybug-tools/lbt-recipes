@@ -39,7 +39,7 @@ class LetImagelessAnnualGlareFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [imageless_annual_glare_workerbee._Main_6c61a333Orchestrator(_input_params=self._input_params)]
+        yield [imageless_annual_glare_workerbee._Main_bafe869fOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
