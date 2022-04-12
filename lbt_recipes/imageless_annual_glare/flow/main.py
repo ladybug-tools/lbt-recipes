@@ -17,7 +17,7 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.imageless_annual_glare import _ImagelessAnnualGlare_bafe869fOrchestrator as ImagelessAnnualGlare_bafe869fWorkerbee
+from .dependencies.imageless_annual_glare import _ImagelessAnnualGlare_67506d2bOrchestrator as ImagelessAnnualGlare_67506d2bWorkerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -128,7 +128,7 @@ class AnnualImagelessGlareLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [ImagelessAnnualGlare_bafe869fWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [ImagelessAnnualGlare_67506d2bWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_imageless_glare.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -809,7 +809,7 @@ class SplitGridFolder(QueenbeeTask):
 
     @property
     def cpus_per_grid(self):
-        return '3'
+        return '1'
 
     @property
     def min_sensor_count(self):
@@ -883,7 +883,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_bafe869fOrchestrator(luigi.WrapperTask):
+class _Main_67506d2bOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
