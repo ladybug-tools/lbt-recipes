@@ -16,6 +16,7 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
+from queenbee_local import load_input_param as qb_load_input_param
 
 
 _default_inputs = {   'bsdfs': None,
@@ -77,7 +78,7 @@ class MergeResults(QueenbeeTask):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance view merge input_folder view {extension} --scale-factor {scale_factor} --name {name} --view original-view.vf'.format(extension=self.extension, scale_factor=self.scale_factor, name=self.name)
@@ -182,7 +183,7 @@ class RayTracingLoop(QueenbeeTask):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance rpict rpict scene.oct view.vf --rad-params "{radiance_parameters}" --metric {metric} --resolution {resolution} --scale-factor {scale_factor} --output view.HDR'.format(radiance_parameters=self.radiance_parameters, metric=self.metric, resolution=self.resolution, scale_factor=self.scale_factor)
@@ -230,10 +231,10 @@ class RayTracing(luigi.Task):
     def items(self):
         try:
             # assume the input is a file
-            return QueenbeeTask.load_input_param(self.views_list)
+            return qb_load_input_param(self.views_list)
         except:
             # it is a parameter
-            return pathlib.Path(self.input()['SplitView']['views_list'].path).as_posix()
+            return self.input()['SplitView']['views_list'].path
 
     def run(self):
         yield [RayTracingLoop(item=item, _input_params=self._input_params) for item in self.items]
@@ -251,7 +252,7 @@ class RayTracing(luigi.Task):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def requires(self):
         return {'SplitView': SplitView(_input_params=self._input_params)}
@@ -323,10 +324,10 @@ class SplitView(QueenbeeTask):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance view split view.vf {view_count} --resolution {resolution} --{overture} --octree {scene_file} --rad-params "{radiance_parameters}" --folder output --log-file output/views_info.json'.format(view_count=self.view_count, resolution=self.resolution, overture=self.overture, scene_file=self.scene_file, radiance_parameters=self.radiance_parameters)
+        return 'honeybee-radiance view split view.vf {view_count} --resolution {resolution} --{overture} --octree scene.oct --rad-params "{radiance_parameters}" --folder output --log-file output/views_info.json'.format(view_count=self.view_count, resolution=self.resolution, overture=self.overture, radiance_parameters=self.radiance_parameters)
 
     def output(self):
         return {
@@ -374,7 +375,7 @@ class SplitView(QueenbeeTask):
         return [{'name': 'views-list', 'from': 'output/views_info.json', 'to': pathlib.Path(self.params_folder, 'output/views_info.json').resolve().as_posix()}]
 
 
-class _PointInTimeViewRayTracing_f677f6a5Orchestrator(luigi.WrapperTask):
+class _PointInTimeViewRayTracing_49541c51Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

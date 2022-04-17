@@ -16,7 +16,8 @@ import luigi
 import os
 import pathlib
 from queenbee_local import QueenbeeTask
-from .dependencies.point_in_time_view_ray_tracing import _PointInTimeViewRayTracing_f677f6a5Orchestrator as PointInTimeViewRayTracing_f677f6a5Workerbee
+from queenbee_local import load_input_param as qb_load_input_param
+from .dependencies.point_in_time_view_ray_tracing import _PointInTimeViewRayTracing_49541c51Orchestrator as PointInTimeViewRayTracing_49541c51Workerbee
 
 
 _default_inputs = {   'cpu_count': 12,
@@ -61,7 +62,7 @@ class AdjustSky(QueenbeeTask):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance sky adjust-for-metric input.sky --metric {metric}'.format(metric=self.metric)
@@ -119,7 +120,7 @@ class ComputeViewSplitCount(QueenbeeTask):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance view split-count view_info.json {cpu_count} --output-file view-split-count.txt'.format(cpu_count=self.cpu_count)
@@ -178,7 +179,7 @@ class CreateOctree(QueenbeeTask):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out} --add-before sky.sky'.format(include_aperture=self.include_aperture, black_out=self.black_out)
@@ -237,7 +238,7 @@ class CreateRadFolder(QueenbeeTask):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance translate model-to-rad-folder model.hbjson --view "{view_filter}" --view-check'.format(view_filter=self.view_filter)
@@ -318,7 +319,7 @@ class GenerateSky(QueenbeeTask):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
         return 'honeybee-radiance sky {sky_string} --name output.sky'.format(sky_string=self.sky_string)
@@ -366,12 +367,9 @@ class PointInTimeViewRayTracingLoop(luigi.Task):
 
     @property
     def view_count(self):
-        return QueenbeeTask.load_input_param(
-            pathlib.Path(
-                self.params_folder, 
-                os.path.split(self.input()['ComputeViewSplitCount']['split_count'].path)[-1]
-            ).resolve().as_posix()
-        )
+        return qb_load_input_param(
+                self.input()['ComputeViewSplitCount']['split_count'].path
+            )
 
     @property
     def view_name(self):
@@ -416,7 +414,7 @@ class PointInTimeViewRayTracingLoop(luigi.Task):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     @property
     def map_dag_inputs(self):
@@ -442,7 +440,7 @@ class PointInTimeViewRayTracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [PointInTimeViewRayTracing_f677f6a5Workerbee(_input_params=self.map_dag_inputs)]
+        yield [PointInTimeViewRayTracing_49541c51Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'point_in_time_view_ray_tracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -470,10 +468,10 @@ class PointInTimeViewRayTracing(luigi.Task):
     def items(self):
         try:
             # assume the input is a file
-            return QueenbeeTask.load_input_param(self.views)
+            return qb_load_input_param(self.views)
         except:
             # it is a parameter
-            return pathlib.Path(self.input()['CreateRadFolder']['views'].path).as_posix()
+            return self.input()['CreateRadFolder']['views'].path
 
     def run(self):
         yield [PointInTimeViewRayTracingLoop(item=item, _input_params=self._input_params) for item in self.items]
@@ -491,7 +489,7 @@ class PointInTimeViewRayTracing(luigi.Task):
 
     @property
     def params_folder(self):
-        return pathlib.Path(self.initiation_folder, self._input_params['params_folder']).resolve().as_posix()
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params), 'CreateOctree': CreateOctree(_input_params=self._input_params), 'ComputeViewSplitCount': ComputeViewSplitCount(_input_params=self._input_params)}
@@ -502,7 +500,7 @@ class PointInTimeViewRayTracing(luigi.Task):
         }
 
 
-class _Main_f677f6a5Orchestrator(luigi.WrapperTask):
+class _Main_49541c51Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
