@@ -37,6 +37,8 @@ _default_inputs = {   'air_speed_mtx': None,
     'solarcal_parameters': '--posture standing --sharp 135 --absorptivity 0.7 '
                            '--emissivity 0.95',
     'sun_up_hours': None,
+    'trans_schedules': None,
+    'transmittance_contribs': None,
     'view_factors': None,
     'wind_speed': None}
 
@@ -250,6 +252,11 @@ class CreateAirTemperatureMap(QueenbeeTask):
 
     @property
     def result_sql(self):
+        try:
+            pathlib.Path(self._input_params['result_sql'])
+        except TypeError:
+            # optional artifact
+            return None
         value = pathlib.Path(self._input_params['result_sql'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -291,7 +298,7 @@ class CreateAirTemperatureMap(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'result_sql', 'to': 'result.sql', 'from': self.result_sql, 'optional': False},
+            {'name': 'result_sql', 'to': 'result.sql', 'from': self.result_sql, 'optional': True},
             {'name': 'enclosure_info', 'to': 'enclosure_info.json', 'from': self.enclosure_info, 'optional': False},
             {'name': 'epw', 'to': 'weather.epw', 'from': self.epw, 'optional': False}]
 
@@ -323,6 +330,11 @@ class CreateLongwaveMrtMap(QueenbeeTask):
 
     @property
     def result_sql(self):
+        try:
+            pathlib.Path(self._input_params['result_sql'])
+        except TypeError:
+            # optional artifact
+            return None
         value = pathlib.Path(self._input_params['result_sql'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -376,7 +388,7 @@ class CreateLongwaveMrtMap(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'result_sql', 'to': 'result.sql', 'from': self.result_sql, 'optional': False},
+            {'name': 'result_sql', 'to': 'result.sql', 'from': self.result_sql, 'optional': True},
             {'name': 'view_factors', 'to': 'view_factors.csv', 'from': self.view_factors, 'optional': False},
             {'name': 'modifiers', 'to': 'view_factors.mod', 'from': self.modifiers, 'optional': False},
             {'name': 'enclosure_info', 'to': 'enclosure_info.json', 'from': self.enclosure_info, 'optional': False},
@@ -414,6 +426,11 @@ class CreateRelHumidityMap(QueenbeeTask):
 
     @property
     def result_sql(self):
+        try:
+            pathlib.Path(self._input_params['result_sql'])
+        except TypeError:
+            # optional artifact
+            return None
         value = pathlib.Path(self._input_params['result_sql'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -455,7 +472,7 @@ class CreateRelHumidityMap(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'result_sql', 'to': 'result.sql', 'from': self.result_sql, 'optional': False},
+            {'name': 'result_sql', 'to': 'result.sql', 'from': self.result_sql, 'optional': True},
             {'name': 'enclosure_info', 'to': 'enclosure_info.json', 'from': self.enclosure_info, 'optional': False},
             {'name': 'epw', 'to': 'weather.epw', 'from': self.epw, 'optional': False}]
 
@@ -522,6 +539,28 @@ class CreateShortwaveMrtMap(QueenbeeTask):
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
+    def transmittance_contribs(self):
+        try:
+            pathlib.Path(self._input_params['transmittance_contribs'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['transmittance_contribs'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def trans_schedules(self):
+        try:
+            pathlib.Path(self._input_params['trans_schedules'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['trans_schedules'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
     def execution_folder(self):
         return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
@@ -534,7 +573,7 @@ class CreateShortwaveMrtMap(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort map shortwave-mrt weather.epw indirect.ill direct.ill ref.ill sun-up-hours.txt --contributions dynamic --solarcal-par "{solarcal_par}" --run-period "{run_period}" --{indirect_is_total} --output-file shortwave.csv'.format(solarcal_par=self.solarcal_par, run_period=self.run_period, indirect_is_total=self.indirect_is_total)
+        return 'ladybug-comfort map shortwave-mrt weather.epw indirect.ill direct.ill ref.ill sun-up-hours.txt --contributions dynamic --transmittance-contribs dyn_shade --trans-schedule-json trans_schedules.json --solarcal-par "{solarcal_par}" --run-period "{run_period}" --{indirect_is_total} --output-file shortwave.csv'.format(solarcal_par=self.solarcal_par, run_period=self.run_period, indirect_is_total=self.indirect_is_total)
 
     def output(self):
         return {
@@ -550,7 +589,9 @@ class CreateShortwaveMrtMap(QueenbeeTask):
             {'name': 'indirect_irradiance', 'to': 'indirect.ill', 'from': self.indirect_irradiance, 'optional': False},
             {'name': 'direct_irradiance', 'to': 'direct.ill', 'from': self.direct_irradiance, 'optional': False},
             {'name': 'ref_irradiance', 'to': 'ref.ill', 'from': self.ref_irradiance, 'optional': False},
-            {'name': 'sun_up_hours', 'to': 'sun-up-hours.txt', 'from': self.sun_up_hours, 'optional': False}]
+            {'name': 'sun_up_hours', 'to': 'sun-up-hours.txt', 'from': self.sun_up_hours, 'optional': False},
+            {'name': 'transmittance_contribs', 'to': 'dyn_shade', 'from': self.transmittance_contribs, 'optional': True},
+            {'name': 'trans_schedules', 'to': 'trans_schedules.json', 'from': self.trans_schedules, 'optional': True}]
 
     @property
     def output_artifacts(self):
@@ -687,7 +728,7 @@ class ProcessUtciMatrix(QueenbeeTask):
             }]
 
 
-class _ComfortMappingEntryPoint_84dd66d2Orchestrator(luigi.WrapperTask):
+class _ComfortMappingEntryPoint_c2b98c0eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

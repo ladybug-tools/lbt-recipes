@@ -17,16 +17,14 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.radiance_contrib_entry_point import _RadianceContribEntryPoint_ab2b8200Orchestrator as RadianceContribEntryPoint_ab2b8200Workerbee
+from .dependencies.shade_contrib_entry_point import _ShadeContribEntryPoint_9d6ff838Orchestrator as ShadeContribEntryPoint_9d6ff838Workerbee
 
 
 _default_inputs = {   'group_name': None,
-    'octree_file_diff': None,
-    'octree_file_spec': None,
+    'octree_file': None,
     'octree_file_with_suns': None,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
-    'result_sql': None,
     'sensor_grid_folder': None,
     'sensor_grids': None,
     'simulation_folder': '.',
@@ -37,7 +35,7 @@ _default_inputs = {   'group_name': None,
     'sun_up_hours': None}
 
 
-class ReadGrids(QueenbeeTask):
+class ReadGridsForShade(QueenbeeTask):
     """Read the content of a JSON file as a list."""
 
     # DAG Input parameters
@@ -83,7 +81,7 @@ class ReadGrids(QueenbeeTask):
         return [{'name': 'data', 'from': 'input_path', 'to': pathlib.Path(self.params_folder, 'input_path').resolve().as_posix()}]
 
 
-class RunRadianceWindowContribLoop(luigi.Task):
+class RunRadianceShadeContribLoop(luigi.Task):
     """No description is provided."""
 
     # DAG Input parameters
@@ -107,14 +105,8 @@ class RunRadianceWindowContribLoop(luigi.Task):
         return self.item['count']
 
     @property
-    def octree_file_spec(self):
-        value = pathlib.Path(self._input_params['octree_file_spec'])
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def octree_file_diff(self):
-        value = pathlib.Path(self._input_params['octree_file_diff'])
+    def octree_file(self):
+        value = pathlib.Path(self._input_params['octree_file'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -161,12 +153,6 @@ class RunRadianceWindowContribLoop(luigi.Task):
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
-    def result_sql(self):
-        value = pathlib.Path(self._input_params['result_sql'])
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
     def sun_up_hours(self):
         value = pathlib.Path(self._input_params['sun_up_hours'])
         return value.as_posix() if value.is_absolute() \
@@ -196,8 +182,7 @@ class RunRadianceWindowContribLoop(luigi.Task):
         inputs = {
             'simulation_folder': self.execution_folder,
             'radiance_parameters': self.radiance_parameters,
-            'octree_file_spec': self.octree_file_spec,
-            'octree_file_diff': self.octree_file_diff,
+            'octree_file': self.octree_file,
             'octree_file_with_suns': self.octree_file_with_suns,
             'group_name': self.group_name,
             'grid_name': self.grid_name,
@@ -208,7 +193,6 @@ class RunRadianceWindowContribLoop(luigi.Task):
             'sky_matrix': self.sky_matrix,
             'sky_matrix_direct': self.sky_matrix_direct,
             'sun_modifiers': self.sun_modifiers,
-            'result_sql': self.result_sql,
             'sun_up_hours': self.sun_up_hours
         }
         try:
@@ -220,27 +204,27 @@ class RunRadianceWindowContribLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [RadianceContribEntryPoint_ab2b8200Workerbee(_input_params=self.map_dag_inputs)]
-        done_file = pathlib.Path(self.execution_folder, 'run_radiance_window_contrib.done')
+        yield [ShadeContribEntryPoint_9d6ff838Workerbee(_input_params=self.map_dag_inputs)]
+        done_file = pathlib.Path(self.execution_folder, 'run_radiance_shade_contrib.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
 
     def requires(self):
-        return {'ReadGrids': ReadGrids(_input_params=self._input_params)}
+        return {'ReadGridsForShade': ReadGridsForShade(_input_params=self._input_params)}
 
     def output(self):
         return {
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'run_radiance_window_contrib.done').resolve().as_posix())
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'run_radiance_shade_contrib.done').resolve().as_posix())
         }
 
 
-class RunRadianceWindowContrib(luigi.Task):
+class RunRadianceShadeContrib(luigi.Task):
     """No description is provided."""
     # global parameters
     _input_params = luigi.DictParameter()
     @property
     def data(self):
-        value = pathlib.Path(self.input()['ReadGrids']['data'].path)
+        value = pathlib.Path(self.input()['ReadGridsForShade']['data'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -251,11 +235,11 @@ class RunRadianceWindowContrib(luigi.Task):
             return qb_load_input_param(self.data)
         except:
             # it is a parameter
-            return self.input()['ReadGrids']['data'].path
+            return self.input()['ReadGridsForShade']['data'].path
 
     def run(self):
-        yield [RunRadianceWindowContribLoop(item=item, _input_params=self._input_params) for item in self.items]
-        done_file = pathlib.Path(self.execution_folder, 'run_radiance_window_contrib.done')
+        yield [RunRadianceShadeContribLoop(item=item, _input_params=self._input_params) for item in self.items]
+        done_file = pathlib.Path(self.execution_folder, 'run_radiance_shade_contrib.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
 
@@ -272,15 +256,15 @@ class RunRadianceWindowContrib(luigi.Task):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def requires(self):
-        return {'ReadGrids': ReadGrids(_input_params=self._input_params)}
+        return {'ReadGridsForShade': ReadGridsForShade(_input_params=self._input_params)}
 
     def output(self):
         return {
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'run_radiance_window_contrib.done').resolve().as_posix())
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'run_radiance_shade_contrib.done').resolve().as_posix())
         }
 
 
-class _DynamicContributionEntryPoint_ab2b8200Orchestrator(luigi.WrapperTask):
+class _DynamicShadeContribEntryPoint_9d6ff838Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -292,4 +276,4 @@ class _DynamicContributionEntryPoint_ab2b8200Orchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [RunRadianceWindowContrib(_input_params=self.input_values)]
+        yield [RunRadianceShadeContrib(_input_params=self.input_values)]
