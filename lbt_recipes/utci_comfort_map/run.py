@@ -28,7 +28,7 @@ _recipe_default_inputs = {   'air_speed_matrices': None,
     'cpu_count': 50,
     'ddy': None,
     'epw': None,
-    'min_sensor_count': 1,
+    'min_sensor_count': 500,
     'model': None,
     'north': 0.0,
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
@@ -44,7 +44,7 @@ class LetUtciComfortMapFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [utci_comfort_map_workerbee._Main_c2b98c0eOrchestrator(_input_params=self._input_params)]
+        yield [utci_comfort_map_workerbee._Main_8559c060Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -65,7 +65,7 @@ def start(project_folder, user_values, workers):
 
     # copy project folder content to simulation folder
     artifacts = ['air_speed_matrices', 'ddy', 'epw', 'model', 'schedule', 'wind_speed']
-    optional_artifacts = ['air_speed_matrices', 'schedule', 'wind_speed']
+    optional_artifacts = ['air_speed_matrices', 'ddy', 'schedule', 'wind_speed']
     for artifact in artifacts:
         value = input_params[artifact]
         if value is None:
