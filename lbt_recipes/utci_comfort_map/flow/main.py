@@ -17,9 +17,9 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_c2b98c0eOrchestrator as ComfortMappingEntryPoint_c2b98c0eWorkerbee
-from .dependencies.dynamic_shade_contrib_entry_point import _DynamicShadeContribEntryPoint_c2b98c0eOrchestrator as DynamicShadeContribEntryPoint_c2b98c0eWorkerbee
-from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_c2b98c0eOrchestrator as RadianceMappingEntryPoint_c2b98c0eWorkerbee
+from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_8559c060Orchestrator as ComfortMappingEntryPoint_8559c060Workerbee
+from .dependencies.dynamic_shade_contrib_entry_point import _DynamicShadeContribEntryPoint_8559c060Orchestrator as DynamicShadeContribEntryPoint_8559c060Workerbee
+from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_8559c060Orchestrator as RadianceMappingEntryPoint_8559c060Workerbee
 
 
 _default_inputs = {   'air_speed_matrices': None,
@@ -27,7 +27,7 @@ _default_inputs = {   'air_speed_matrices': None,
     'cpu_count': 50,
     'ddy': None,
     'epw': None,
-    'min_sensor_count': 1,
+    'min_sensor_count': 500,
     'model': None,
     'north': 0.0,
     'params_folder': '__params',
@@ -881,6 +881,11 @@ class CreateSimPar(QueenbeeTask):
 
     @property
     def ddy(self):
+        try:
+            pathlib.Path(self._input_params['ddy'])
+        except TypeError:
+            # optional artifact
+            return None
         value = pathlib.Path(self._input_params['ddy'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -910,7 +915,7 @@ class CreateSimPar(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'ddy', 'to': 'input.ddy', 'from': self.ddy, 'optional': False}]
+            {'name': 'ddy', 'to': 'input.ddy', 'from': self.ddy, 'optional': True}]
 
     @property
     def output_artifacts(self):
@@ -1841,7 +1846,7 @@ class RunComfortMapLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [ComfortMappingEntryPoint_c2b98c0eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [ComfortMappingEntryPoint_8559c060Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_comfort_map.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -2100,7 +2105,7 @@ class RunRadianceDynamicShadeContributionLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DynamicShadeContribEntryPoint_c2b98c0eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [DynamicShadeContribEntryPoint_8559c060Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_dynamic_shade_contribution.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -2285,7 +2290,7 @@ class RunRadianceSimulationLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [RadianceMappingEntryPoint_c2b98c0eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [RadianceMappingEntryPoint_8559c060Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_simulation.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -2346,7 +2351,12 @@ class RunRadianceSimulation(luigi.Task):
 
 
 class SetModifiersFromConstructions(QueenbeeTask):
-    """Assign honeybee Radiance modifiers based on energy construction properties."""
+    """Assign honeybee Radiance modifiers based on energy construction properties.
+
+    This includes matching properties for reflectance, absorptance and transmission.
+    Furthermore, any dynamic window constructions can be translated to dynamic
+    Radiance groups and shade transmittance schedules will be translated to
+    dynamic shade groups."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
@@ -2600,7 +2610,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_c2b98c0eOrchestrator(luigi.WrapperTask):
+class _Main_8559c060Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
