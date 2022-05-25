@@ -8,8 +8,8 @@ from honeybee_energy.config import folders as energy_folders
 # These constants set the engine version compatibility across the entire
 # LBT Grasshopper plugin
 RADIANCE_DATE = (2021, 3, 28)
-EP_VERSION = (9, 6, 0)
-OS_VERSION = (3, 3, 0)
+EP_VERSION = (22, 1, 0)
+OS_VERSION = (3, 4, 0)
 COMPATIBILITY_URL = 'https://github.com/ladybug-tools/lbt-grasshopper/wiki/' \
     '1.4-Compatibility-Matrix'
 
@@ -22,18 +22,19 @@ def check_radiance_date():
         'No Radiance installation was found on this machine.\n{}'.format(rad_msg)
     rad_version = rad_folders.radiance_version_date
     if rad_version is None:
-        rad_exe = os.path.join(rad_folders.radbin_path, 'rtrace.exe') if os.name == 'nt' \
-            else os.path.join(self.radbin_path, 'rtrace')
+        rad_exe = os.path.join(rad_folders.radbin_path, 'rtrace.exe') \
+            if os.name == 'nt' \
+            else os.path.join(rad_folders.radbin_path, 'rtrace')
         cmds = [rad_exe, '-version']
         use_shell = True if os.name == 'nt' else False
         process = subprocess.Popen(cmds, stderr=subprocess.PIPE, shell=use_shell)
         _, stderr = process.communicate()
         if stderr not in ('', b''):
             msg = 'A Radiance installation was found at {}\n' \
-            'but the Radiance executables are not accessible.\n{}'.format(
-                rad_folders.radbin_path, stderr)
+                'but the Radiance executables are not accessible.\n{}'.format(
+                    rad_folders.radbin_path, stderr)
             raise ValueError(msg)
-        return None  # in case the issue was specifically with mkmap
+        return None  # in case the issue was specifically with rtrace
     assert rad_version >= RADIANCE_DATE, \
         'The installed Radiance is from {}.\n Must be from from {} or later.\n{}'.format(
             '/'.join(str(v) for v in rad_version),
