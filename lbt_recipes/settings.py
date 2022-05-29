@@ -72,7 +72,9 @@ class RecipeSettings(object):
     @folder.setter
     def folder(self, value):
         if value is not None:
-            value = str(value)
+            value = str(value).replace('\\', '/')
+            if value.endswith('/'):
+                value = value[:-1]
         self._folder = value
 
     @property
