@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "imageless-annual-glare",
-    "tag": "0.0.6",
+    "tag": "0.0.15",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -33,7 +33,7 @@
     "sources": [
       "https://hub.docker.com/r/ladybugtools/honeybee-radiance"
     ],
-    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/annualrecipe.png",
+    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/annualglare.png",
     "deprecated": null,
     "description": "Imageless annual glare recipe for Pollination.",
     "license": {
@@ -111,11 +111,23 @@
       "spec": null
     },
     {
+      "type": "DAGNumberInput",
+      "annotations": {},
+      "name": "luminance-factor",
+      "description": "Luminance factor in cd/m2. If the sky patch brightness is above this factor it will act as a glare source. If larger than 100, it is used as constant threshold in cd/m2. If less than or equal to 100, this factor multiplied by the average luminance in each view will be used as threshold for detecting the glare sources (not recommended). The default value is 2000 (fixed threshold method).",
+      "default": 2000.0,
+      "alias": [],
+      "required": false,
+      "spec": {
+        "type": "number"
+      }
+    },
+    {
       "type": "DAGIntegerInput",
       "annotations": {},
       "name": "min-sensor-count",
       "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids. The default value is set to 1, which means that the cpu_count is always respected.",
-      "default": 1,
+      "default": 500,
       "alias": [
         {
           "type": "DAGIntegerInputAlias",
@@ -201,7 +213,10 @@
       "spec": null,
       "extensions": [
         "json",
-        "hbjson"
+        "hbjson",
+        "pkl",
+        "hbpkl",
+        "zip"
       ]
     },
     {

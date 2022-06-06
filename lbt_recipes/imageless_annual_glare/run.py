@@ -26,7 +26,8 @@ import flow.main as imageless_annual_glare_workerbee
 _recipe_default_inputs = {   'cpu_count': 50,
     'glare_threshold': 0.4,
     'grid_filter': '*',
-    'min_sensor_count': 1,
+    'luminance_factor': 2000.0,
+    'min_sensor_count': 500,
     'model': None,
     'north': 0.0,
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
@@ -39,7 +40,7 @@ class LetImagelessAnnualGlareFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [imageless_annual_glare_workerbee._Main_67506d2bOrchestrator(_input_params=self._input_params)]
+        yield [imageless_annual_glare_workerbee._Main_5a4cf8eaOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

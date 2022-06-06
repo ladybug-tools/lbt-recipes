@@ -21,6 +21,7 @@ from queenbee_local import load_input_param as qb_load_input_param
 
 _default_inputs = {   'bsdfs': None,
     'grid_name': None,
+    'luminance_factor': 2000.0,
     'octree_file': None,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
@@ -45,7 +46,9 @@ class DaylightGlareProbability(QueenbeeTask):
     def name(self):
         return self._input_params['grid_name']
 
-    threshold_factor = luigi.Parameter(default='2000.0')
+    @property
+    def threshold_factor(self):
+        return self._input_params['luminance_factor']
 
     @property
     def dc_direct(self):
@@ -309,7 +312,7 @@ class TotalSky(QueenbeeTask):
             }]
 
 
-class _ImagelessAnnualGlare_67506d2bOrchestrator(luigi.WrapperTask):
+class _ImagelessAnnualGlare_5a4cf8eaOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
