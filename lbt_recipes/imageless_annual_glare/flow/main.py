@@ -17,13 +17,14 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.imageless_annual_glare import _ImagelessAnnualGlare_67506d2bOrchestrator as ImagelessAnnualGlare_67506d2bWorkerbee
+from .dependencies.imageless_annual_glare import _ImagelessAnnualGlare_5a4cf8eaOrchestrator as ImagelessAnnualGlare_5a4cf8eaWorkerbee
 
 
 _default_inputs = {   'cpu_count': 50,
     'glare_threshold': 0.4,
     'grid_filter': '*',
-    'min_sensor_count': 1,
+    'luminance_factor': 2000.0,
+    'min_sensor_count': 500,
     'model': None,
     'north': 0.0,
     'params_folder': '__params',
@@ -51,6 +52,10 @@ class AnnualImagelessGlareLoop(luigi.Task):
     @property
     def sensor_count(self):
         return self.item['count']
+
+    @property
+    def luminance_factor(self):
+        return self._input_params['luminance_factor']
 
     @property
     def octree_file(self):
@@ -117,7 +122,8 @@ class AnnualImagelessGlareLoop(luigi.Task):
             'sensor_count': self.sensor_count,
             'sky_matrix': self.sky_matrix,
             'sky_dome': self.sky_dome,
-            'bsdfs': self.bsdfs
+            'bsdfs': self.bsdfs,
+            'luminance_factor': self.luminance_factor
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -128,7 +134,7 @@ class AnnualImagelessGlareLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [ImagelessAnnualGlare_67506d2bWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [ImagelessAnnualGlare_5a4cf8eaWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_imageless_glare.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -883,7 +889,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_67506d2bOrchestrator(luigi.WrapperTask):
+class _Main_5a4cf8eaOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
