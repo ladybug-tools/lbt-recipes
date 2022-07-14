@@ -158,7 +158,7 @@ class DirectSun(QueenbeeTask):
 
     @property
     def fixed_radiance_parameters(self):
-        return '-aa 0.0 -I -ab 0 -dc 1.0 -dt 0.0 -dj 0.0 -dr 0'
+        return '-aa 0.0 -I -ab 0 -dc 1.0 -dt 0.0 -dj 0.0'
 
     @property
     def sensor_count(self):
@@ -432,7 +432,7 @@ class TotalSky(QueenbeeTask):
             }]
 
 
-class _AnnualIrradianceRayTracing_cf993373Orchestrator(luigi.WrapperTask):
+class _AnnualIrradianceRayTracing_2fafd374Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
