@@ -25,10 +25,10 @@ import flow.main as annual_daylight_workerbee
 
 _recipe_default_inputs = {   'cpu_count': 50,
     'grid_filter': '*',
-    'min_sensor_count': 1,
+    'min_sensor_count': 500,
     'model': None,
     'north': 0.0,
-    'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
+    'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05 -dr 0',
     'schedule': None,
     'thresholds': '-t 300 -lt 100 -ut 3000',
     'wea': None}
@@ -39,7 +39,7 @@ class LetAnnualDaylightFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [annual_daylight_workerbee._Main_4ea8b907Orchestrator(_input_params=self._input_params)]
+        yield [annual_daylight_workerbee._Main_ae044755Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

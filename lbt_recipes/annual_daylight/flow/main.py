@@ -17,16 +17,16 @@ import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_4ea8b907Orchestrator as AnnualDaylightRayTracing_4ea8b907Workerbee
+from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_ae044755Orchestrator as AnnualDaylightRayTracing_ae044755Workerbee
 
 
 _default_inputs = {   'cpu_count': 50,
     'grid_filter': '*',
-    'min_sensor_count': 1,
+    'min_sensor_count': 500,
     'model': None,
     'north': 0.0,
     'params_folder': '__params',
-    'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
+    'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05 -dr 0',
     'schedule': None,
     'simulation_folder': '.',
     'thresholds': '-t 300 -lt 100 -ut 3000',
@@ -156,7 +156,7 @@ class AnnualDaylightRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightRayTracing_4ea8b907Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightRayTracing_ae044755Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_daylight_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -950,7 +950,7 @@ class SplitGridFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
 
-class _Main_4ea8b907Orchestrator(luigi.WrapperTask):
+class _Main_ae044755Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

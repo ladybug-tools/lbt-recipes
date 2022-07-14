@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "annual-irradiance",
-    "tag": "0.3.8",
+    "tag": "0.3.10",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -274,7 +274,7 @@
       "annotations": {},
       "name": "radiance-parameters",
       "description": "Radiance parameters for ray tracing.",
-      "default": "-ab 2 -ad 5000 -lw 2e-05",
+      "default": "-ab 2 -ad 5000 -lw 2e-05 -dr 0",
       "alias": [
         {
           "type": "DAGStringInputAlias",
@@ -285,7 +285,7 @@
             "grasshopper"
           ],
           "handler": [],
-          "default": "-ab 2 -ad 5000 -lw 2e-05",
+          "default": "-ab 2 -ad 5000 -lw 2e-05 -dr 0",
           "required": false,
           "spec": null
         }
