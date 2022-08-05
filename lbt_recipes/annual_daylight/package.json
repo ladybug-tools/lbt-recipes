@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "annual-daylight",
-    "tag": "0.8.21",
+    "tag": "0.8.22",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -496,27 +496,7 @@
         "annotations": {},
         "path": "results"
       },
-      "alias": [
-        {
-          "type": "DAGGenericOutputAlias",
-          "annotations": {},
-          "name": "results",
-          "description": "Raw result files (.ill) that contain illuminance matrices.",
-          "platform": [
-            "grasshopper"
-          ],
-          "handler": [
-            {
-              "type": "IOAliasHandler",
-              "annotations": {},
-              "language": "python",
-              "module": "pollination_handlers.outputs.daylight",
-              "function": "sort_ill_from_folder",
-              "index": 0
-            }
-          ]
-        }
-      ],
+      "alias": [],
       "required": true
     },
     {

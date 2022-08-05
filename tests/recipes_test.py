@@ -16,7 +16,7 @@ for k, v in genv.items():
     env_args.append('{}="{}"'.format(k, v))
 
 
-def run_daylight_recipe(recipe_name, extension):
+def run_daylight_recipe(recipe_name, extension, is_dynamic=False):
     project_folder = './tests/assets/project folder'
     recipe_folder = './lbt_recipes/{}'.format(recipe_name.replace('-', '_'))
     inputs = './tests/assets/radiance_grid_inputs.json'
@@ -32,8 +32,14 @@ def run_daylight_recipe(recipe_name, extension):
     )
     assert result.exit_code == 0
     results_folder = os.path.join(sim_folder, 'results')
-    assert os.path.isfile(os.path.join(results_folder, f'TestRoom_1.{extension}'))
-    assert os.path.isfile(os.path.join(results_folder, f'TestRoom_2.{extension}'))
+    if is_dynamic:
+        results_folder = os.path.join(
+            results_folder, '__static_apertures__', 'default', 'total')
+        assert os.path.isfile(os.path.join(results_folder, f'TestRoom_1.{extension}'))
+        assert os.path.isfile(os.path.join(results_folder, f'TestRoom_2.{extension}'))
+    else:
+        assert os.path.isfile(os.path.join(results_folder, f'TestRoom_1.{extension}'))
+        assert os.path.isfile(os.path.join(results_folder, f'TestRoom_2.{extension}'))
     nukedir(sim_folder, True)
 
 
@@ -42,7 +48,7 @@ def test_daylight_factor():
 
 
 def test_annual_daylight():
-    run_daylight_recipe('annual-daylight', 'ill')
+    run_daylight_recipe('annual-daylight', 'npy', True)
 
 
 def run_comfort_map_recipe(recipe_name):
