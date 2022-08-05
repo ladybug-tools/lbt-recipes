@@ -39,7 +39,7 @@ class LetAnnualDaylightFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [annual_daylight_workerbee._Main_ae044755Orchestrator(_input_params=self._input_params)]
+        yield [annual_daylight_workerbee._Main_8529a1a1Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
