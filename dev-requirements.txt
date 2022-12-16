@@ -1,4 +1,4 @@
-lbt-honeybee==0.7.64
+lbt-honeybee==0.7.65
 pytest==6.2.4
 Sphinx==3.3.1
 docutils==0.17
