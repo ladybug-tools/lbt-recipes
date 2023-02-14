@@ -1,7 +1,7 @@
 """
-This file is auto-generated from a Queenbee recipe. It is unlikely that
-you should be editing this file directly. Instead try to edit the recipe
-itself and regenerate the code.
+This file is auto-generated from utci-comfort-map:0.9.10.
+It is unlikely that you should be editing this file directly.
+Try to edit the original recipe itself and regenerate the code.
 
 Contact the recipe maintainers with additional questions.
     chris: chris@ladybug.tools
@@ -13,11 +13,11 @@ See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0
 
 
 import luigi
-import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
-from .dependencies.shade_contrib_entry_point import _ShadeContribEntryPoint_8559c060Orchestrator as ShadeContribEntryPoint_8559c060Workerbee
+from . import _queenbee_status_lock_
+from .dependencies.shade_contrib_entry_point import _ShadeContribEntryPoint_6c6f2571Orchestrator as ShadeContribEntryPoint_6c6f2571Workerbee
 
 
 _default_inputs = {   'group_name': None,
@@ -40,6 +40,7 @@ class ReadGridsForShade(QueenbeeTask):
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
 
     # Task inputs
     @property
@@ -80,12 +81,21 @@ class ReadGridsForShade(QueenbeeTask):
     def output_parameters(self):
         return [{'name': 'data', 'from': 'input_path', 'to': pathlib.Path(self.params_folder, 'input_path').resolve().as_posix()}]
 
+    @property
+    def task_image(self):
+        return 'docker.io/python:3.7-slim'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
+
 
 class RunRadianceShadeContribLoop(luigi.Task):
     """No description is provided."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
 
     # Task inputs
     @property
@@ -204,7 +214,7 @@ class RunRadianceShadeContribLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [ShadeContribEntryPoint_8559c060Workerbee(_input_params=self.map_dag_inputs)]
+        yield [ShadeContribEntryPoint_6c6f2571Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_shade_contrib.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -264,7 +274,7 @@ class RunRadianceShadeContrib(luigi.Task):
         }
 
 
-class _DynamicShadeContribEntryPoint_8559c060Orchestrator(luigi.WrapperTask):
+class _DynamicShadeContribEntryPoint_6c6f2571Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -1,7 +1,7 @@
 """
-This file is auto-generated from a Queenbee recipe. It is unlikely that
-you should be editing this file directly. Instead try to edit the recipe
-itself and regenerate the code.
+This file is auto-generated from point-in-time-view:0.4.0.
+It is unlikely that you should be editing this file directly.
+Try to edit the original recipe itself and regenerate the code.
 
 Contact the recipe maintainers with additional questions.
     chris: chris@ladybug.tools
@@ -13,14 +13,17 @@ See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0
 
 
 import sys
+import datetime
+import json
 import luigi
-import os
 import time
 import pathlib
+import shutil
 from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
+from luigi.execution_summary import LuigiStatusCode
 
-import flow.main as point_in_time_view_workerbee
+import flow.main_2566d757 as point_in_time_view_workerbee
 
 
 _recipe_default_inputs = {   'cpu_count': 12,
@@ -38,7 +41,7 @@ class LetPointInTimeViewFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [point_in_time_view_workerbee._Main_49541c51Orchestrator(_input_params=self._input_params)]
+        yield [point_in_time_view_workerbee._Main_2566d757Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -78,6 +81,20 @@ def start(project_folder, user_values, workers):
     with cfg_file.open('w') as lf:
         lf.write(LOGS_CONFIG.replace('WORKFLOW.LOG', log_file))
 
+    status_file = log_folder.joinpath('status.json')
+    if status_file.exists():
+        status_file.unlink()
+    shutil.copyfile(
+        pathlib.Path(__file__).parent.joinpath('status.json'),
+        status_file
+    )
+
+    now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+    status = json.loads(status_file.read_text())
+    status['status']['started_at'] = now
+    status['status']['status'] = 'Running'
+    status_file.write_text(json.dumps(status))
+
     summary = luigi.build(
         [LetPointInTimeViewFly(_input_params=input_params)],
         local_scheduler=local_scheduler(),
@@ -86,7 +103,27 @@ def start(project_folder, user_values, workers):
         logging_conf_file=cfg_file.as_posix()
     )
 
+    now = datetime.datetime.utcnow()
+    status = json.loads(status_file.read_text())
+    duration = now - datetime.datetime.strptime(
+        status['status']['started_at'], '%Y-%m-%dT%H:%M:%SZ'
+    )
+    duration -= datetime.timedelta(microseconds=duration.microseconds)
+    status['status']['finished_at'] = now.strftime('%Y-%m-%dT%H:%M:%SZ')
+    status['status']['status'] = 'Cancelled'
+    status_file.write_text(json.dumps(status))
+    if summary.status == LuigiStatusCode.FAILED:
+        status['status']['status'] = 'Failed'
+    elif summary.status == LuigiStatusCode.SUCCESS:
+        status['status']['status'] = 'Succeeded'
+    status_file.write_text(json.dumps(status))
+
+    cpu_usage = status['meta']['resources_duration']['cpu']
+
     print(summary.summary_text)
+
+    print(f'Duration: {duration}    CPU Usage: {datetime.timedelta(seconds=cpu_usage)}')
+
     print(f'More info:\n{log_file}')
 
 

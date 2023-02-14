@@ -1,7 +1,7 @@
 """
-This file is auto-generated from a Queenbee recipe. It is unlikely that
-you should be editing this file directly. Instead try to edit the recipe
-itself and regenerate the code.
+This file is auto-generated from sky-view:1.2.4.
+It is unlikely that you should be editing this file directly.
+Try to edit the original recipe itself and regenerate the code.
 
 Contact the recipe maintainers with additional questions.
     chris: chris@ladybug.tools
@@ -13,19 +13,175 @@ See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0
 
 
 import luigi
-import os
 import pathlib
 from queenbee_local import QueenbeeTask
+from queenbee_local import load_input_param as qb_load_input_param
+from . import _queenbee_status_lock_
 
 
 _default_inputs = {   'cloudy_sky': 'uniform',
     'cpu_count': 50,
     'grid_filter': '*',
-    'min_sensor_count': 1,
+    'min_sensor_count': 500,
     'model': None,
     'params_folder': '__params',
     'radiance_parameters': '-aa 0.1 -ad 2048 -ar 64',
     'simulation_folder': '.'}
+
+
+class CreateRadFolder(QueenbeeTask):
+    """Create a Radiance folder from a HBJSON input file."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
+
+    # Task inputs
+    @property
+    def grid_filter(self):
+        return self._input_params['grid_filter']
+
+    @property
+    def input_model(self):
+        value = pathlib.Path(self._input_params['model'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def execution_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def initiation_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def params_folder(self):
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    def command(self):
+        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid "{grid_filter}" --grid-check'.format(grid_filter=self.grid_filter)
+
+    def output(self):
+        return {
+            
+            'model_folder': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
+            ),
+            
+            'bsdf_folder': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
+            ),
+            
+            'model_sensor_grids_file': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'results/sky_view/grids_info.json').resolve().as_posix()
+            ),
+            'sensor_grids': luigi.LocalTarget(
+                pathlib.Path(
+                    self.params_folder,
+                    'model/grid/_info.json').resolve().as_posix()
+                )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'input_model', 'to': 'model.hbjson', 'from': self.input_model, 'optional': False}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'model-folder', 'from': 'model',
+                'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
+            },
+                
+            {
+                'name': 'bsdf-folder', 'from': 'model/bsdf',
+                'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix(),
+                'optional': True,
+                'type': 'folder'
+            },
+                
+            {
+                'name': 'model-sensor-grids-file', 'from': 'model/grid/_model_grids_info.json',
+                'to': pathlib.Path(self.execution_folder, 'results/sky_view/grids_info.json').resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
+            }]
+
+    @property
+    def output_parameters(self):
+        return [{'name': 'sensor-grids', 'from': 'model/grid/_info.json', 'to': pathlib.Path(self.params_folder, 'model/grid/_info.json').resolve().as_posix()}]
+
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
+
+
+class GenerateSky(QueenbeeTask):
+    """Generates a sky with certain illuminance level."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
+
+    # Task inputs
+    @property
+    def uniform(self):
+        return self._input_params['cloudy_sky']
+
+    @property
+    def ground_reflectance(self):
+        return '0'
+
+    illuminance = luigi.Parameter(default='100000.0')
+
+    @property
+    def execution_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def initiation_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def params_folder(self):
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    def command(self):
+        return 'honeybee-radiance sky illuminance {illuminance} --ground {ground_reflectance} --{uniform} --name output.sky'.format(uniform=self.uniform, illuminance=self.illuminance, ground_reflectance=self.ground_reflectance)
+
+    def output(self):
+        return {
+            'sky': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'resources/input.sky').resolve().as_posix()
+            )
+        }
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'sky', 'from': 'output.sky',
+                'to': pathlib.Path(self.execution_folder, 'resources/input.sky').resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
+            }]
+
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
 
 
 class CreateOctree(QueenbeeTask):
@@ -33,6 +189,7 @@ class CreateOctree(QueenbeeTask):
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
 
     # Task inputs
     black_out = luigi.Parameter(default='default')
@@ -92,21 +249,43 @@ class CreateOctree(QueenbeeTask):
                 'type': 'file'
             }]
 
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
 
-class CreateRadFolder(QueenbeeTask):
-    """Create a Radiance folder from a HBJSON input file."""
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
+
+
+class SplitGridFolder(QueenbeeTask):
+    """Create new sensor grids folder with evenly distributed sensors.
+
+    This function creates a new folder with evenly distributed sensor grids. The folder
+    will include a ``_redist_info.json`` file which has the information to recreate the
+    original input files from this folder and the results generated based on the grids
+    in this folder."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
 
     # Task inputs
     @property
-    def grid_filter(self):
-        return self._input_params['grid_filter']
+    def cpu_count(self):
+        return self._input_params['cpu_count']
 
     @property
-    def input_model(self):
-        value = pathlib.Path(self._input_params['model'])
+    def cpus_per_grid(self):
+        return '1'
+
+    @property
+    def min_sensor_count(self):
+        return self._input_params['min_sensor_count']
+
+    @property
+    def input_folder(self):
+        value = pathlib.Path(self.input()['CreateRadFolder']['model_folder'].path, 'grid')
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -123,153 +302,26 @@ class CreateRadFolder(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid "{grid_filter}" --grid-check'.format(grid_filter=self.grid_filter)
+        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(cpus_per_grid=self.cpus_per_grid, min_sensor_count=self.min_sensor_count, cpu_count=self.cpu_count)
+
+    def requires(self):
+        return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
 
     def output(self):
         return {
             
-            'model_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
+            'output_folder': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'resources/grid').resolve().as_posix()
             ),
             
-            'bsdf_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix()
-            ),
-            
-            'model_sensor_grids_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix()
+            'dist_info': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'initial_results/_redist_info.json').resolve().as_posix()
             ),
             'sensor_grids': luigi.LocalTarget(
                 pathlib.Path(
                     self.params_folder,
-                    'model/grid/_info.json').resolve().as_posix()
+                    'output_folder/_info.json').resolve().as_posix()
                 )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'input_model', 'to': 'model.hbjson', 'from': self.input_model, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'model-folder', 'from': 'model',
-                'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix(),
-                'optional': False,
-                'type': 'folder'
-            },
-                
-            {
-                'name': 'bsdf-folder', 'from': 'model/bsdf',
-                'to': pathlib.Path(self.execution_folder, 'model/bsdf').resolve().as_posix(),
-                'optional': True,
-                'type': 'folder'
-            },
-                
-            {
-                'name': 'model-sensor-grids-file', 'from': 'model/grid/_model_grids_info.json',
-                'to': pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix(),
-                'optional': False,
-                'type': 'file'
-            }]
-
-    @property
-    def output_parameters(self):
-        return [{'name': 'sensor-grids', 'from': 'model/grid/_info.json', 'to': pathlib.Path(self.params_folder, 'model/grid/_info.json').resolve().as_posix()}]
-
-
-class GenerateSky(QueenbeeTask):
-    """Generates a sky with certain illuminance level."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def uniform(self):
-        return self._input_params['cloudy_sky']
-
-    @property
-    def ground_reflectance(self):
-        return '0'
-
-    illuminance = luigi.Parameter(default='100000.0')
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'honeybee-radiance sky illuminance {illuminance} --ground {ground_reflectance} --{uniform} --name output.sky'.format(illuminance=self.illuminance, ground_reflectance=self.ground_reflectance, uniform=self.uniform)
-
-    def output(self):
-        return {
-            'sky': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'resources/input.sky').resolve().as_posix()
-            )
-        }
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'sky', 'from': 'output.sky',
-                'to': pathlib.Path(self.execution_folder, 'resources/input.sky').resolve().as_posix(),
-                'optional': False,
-                'type': 'file'
-            }]
-
-
-class RestructureResults(QueenbeeTask):
-    """Restructure files in a distributed folder."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def extension(self):
-        return 'res'
-
-    @property
-    def input_folder(self):
-        value = pathlib.Path('initial_results')
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension}'.format(extension=self.extension)
-
-    def requires(self):
-        return {'SkyViewRayTracing': SkyViewRayTracing(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'output_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'results').resolve().as_posix()
-            )
         }
 
     @property
@@ -282,10 +334,29 @@ class RestructureResults(QueenbeeTask):
         return [
             {
                 'name': 'output-folder', 'from': 'output_folder',
-                'to': pathlib.Path(self.execution_folder, 'results').resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'resources/grid').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
+            },
+                
+            {
+                'name': 'dist-info', 'from': 'output_folder/_redist_info.json',
+                'to': pathlib.Path(self.execution_folder, 'initial_results/_redist_info.json').resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
             }]
+
+    @property
+    def output_parameters(self):
+        return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
+
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
 
 
 class SkyViewRayTracingLoop(QueenbeeTask):
@@ -293,6 +364,7 @@ class SkyViewRayTracingLoop(QueenbeeTask):
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
 
     # Task inputs
     @property
@@ -372,6 +444,14 @@ class SkyViewRayTracingLoop(QueenbeeTask):
                 'type': 'file'
             }]
 
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
+
 
 class SkyViewRayTracing(luigi.Task):
     """Run ray-tracing and post-process the results for a skyview simulation."""
@@ -387,10 +467,10 @@ class SkyViewRayTracing(luigi.Task):
     def items(self):
         try:
             # assume the input is a file
-            return QueenbeeTask.load_input_param(self.sensor_grids)
+            return qb_load_input_param(self.sensor_grids)
         except:
             # it is a parameter
-            return pathlib.Path(self.input()['SplitGridFolder']['sensor_grids'].path).as_posix()
+            return self.input()['SplitGridFolder']['sensor_grids'].path
 
     def run(self):
         yield [SkyViewRayTracingLoop(item=item, _input_params=self._input_params) for item in self.items]
@@ -418,34 +498,30 @@ class SkyViewRayTracing(luigi.Task):
             'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'sky_view_ray_tracing.done').resolve().as_posix())
         }
 
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
 
-class SplitGridFolder(QueenbeeTask):
-    """Create new sensor grids folder with evenly distributed sensors.
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
 
-    This function creates a new folder with evenly distributed sensor grids. The folder
-    will include a ``_redist_info.json`` file which has the information to recreate the
-    original input files from this folder and the results generated based on the grids
-    in this folder."""
+
+class RestructureResults(QueenbeeTask):
+    """Restructure files in a distributed folder."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
 
     # Task inputs
     @property
-    def cpu_count(self):
-        return self._input_params['cpu_count']
-
-    @property
-    def cpus_per_grid(self):
-        return '1'
-
-    @property
-    def min_sensor_count(self):
-        return self._input_params['min_sensor_count']
+    def extension(self):
+        return 'res'
 
     @property
     def input_folder(self):
-        value = pathlib.Path(self.input()['CreateRadFolder']['model_folder'].path, 'grid')
+        value = pathlib.Path('initial_results')
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -462,26 +538,16 @@ class SplitGridFolder(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(cpu_count=self.cpu_count, cpus_per_grid=self.cpus_per_grid, min_sensor_count=self.min_sensor_count)
+        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
     def requires(self):
-        return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
+        return {'SkyViewRayTracing': SkyViewRayTracing(_input_params=self._input_params)}
 
     def output(self):
         return {
-            
             'output_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'resources/grid').resolve().as_posix()
-            ),
-            
-            'dist_info': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'initial_results/_redist_info.json').resolve().as_posix()
-            ),
-            'sensor_grids': luigi.LocalTarget(
-                pathlib.Path(
-                    self.params_folder,
-                    'output_folder/_info.json').resolve().as_posix()
-                )
+                pathlib.Path(self.execution_folder, 'results/sky_view').resolve().as_posix()
+            )
         }
 
     @property
@@ -494,24 +560,21 @@ class SplitGridFolder(QueenbeeTask):
         return [
             {
                 'name': 'output-folder', 'from': 'output_folder',
-                'to': pathlib.Path(self.execution_folder, 'resources/grid').resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'results/sky_view').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
-            },
-                
-            {
-                'name': 'dist-info', 'from': 'output_folder/_redist_info.json',
-                'to': pathlib.Path(self.execution_folder, 'initial_results/_redist_info.json').resolve().as_posix(),
-                'optional': False,
-                'type': 'file'
             }]
 
     @property
-    def output_parameters(self):
-        return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
+    def task_image(self):
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
 
 
-class _Main_b8492043Orchestrator(luigi.WrapperTask):
+class _Main_ce8e2bf9Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

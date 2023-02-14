@@ -1,0 +1,469 @@
+{
+  "type": "RecipeInterface",
+  "annotations": {},
+  "api_version": "v1beta1",
+  "metadata": {
+    "type": "MetaData",
+    "annotations": {},
+    "name": "annual-energy-use",
+    "tag": "0.5.3",
+    "app_version": "3.1.0",
+    "keywords": [
+      "honeybee",
+      "energy",
+      "ladybug-tools",
+      "energyplus",
+      "openstudio",
+      "energy",
+      "annual-energy-use"
+    ],
+    "maintainers": [
+      {
+        "type": "Maintainer",
+        "annotations": {},
+        "name": "chris",
+        "email": "chris@ladybug.tools"
+      },
+      {
+        "type": "Maintainer",
+        "annotations": {},
+        "name": "ladybug-tools",
+        "email": "info@ladybug.tools"
+      }
+    ],
+    "home": "https://github.com/pollination/annual-energy-use",
+    "sources": [
+      "https://hub.docker.com/r/ladybugtools/honeybee-energy"
+    ],
+    "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/eui.png",
+    "deprecated": null,
+    "description": "Run an annual energy simulation and compute energy use intensity.",
+    "license": {
+      "type": "License",
+      "annotations": {},
+      "name": "PolyForm Shield License 1.0.0",
+      "url": "https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0.txt"
+    }
+  },
+  "source": null,
+  "inputs": [
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "additional-idf",
+      "description": "An IDF file with text to be appended before simulation. This input can be used to include large EnergyPlus objects that are not currently supported by honeybee.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGArrayInputAlias",
+          "annotations": {},
+          "name": "add_str",
+          "description": "THIS OPTION IS JUST FOR ADVANCED USERS OF ENERGYPLUS. An additional text string to be appended to the IDF before simulation. The input should include complete EnergyPlus objects following the IDF format. This input can be used to include EnergyPlus objects that are not currently supported by honeybee.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.simulation",
+              "function": "list_to_additional_idf",
+              "index": 0
+            }
+          ],
+          "default": [],
+          "required": false,
+          "spec": null,
+          "items_type": "String"
+        }
+      ],
+      "required": false,
+      "spec": null,
+      "extensions": [
+        "idf"
+      ]
+    },
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "ddy",
+      "description": "A DDY file with design days to be used for the initial sizing calculation.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "ddy",
+          "description": "The path to a .ddy file or an .epw file with design days to be used for the initial sizing calculation.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.ddy",
+              "function": "ddy_handler",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": true,
+      "spec": null,
+      "extensions": [
+        "ddy"
+      ]
+    },
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "epw",
+      "description": "EPW weather file to be used for the annual energy simulation.",
+      "default": null,
+      "alias": [],
+      "required": true,
+      "spec": null,
+      "extensions": [
+        "epw"
+      ]
+    },
+    {
+      "type": "DAGFolderInput",
+      "annotations": {},
+      "name": "measures",
+      "description": "A folder containing an OSW JSON be used as the base for the execution of the OpenStudio CLI. This folder must also contain all of the measures that are referenced within the OSW.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGArrayInputAlias",
+          "annotations": {},
+          "name": "measures",
+          "description": "An optional list of measures to apply to the OpenStudio model upon export. Use the \"HB Load Measure\" component to load a measure into Grasshopper and assign input arguments. Measures can be downloaded from the NREL Building Components Library (BCL) at (https://bcl.nrel.gov/).",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.simulation",
+              "function": "measures_to_folder",
+              "index": 0
+            }
+          ],
+          "default": [],
+          "required": false,
+          "spec": null,
+          "items_type": "Generic"
+        }
+      ],
+      "required": false,
+      "spec": null
+    },
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "model",
+      "description": "An energy Model as either a HBJSON, OSM, or IDF.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.model",
+              "function": "model_to_json",
+              "index": 0
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "HBModelToJSON",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        },
+        {
+          "type": "DAGLinkedInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "This input links the model to Rhino model.",
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "RhinoHBModelToJSON",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": true,
+      "spec": null,
+      "extensions": [
+        "hbjson",
+        "json",
+        "osm",
+        "idf"
+      ]
+    },
+    {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "sim-par",
+      "description": "SimulationParameter JSON that describes the settings for the simulation.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "sim_par",
+          "description": "A SimulationParameter object that describes all of the setting for the energy simulation. If None, some default simulation parameters will automatically be used. This can also be the path to a SimulationParameter JSON file.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.simulation",
+              "function": "energy_sim_par_to_json",
+              "index": 0
+            },
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "HBSimulationParameterToJSON",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": false,
+          "spec": null
+        },
+        {
+          "type": "DAGLinkedInputAlias",
+          "annotations": {},
+          "name": "sim_par",
+          "description": "This input links to SimulationParameter setting in Rhino.",
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "RhinoSimulationParameterToJSON",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": null,
+      "extensions": [
+        "json"
+      ]
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "units",
+      "description": "A switch to indicate whether the data in the final EUI file should be in SI (kWh/m2) or IP (kBtu/ft2). Valid values are \"si\" and \"ip\".",
+      "default": "si",
+      "alias": [],
+      "required": false,
+      "spec": {
+        "type": "string",
+        "enum": [
+          "si",
+          "ip"
+        ]
+      }
+    },
+    {
+      "type": "DAGStringInput",
+      "annotations": {},
+      "name": "viz-variables",
+      "description": "Text for EnergyPlus output variables to be visualized on the geometry in an output view_data HTML report. If unspecified, no view_data report is produced. Each variable should be in \"quotes\" and should be preceded by a -v option. For example\n-v \"Zone Air System Sensible Heating Rate\" -v \"Zone Air System Sensible Cooling Rate\".",
+      "default": "",
+      "alias": [
+        {
+          "type": "DAGArrayInputAlias",
+          "annotations": {},
+          "name": "viz_vars",
+          "description": "A list of text for EnergyPlus output variables to be visualized on the geometry in an output HTML report. If unspecified, no report is produced. For example, \"Zone Air System Sensible Heating Rate\".",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.simulation",
+              "function": "viz_variables_to_string",
+              "index": 0
+            }
+          ],
+          "default": [],
+          "required": false,
+          "spec": null,
+          "items_type": "String"
+        }
+      ],
+      "required": false,
+      "spec": null
+    }
+  ],
+  "outputs": [
+    {
+      "type": "DAGFileOutput",
+      "annotations": {},
+      "name": "err",
+      "description": "The error report output by the simulation.",
+      "from": {
+        "type": "FileReference",
+        "annotations": {},
+        "path": "run/eplusout.err"
+      },
+      "alias": [],
+      "required": true
+    },
+    {
+      "type": "DAGFileOutput",
+      "annotations": {},
+      "name": "eui",
+      "description": "A JSON containing energy use intensity information across the total model floor area. Values are either kWh/m2 or kBtu/ft2 depending upon the units input.",
+      "from": {
+        "type": "FileReference",
+        "annotations": {},
+        "path": "eui.json"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "eui",
+          "description": "Energy Use intensity, including total and for each end use.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.eui",
+              "function": "eui_json_from_path",
+              "index": 0
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFileOutput",
+      "annotations": {},
+      "name": "html",
+      "description": "The result HTML page with summary reports output by the simulation.",
+      "from": {
+        "type": "FileReference",
+        "annotations": {},
+        "path": "run/eplustbl.htm"
+      },
+      "alias": [],
+      "required": true
+    },
+    {
+      "type": "DAGFileOutput",
+      "annotations": {},
+      "name": "result-report",
+      "description": "The HTML report with interactive summaries of energy use, HVAC component sizes, and other information.",
+      "from": {
+        "type": "FileReference",
+        "annotations": {},
+        "path": "results.html"
+      },
+      "alias": [],
+      "required": false
+    },
+    {
+      "type": "DAGFileOutput",
+      "annotations": {},
+      "name": "sql",
+      "description": "The result SQL file output by the simulation.",
+      "from": {
+        "type": "FileReference",
+        "annotations": {},
+        "path": "run/eplusout.sql"
+      },
+      "alias": [],
+      "required": true
+    },
+    {
+      "type": "DAGFileOutput",
+      "annotations": {},
+      "name": "visual-report",
+      "description": "The HTML report with hourly EnergyPlus output variables visualized on the geometry.",
+      "from": {
+        "type": "FileReference",
+        "annotations": {},
+        "path": "visual.html"
+      },
+      "alias": [],
+      "required": false
+    },
+    {
+      "type": "DAGFileOutput",
+      "annotations": {},
+      "name": "zsz",
+      "description": "The result CSV with the zone loads over the design day output by the simulation.",
+      "from": {
+        "type": "FileReference",
+        "annotations": {},
+        "path": "run/epluszsz.csv"
+      },
+      "alias": [],
+      "required": false
+    }
+  ]
+}

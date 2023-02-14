@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "point-in-time-view",
-    "tag": "0.3.2",
+    "tag": "0.4.0",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -180,7 +180,8 @@
         "json",
         "hbjson",
         "pkl",
-        "hbplk"
+        "hbplk",
+        "zip"
       ]
     },
     {

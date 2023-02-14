@@ -1,7 +1,7 @@
 """
-This file is auto-generated from a Queenbee recipe. It is unlikely that
-you should be editing this file directly. Instead try to edit the recipe
-itself and regenerate the code.
+This file is auto-generated from annual-daylight:0.9.10.
+It is unlikely that you should be editing this file directly.
+Try to edit the original recipe itself and regenerate the code.
 
 Contact the recipe maintainers with additional questions.
     mostapha: mostapha@ladybug.tools
@@ -13,10 +13,10 @@ See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0
 
 
 import luigi
-import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
+from . import _queenbee_status_lock_
 
 
 _default_inputs = {   'bsdfs': None,
@@ -40,6 +40,7 @@ class DirectSky(QueenbeeTask):
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
 
     # Task inputs
     @property
@@ -110,7 +111,7 @@ class DirectSky(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format, order_by=self.order_by, header=self.header)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(fixed_radiance_parameters=self.fixed_radiance_parameters, header=self.header, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, order_by=self.order_by, output_format=self.output_format, conversion=self.conversion)
 
     def output(self):
         return {
@@ -138,6 +139,14 @@ class DirectSky(QueenbeeTask):
                 'type': 'file'
             }]
 
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
+
 
 class DirectSunlight(QueenbeeTask):
     """Calculate daylight contribution for a grid of sensors from a series of modifiers
@@ -145,6 +154,7 @@ class DirectSunlight(QueenbeeTask):
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
 
     # Task inputs
     @property
@@ -211,7 +221,7 @@ class DirectSunlight(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(calculate_values=self.calculate_values, sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format, order_by=self.order_by, header=self.header)
+        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(fixed_radiance_parameters=self.fixed_radiance_parameters, header=self.header, radiance_parameters=self.radiance_parameters, calculate_values=self.calculate_values, sensor_count=self.sensor_count, order_by=self.order_by, output_format=self.output_format, conversion=self.conversion)
 
     def output(self):
         return {
@@ -238,143 +248,13 @@ class DirectSunlight(QueenbeeTask):
                 'type': 'file'
             }]
 
-
-class DirectSunlightToNpy(QueenbeeTask):
-    """Convert binary Radiance matrix file to NumPy file."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
     @property
-    def name(self):
-        return self._input_params['grid_name']
+    def task_image(self):
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
 
     @property
-    def conversion(self):
-        return '47.4 119.9 11.6'
-
-    @property
-    def matrix_file(self):
-        value = pathlib.Path(self.input()['DirectSunlight']['result_file'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'honeybee-radiance-postprocess translate binary-to-npy "{matrix_file}" --conversion "{conversion}" --name output'.format(matrix_file=self.matrix_file, conversion=self.conversion)
-
-    def requires(self):
-        return {'DirectSunlight': DirectSunlight(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'output_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '../final/direct/{name}.ill'.format(name=self.name)).resolve().as_posix()
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'matrix_file', 'to': 'input.ill', 'from': self.matrix_file, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'output-file', 'from': 'output.npy',
-                'to': pathlib.Path(self.execution_folder, '../final/direct/{name}.ill'.format(name=self.name)).resolve().as_posix(),
-                'optional': False,
-                'type': 'file'
-            }]
-
-
-class OutputMatrixMath(QueenbeeTask):
-    """Multiply a matrix with conversation numbers."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def name(self):
-        return self._input_params['grid_name']
-
-    @property
-    def conversion(self):
-        return '47.4 119.9 11.6'
-
-    @property
-    def direct_sky_matrix(self):
-        value = pathlib.Path(self.input()['DirectSky']['result_file'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def total_sky_matrix(self):
-        value = pathlib.Path(self.input()['TotalSky']['result_file'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def sunlight_matrix(self):
-        value = pathlib.Path(self.input()['DirectSunlight']['result_file'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'honeybee-radiance-postprocess mtxop operate-three "{total_sky_matrix}" "{direct_sky_matrix}" "{sunlight_matrix}" --operator-one - --operator-two + --conversion "{conversion}" --name output'.format(total_sky_matrix=self.total_sky_matrix, direct_sky_matrix=self.direct_sky_matrix, sunlight_matrix=self.sunlight_matrix, conversion=self.conversion)
-
-    def requires(self):
-        return {'DirectSunlight': DirectSunlight(_input_params=self._input_params), 'TotalSky': TotalSky(_input_params=self._input_params), 'DirectSky': DirectSky(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'results_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '../final/total/{name}.ill'.format(name=self.name)).resolve().as_posix()
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'direct_sky_matrix', 'to': 'sky_dir.ill', 'from': self.direct_sky_matrix, 'optional': False},
-            {'name': 'total_sky_matrix', 'to': 'sky.ill', 'from': self.total_sky_matrix, 'optional': False},
-            {'name': 'sunlight_matrix', 'to': 'sun.ill', 'from': self.sunlight_matrix, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'results-file', 'from': 'output.npy',
-                'to': pathlib.Path(self.execution_folder, '../final/total/{name}.ill'.format(name=self.name)).resolve().as_posix(),
-                'optional': False,
-                'type': 'file'
-            }]
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
 
 
 class TotalSky(QueenbeeTask):
@@ -382,6 +262,7 @@ class TotalSky(QueenbeeTask):
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
 
     # Task inputs
     @property
@@ -452,7 +333,7 @@ class TotalSky(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion, output_format=self.output_format, order_by=self.order_by, header=self.header)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(fixed_radiance_parameters=self.fixed_radiance_parameters, header=self.header, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, order_by=self.order_by, output_format=self.output_format, conversion=self.conversion)
 
     def output(self):
         return {
@@ -480,8 +361,110 @@ class TotalSky(QueenbeeTask):
                 'type': 'file'
             }]
 
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
 
-class _AnnualDaylightRayTracing_8529a1a1Orchestrator(luigi.WrapperTask):
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
+
+
+class OutputMatrixMath(QueenbeeTask):
+    """Multiply a matrix with conversation numbers. Output both total and
+    direct results. The direct output is the direct sunlight contribution
+    (not the direct sky contribution)."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
+
+    # Task inputs
+    @property
+    def name(self):
+        return self._input_params['grid_name']
+
+    @property
+    def direct_sky_matrix(self):
+        value = pathlib.Path(self.input()['DirectSky']['result_file'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def total_sky_matrix(self):
+        value = pathlib.Path(self.input()['TotalSky']['result_file'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def sunlight_matrix(self):
+        value = pathlib.Path(self.input()['DirectSunlight']['result_file'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def execution_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def initiation_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def params_folder(self):
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    def command(self):
+        return 'honeybee-radiance-postprocess post-process two-phase rgb-to-illuminance "{total_sky_matrix}" "{direct_sky_matrix}" "{sunlight_matrix}"'.format(total_sky_matrix=self.total_sky_matrix, sunlight_matrix=self.sunlight_matrix, direct_sky_matrix=self.direct_sky_matrix)
+
+    def requires(self):
+        return {'DirectSunlight': DirectSunlight(_input_params=self._input_params), 'TotalSky': TotalSky(_input_params=self._input_params), 'DirectSky': DirectSky(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            'total': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, '../final/total/{name}.ill'.format(name=self.name)).resolve().as_posix()
+            ),
+            
+            'direct': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, '../final/direct/{name}.ill'.format(name=self.name)).resolve().as_posix()
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'direct_sky_matrix', 'to': 'sky_dir.ill', 'from': self.direct_sky_matrix, 'optional': False},
+            {'name': 'total_sky_matrix', 'to': 'sky.ill', 'from': self.total_sky_matrix, 'optional': False},
+            {'name': 'sunlight_matrix', 'to': 'sun.ill', 'from': self.sunlight_matrix, 'optional': False}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'total', 'from': 'total.npy',
+                'to': pathlib.Path(self.execution_folder, '../final/total/{name}.ill'.format(name=self.name)).resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
+            },
+                
+            {
+                'name': 'direct', 'from': 'direct.npy',
+                'to': pathlib.Path(self.execution_folder, '../final/direct/{name}.ill'.format(name=self.name)).resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
+            }]
+
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.147'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
+
+
+class _TwoPhaseRayTracing_acc750a6Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -493,4 +476,4 @@ class _AnnualDaylightRayTracing_8529a1a1Orchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [DirectSunlightToNpy(_input_params=self.input_values), OutputMatrixMath(_input_params=self.input_values)]
+        yield [OutputMatrixMath(_input_params=self.input_values)]

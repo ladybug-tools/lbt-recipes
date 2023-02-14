@@ -1,7 +1,7 @@
 """
-This file is auto-generated from a Queenbee recipe. It is unlikely that
-you should be editing this file directly. Instead try to edit the recipe
-itself and regenerate the code.
+This file is auto-generated from cumulative-radiation:0.3.4.
+It is unlikely that you should be editing this file directly.
+Try to edit the original recipe itself and regenerate the code.
 
 Contact the recipe maintainers with additional questions.
     mostapha: mostapha@ladybug.tools
@@ -13,19 +13,22 @@ See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0
 
 
 import sys
+import datetime
+import json
 import luigi
-import os
 import time
 import pathlib
+import shutil
 from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
+from luigi.execution_summary import LuigiStatusCode
 
-import flow.main as cumulative_radiation_workerbee
+import flow.main_62668fa9 as cumulative_radiation_workerbee
 
 
 _recipe_default_inputs = {   'cpu_count': 50,
     'grid_filter': '*',
-    'min_sensor_count': 1,
+    'min_sensor_count': 500,
     'model': None,
     'north': 0.0,
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
@@ -39,7 +42,7 @@ class LetCumulativeRadiationFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [cumulative_radiation_workerbee._Main_e9c43459Orchestrator(_input_params=self._input_params)]
+        yield [cumulative_radiation_workerbee._Main_62668fa9Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -79,12 +82,50 @@ def start(project_folder, user_values, workers):
     with cfg_file.open('w') as lf:
         lf.write(LOGS_CONFIG.replace('WORKFLOW.LOG', log_file))
 
-    luigi.build(
+    status_file = log_folder.joinpath('status.json')
+    if status_file.exists():
+        status_file.unlink()
+    shutil.copyfile(
+        pathlib.Path(__file__).parent.joinpath('status.json'),
+        status_file
+    )
+
+    now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+    status = json.loads(status_file.read_text())
+    status['status']['started_at'] = now
+    status['status']['status'] = 'Running'
+    status_file.write_text(json.dumps(status))
+
+    summary = luigi.build(
         [LetCumulativeRadiationFly(_input_params=input_params)],
         local_scheduler=local_scheduler(),
         workers=workers,
+        detailed_summary=True,
         logging_conf_file=cfg_file.as_posix()
     )
+
+    now = datetime.datetime.utcnow()
+    status = json.loads(status_file.read_text())
+    duration = now - datetime.datetime.strptime(
+        status['status']['started_at'], '%Y-%m-%dT%H:%M:%SZ'
+    )
+    duration -= datetime.timedelta(microseconds=duration.microseconds)
+    status['status']['finished_at'] = now.strftime('%Y-%m-%dT%H:%M:%SZ')
+    status['status']['status'] = 'Cancelled'
+    status_file.write_text(json.dumps(status))
+    if summary.status == LuigiStatusCode.FAILED:
+        status['status']['status'] = 'Failed'
+    elif summary.status == LuigiStatusCode.SUCCESS:
+        status['status']['status'] = 'Succeeded'
+    status_file.write_text(json.dumps(status))
+
+    cpu_usage = status['meta']['resources_duration']['cpu']
+
+    print(summary.summary_text)
+
+    print(f'Duration: {duration}    CPU Usage: {datetime.timedelta(seconds=cpu_usage)}')
+
+    print(f'More info:\n{log_file}')
 
 
 if __name__ == '__main__':
