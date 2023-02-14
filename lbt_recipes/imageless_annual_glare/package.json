@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "imageless-annual-glare",
-    "tag": "0.0.15",
+    "tag": "0.1.5",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -272,7 +272,7 @@
             "grasshopper"
           ],
           "handler": [],
-          "default": "-ab 2 -ad 5000 -lw 2e-05",
+          "default": "-ab 2 -ad 5000 -lw 2e-05 -dr 0",
           "required": false,
           "spec": null
         }

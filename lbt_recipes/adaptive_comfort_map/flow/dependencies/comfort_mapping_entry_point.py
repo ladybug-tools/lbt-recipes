@@ -1,7 +1,7 @@
 """
-This file is auto-generated from a Queenbee recipe. It is unlikely that
-you should be editing this file directly. Instead try to edit the recipe
-itself and regenerate the code.
+This file is auto-generated from adaptive-comfort-map:0.9.0.
+It is unlikely that you should be editing this file directly.
+Try to edit the original recipe itself and regenerate the code.
 
 Contact the recipe maintainers with additional questions.
     chris: chris@ladybug.tools
@@ -13,10 +13,10 @@ See https://polyformproject.org/wp-content/uploads/2020/06/PolyForm-Shield-1.0.0
 
 
 import luigi
-import os
 import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
+from . import _queenbee_status_lock_
 
 
 _default_inputs = {   'air_speed': None,
@@ -43,105 +43,12 @@ _default_inputs = {   'air_speed': None,
     'view_factors': None}
 
 
-class ComputeTcp(QueenbeeTask):
-    """Compute Thermal Comfort Petcent (TCP) from thermal condition CSV map."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-
-    # Task inputs
-    @property
-    def name(self):
-        return self._input_params['grid_name']
-
-    @property
-    def condition_csv(self):
-        value = pathlib.Path(self.input()['ProcessAdaptiveMatrix']['condition_map'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def enclosure_info(self):
-        value = pathlib.Path(self._input_params['enclosure_info'])
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def occ_schedule_json(self):
-        value = pathlib.Path(self._input_params['occ_schedules'])
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'ladybug-comfort map tcp condition.csv enclosure_info.json --schedule schedule.txt --occ-schedule-json occ_schedule.json --folder output'
-
-    def requires(self):
-        return {'ProcessAdaptiveMatrix': ProcessAdaptiveMatrix(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'tcp': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'metrics/TCP/{name}.csv'.format(name=self.name)).resolve().as_posix()
-            ),
-            
-            'hsp': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'metrics/HSP/{name}.csv'.format(name=self.name)).resolve().as_posix()
-            ),
-            
-            'csp': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'metrics/CSP/{name}.csv'.format(name=self.name)).resolve().as_posix()
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'condition_csv', 'to': 'condition.csv', 'from': self.condition_csv, 'optional': False},
-            {'name': 'enclosure_info', 'to': 'enclosure_info.json', 'from': self.enclosure_info, 'optional': False},
-            {'name': 'occ_schedule_json', 'to': 'occ_schedule.json', 'from': self.occ_schedule_json, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'tcp', 'from': 'output/tcp.csv',
-                'to': pathlib.Path(self.execution_folder, 'metrics/TCP/{name}.csv'.format(name=self.name)).resolve().as_posix(),
-                'optional': False,
-                'type': 'file'
-            },
-                
-            {
-                'name': 'hsp', 'from': 'output/hsp.csv',
-                'to': pathlib.Path(self.execution_folder, 'metrics/HSP/{name}.csv'.format(name=self.name)).resolve().as_posix(),
-                'optional': False,
-                'type': 'file'
-            },
-                
-            {
-                'name': 'csp', 'from': 'output/csp.csv',
-                'to': pathlib.Path(self.execution_folder, 'metrics/CSP/{name}.csv'.format(name=self.name)).resolve().as_posix(),
-                'optional': False,
-                'type': 'file'
-            }]
-
-
 class CreateAirSpeedJson(QueenbeeTask):
     """Get a JSON of air speeds that can be used as input for the mtx functions."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
 
     # Task inputs
     @property
@@ -192,7 +99,7 @@ class CreateAirSpeedJson(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort epw air-speed-json weather.epw enclosure_info.json --multiply-by {multiply_by} --indoor-air-speed in_speed.txt --outdoor-air-speed out_speed.txt --run-period "{run_period}" --output-file air_speed.json'.format(multiply_by=self.multiply_by, run_period=self.run_period)
+        return 'ladybug-comfort epw air-speed-json weather.epw enclosure_info.json --multiply-by {multiply_by} --indoor-air-speed in_speed.txt --outdoor-air-speed out_speed.txt --run-period "{run_period}" --output-file air_speed.json'.format(run_period=self.run_period, multiply_by=self.multiply_by)
 
     def output(self):
         return {
@@ -218,12 +125,21 @@ class CreateAirSpeedJson(QueenbeeTask):
                 'type': 'file'
             }]
 
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
+
 
 class CreateAirTemperatureMap(QueenbeeTask):
     """Get CSV files with maps of air temperatures or humidity from EnergyPlus results."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
 
     # Task inputs
     @property
@@ -300,12 +216,21 @@ class CreateAirTemperatureMap(QueenbeeTask):
                 'type': 'file'
             }]
 
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
+
 
 class CreateLongwaveMrtMap(QueenbeeTask):
     """Get CSV files with maps of longwave MRT from Radiance and EnergyPlus results."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
 
     # Task inputs
     @property
@@ -392,12 +317,21 @@ class CreateLongwaveMrtMap(QueenbeeTask):
                 'type': 'file'
             }]
 
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
+
 
 class CreateShortwaveMrtMap(QueenbeeTask):
     """Get CSV files with maps of shortwave MRT Deltas from Radiance results."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
 
     # Task inputs
     @property
@@ -490,7 +424,7 @@ class CreateShortwaveMrtMap(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort map shortwave-mrt weather.epw indirect.ill direct.ill ref.ill sun-up-hours.txt --contributions dynamic --transmittance-contribs dyn_shade --trans-schedule-json trans_schedules.json --solarcal-par "{solarcal_par}" --run-period "{run_period}" --{indirect_is_total} --output-file shortwave.csv'.format(solarcal_par=self.solarcal_par, run_period=self.run_period, indirect_is_total=self.indirect_is_total)
+        return 'ladybug-comfort map shortwave-mrt weather.epw indirect.ill direct.ill ref.ill sun-up-hours.txt --contributions dynamic --transmittance-contribs dyn_shade --trans-schedule-json trans_schedules.json --solarcal-par "{solarcal_par}" --run-period "{run_period}" --{indirect_is_total} --output-file shortwave.csv'.format(run_period=self.run_period, indirect_is_total=self.indirect_is_total, solarcal_par=self.solarcal_par)
 
     def output(self):
         return {
@@ -521,12 +455,21 @@ class CreateShortwaveMrtMap(QueenbeeTask):
                 'type': 'file'
             }]
 
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
+
 
 class ProcessAdaptiveMatrix(QueenbeeTask):
     """Get CSV files with matrices of Adaptive comfort from matrices of Adaptive inputs."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
 
     # Task inputs
     @property
@@ -633,8 +576,119 @@ class ProcessAdaptiveMatrix(QueenbeeTask):
                 'type': 'file'
             }]
 
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
 
-class _ComfortMappingEntryPoint_9d6ff838Orchestrator(luigi.WrapperTask):
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
+
+
+class ComputeTcp(QueenbeeTask):
+    """Compute Thermal Comfort Petcent (TCP) from thermal condition CSV map."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
+
+    # Task inputs
+    @property
+    def name(self):
+        return self._input_params['grid_name']
+
+    @property
+    def condition_csv(self):
+        value = pathlib.Path(self.input()['ProcessAdaptiveMatrix']['condition_map'].path)
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def enclosure_info(self):
+        value = pathlib.Path(self._input_params['enclosure_info'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def occ_schedule_json(self):
+        value = pathlib.Path(self._input_params['occ_schedules'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def execution_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def initiation_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def params_folder(self):
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    def command(self):
+        return 'ladybug-comfort map tcp condition.csv enclosure_info.json --schedule schedule.txt --occ-schedule-json occ_schedule.json --folder output'
+
+    def requires(self):
+        return {'ProcessAdaptiveMatrix': ProcessAdaptiveMatrix(_input_params=self._input_params)}
+
+    def output(self):
+        return {
+            'tcp': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'metrics/TCP/{name}.csv'.format(name=self.name)).resolve().as_posix()
+            ),
+            
+            'hsp': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'metrics/HSP/{name}.csv'.format(name=self.name)).resolve().as_posix()
+            ),
+            
+            'csp': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'metrics/CSP/{name}.csv'.format(name=self.name)).resolve().as_posix()
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'condition_csv', 'to': 'condition.csv', 'from': self.condition_csv, 'optional': False},
+            {'name': 'enclosure_info', 'to': 'enclosure_info.json', 'from': self.enclosure_info, 'optional': False},
+            {'name': 'occ_schedule_json', 'to': 'occ_schedule.json', 'from': self.occ_schedule_json, 'optional': False}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'tcp', 'from': 'output/tcp.csv',
+                'to': pathlib.Path(self.execution_folder, 'metrics/TCP/{name}.csv'.format(name=self.name)).resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
+            },
+                
+            {
+                'name': 'hsp', 'from': 'output/hsp.csv',
+                'to': pathlib.Path(self.execution_folder, 'metrics/HSP/{name}.csv'.format(name=self.name)).resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
+            },
+                
+            {
+                'name': 'csp', 'from': 'output/csp.csv',
+                'to': pathlib.Path(self.execution_folder, 'metrics/CSP/{name}.csv'.format(name=self.name)).resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
+            }]
+
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
+
+
+class _ComfortMappingEntryPoint_6a898778Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

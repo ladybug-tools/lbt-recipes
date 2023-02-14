@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "sky-view",
-    "tag": "1.0.3",
+    "tag": "1.2.4",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -143,7 +143,7 @@
       "annotations": {},
       "name": "min-sensor-count",
       "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids. The default value is set to 1, which means that the cpu_count is always respected.",
-      "default": 1,
+      "default": 500,
       "alias": [
         {
           "type": "DAGIntegerInputAlias",
@@ -229,7 +229,10 @@
       "spec": null,
       "extensions": [
         "json",
-        "hbjson"
+        "hbjson",
+        "pkl",
+        "hbpkl",
+        "zip"
       ]
     },
     {
@@ -266,7 +269,7 @@
       "from": {
         "type": "FolderReference",
         "annotations": {},
-        "path": "results"
+        "path": "results/sky_view"
       },
       "alias": [
         {

@@ -9,7 +9,7 @@ from honeybee_energy.config import folders as energy_folders
 # LBT Grasshopper plugin
 RADIANCE_DATE = (2021, 3, 28)
 EP_VERSION = (22, 2, 0)
-OS_VERSION = (3, 5, 0)
+OS_VERSION = (3, 5, 1)
 COMPATIBILITY_URL = 'https://github.com/ladybug-tools/lbt-grasshopper/wiki/' \
     '1.4-Compatibility-Matrix'
 

@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "daylight-factor",
-    "tag": "0.6.5",
+    "tag": "0.8.8",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -101,7 +101,7 @@
       "annotations": {},
       "name": "min-sensor-count",
       "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids. The default value is set to 1, which means that the cpu_count is always respected.",
-      "default": 1,
+      "default": 500,
       "alias": [
         {
           "type": "DAGIntegerInputAlias",
@@ -127,7 +127,7 @@
       "type": "DAGFileInput",
       "annotations": {},
       "name": "model",
-      "description": "A Honeybee model in HBJSON file format.",
+      "description": "A Honeybee Model in either JSON or Pkl format. This can also be a zipped honeybee-radiance folder.",
       "default": null,
       "alias": [
         {
@@ -187,7 +187,10 @@
       "spec": null,
       "extensions": [
         "json",
-        "hbjson"
+        "hbjson",
+        "pkl",
+        "hbpkl",
+        "zip"
       ]
     },
     {

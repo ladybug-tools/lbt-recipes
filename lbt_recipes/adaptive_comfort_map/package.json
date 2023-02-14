@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "adaptive-comfort-map",
-    "tag": "0.7.1",
+    "tag": "0.9.0",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -222,7 +222,7 @@
       "annotations": {},
       "name": "min-sensor-count",
       "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids. The default value is set to 1, which means that the cpu_count is always respected.",
-      "default": 1,
+      "default": 500,
       "alias": [
         {
           "type": "DAGIntegerInputAlias",
@@ -364,7 +364,7 @@
             "grasshopper"
           ],
           "handler": [],
-          "default": "-ab 2 -ad 5000 -lw 2e-05",
+          "default": "-ab 2 -ad 5000 -lw 2e-05 -dr 0",
           "required": false,
           "spec": null
         }
