@@ -1,5 +1,5 @@
 """
-This file is auto-generated from cumulative-radiation:0.3.4.
+This file is auto-generated from cumulative-radiation:0.3.8.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -23,7 +23,7 @@ from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 from luigi.execution_summary import LuigiStatusCode
 
-import flow.main_62668fa9 as cumulative_radiation_workerbee
+import flow.main_f645822f as cumulative_radiation_workerbee
 
 
 _recipe_default_inputs = {   'cpu_count': 50,
@@ -42,7 +42,7 @@ class LetCumulativeRadiationFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [cumulative_radiation_workerbee._Main_62668fa9Orchestrator(_input_params=self._input_params)]
+        yield [cumulative_radiation_workerbee._Main_f645822fOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
