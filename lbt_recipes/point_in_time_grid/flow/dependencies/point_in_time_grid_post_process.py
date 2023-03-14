@@ -1,10 +1,10 @@
 """
-This file is auto-generated from daylight-factor:0.8.8.
+This file is auto-generated from point-in-time-grid:0.3.10.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
 Contact the recipe maintainers with additional questions.
-    mostapha: mostapha@ladybug.tools
+    chris: chris@ladybug.tools
     ladybug-tools: info@ladybug.tools
 
 This file is licensed under "PolyForm Shield License 1.0.0".
@@ -61,7 +61,7 @@ class RestructureResults(QueenbeeTask):
     def output(self):
         return {
             'output_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'results').resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'results/pit').resolve().as_posix()
             )
         }
 
@@ -75,7 +75,7 @@ class RestructureResults(QueenbeeTask):
         return [
             {
                 'name': 'output-folder', 'from': 'output_folder',
-                'to': pathlib.Path(self.execution_folder, 'results').resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'results/pit').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]
@@ -124,7 +124,7 @@ class CopyGridInfo(QueenbeeTask):
     def output(self):
         return {
             'dst': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'results/pit/grids_info.json').resolve().as_posix()
             )
         }
 
@@ -138,7 +138,7 @@ class CopyGridInfo(QueenbeeTask):
         return [
             {
                 'name': 'dst', 'from': 'input.path',
-                'to': pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'results/pit/grids_info.json').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -152,7 +152,7 @@ class CopyGridInfo(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _DaylightFactorPostProcessResults_afc7c61dOrchestrator(luigi.WrapperTask):
+class _PointInTimeGridPostProcess_05de3fd9Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -102,7 +102,7 @@ class AccumulateResults(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _CumulativeRadiationPostprocess_f645822fOrchestrator(luigi.WrapperTask):
+class _CumulativeRadiationPostprocess_c4e2265aOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

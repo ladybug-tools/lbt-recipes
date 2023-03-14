@@ -107,7 +107,7 @@ class DirectIrradianceCalculation(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, radiance_parameters=self.radiance_parameters, header=self.header, order_by=self.order_by, calculate_values=self.calculate_values, fixed_radiance_parameters=self.fixed_radiance_parameters, sensor_count=self.sensor_count, output_format=self.output_format)
+        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(calculate_values=self.calculate_values, header=self.header, sensor_count=self.sensor_count, conversion=self.conversion, order_by=self.order_by, fixed_radiance_parameters=self.fixed_radiance_parameters, radiance_parameters=self.radiance_parameters, output_format=self.output_format)
 
     def output(self):
         return {
@@ -136,7 +136,7 @@ class DirectIrradianceCalculation(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
@@ -188,7 +188,7 @@ class ConvertToSunHours(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance post-process convert-to-binary input.mtx --output binary.mtx --maximum {maximum} --minimum {minimum} --{reverse} --{include_min}-min --{include_max}-max'.format(maximum=self.maximum, reverse=self.reverse, minimum=self.minimum, include_min=self.include_min, include_max=self.include_max)
+        return 'honeybee-radiance post-process convert-to-binary input.mtx --output binary.mtx --maximum {maximum} --minimum {minimum} --{reverse} --{include_min}-min --{include_max}-max'.format(maximum=self.maximum, include_min=self.include_min, reverse=self.reverse, minimum=self.minimum, include_max=self.include_max)
 
     def requires(self):
         return {'DirectIrradianceCalculation': DirectIrradianceCalculation(_input_params=self._input_params)}
@@ -217,7 +217,7 @@ class ConvertToSunHours(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
@@ -292,7 +292,7 @@ class CalculateCumulativeHours(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
@@ -366,7 +366,7 @@ class CopySunHours(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _DirectSunHoursCalculation_131d7ce0Orchestrator(luigi.WrapperTask):
+class _DirectSunHoursCalculation_f24da6c6Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

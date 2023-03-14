@@ -1,5 +1,5 @@
 """
-This file is auto-generated from direct-sun-hours:0.5.14.
+This file is auto-generated from imageless-annual-glare:0.1.5.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,23 +17,26 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.direct_sun_hours_calculation import _DirectSunHoursCalculation_131d7ce0Orchestrator as DirectSunHoursCalculation_131d7ce0Workerbee
-from .dependencies.direct_sun_hours_postprocess import _DirectSunHoursPostprocess_131d7ce0Orchestrator as DirectSunHoursPostprocess_131d7ce0Workerbee
-from .dependencies.direct_sun_hours_prepare_folder import _DirectSunHoursPrepareFolder_131d7ce0Orchestrator as DirectSunHoursPrepareFolder_131d7ce0Workerbee
+from .dependencies.imageless_annual_glare import _ImagelessAnnualGlare_abf29326Orchestrator as ImagelessAnnualGlare_abf29326Workerbee
+from .dependencies.imageless_annual_glare_postprocess import _ImagelessAnnualGlarePostprocess_abf29326Orchestrator as ImagelessAnnualGlarePostprocess_abf29326Workerbee
+from .dependencies.imageless_annual_glare_prepare_folder import _ImagelessAnnualGlarePrepareFolder_abf29326Orchestrator as ImagelessAnnualGlarePrepareFolder_abf29326Workerbee
 
 
 _default_inputs = {   'cpu_count': 50,
+    'glare_threshold': 0.4,
     'grid_filter': '*',
+    'luminance_factor': 2000.0,
     'min_sensor_count': 500,
     'model': None,
     'north': 0.0,
     'params_folder': '__params',
+    'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
+    'schedule': None,
     'simulation_folder': '.',
-    'timestep': 1,
     'wea': None}
 
 
-class PrepareFolderDirectSunHours(QueenbeeTask):
+class PrepareFolderImagelessAnnualGlare(QueenbeeTask):
     """No description is provided."""
 
     # DAG Input parameters
@@ -41,10 +44,6 @@ class PrepareFolderDirectSunHours(QueenbeeTask):
     _status_lock = _queenbee_status_lock_
 
     # Task inputs
-    @property
-    def timestep(self):
-        return self._input_params['timestep']
-
     @property
     def north(self):
         return self._input_params['north']
@@ -90,7 +89,6 @@ class PrepareFolderDirectSunHours(QueenbeeTask):
         """Map task inputs to DAG inputs."""
         inputs = {
             'simulation_folder': self.execution_folder,
-            'timestep': self.timestep,
             'north': self.north,
             'cpu_count': self.cpu_count,
             'min_sensor_count': self.min_sensor_count,
@@ -107,11 +105,11 @@ class PrepareFolderDirectSunHours(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [DirectSunHoursPrepareFolder_131d7ce0Workerbee(_input_params=self.map_dag_inputs)]
+        yield [ImagelessAnnualGlarePrepareFolder_abf29326Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
-        pathlib.Path(self.execution_folder, 'prepare_folder_direct_sun_hours.done').write_text('done!')
+        pathlib.Path(self.execution_folder, 'prepare_folder_imageless_annual_glare.done').write_text('done!')
 
     def output(self):
         return {
@@ -132,7 +130,7 @@ class PrepareFolderDirectSunHours(QueenbeeTask):
                     self.params_folder,
                     'resources/grid/_info.json').resolve().as_posix()
                 ),
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'prepare_folder_direct_sun_hours.done').resolve().as_posix())
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'prepare_folder_imageless_annual_glare.done').resolve().as_posix())
         }
 
     @property
@@ -164,7 +162,7 @@ class PrepareFolderDirectSunHours(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'resources/grid/_info.json', 'to': pathlib.Path(self.params_folder, 'resources/grid/_info.json').resolve().as_posix()}]
 
 
-class DirectSunHoursRaytracingLoop(luigi.Task):
+class AnnualImagelessGlareLoop(luigi.Task):
     """No description is provided."""
 
     # DAG Input parameters
@@ -173,43 +171,53 @@ class DirectSunHoursRaytracingLoop(luigi.Task):
 
     # Task inputs
     @property
-    def timestep(self):
-        return self._input_params['timestep']
-
-    @property
-    def sensor_count(self):
-        return self.item['count']
+    def radiance_parameters(self):
+        return self._input_params['radiance_parameters']
 
     @property
     def grid_name(self):
         return self.item['full_id']
 
     @property
+    def sensor_count(self):
+        return self.item['count']
+
+    @property
+    def luminance_factor(self):
+        return self._input_params['luminance_factor']
+
+    @property
     def octree_file(self):
-        value = pathlib.Path(self.input()['PrepareFolderDirectSunHours']['resources'].path, 'scene_with_suns.oct')
+        value = pathlib.Path(self.input()['PrepareFolderImagelessAnnualGlare']['resources'].path, 'scene.oct')
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def sensor_grid(self):
-        value = pathlib.Path(self.input()['PrepareFolderDirectSunHours']['resources'].path, 'grid/{item_full_id}.pts'.format(item_full_id=self.item['full_id']))
+        value = pathlib.Path(self.input()['PrepareFolderImagelessAnnualGlare']['resources'].path, 'grid/{item_full_id}.pts'.format(item_full_id=self.item['full_id']))
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
-    def sun_modifiers(self):
-        value = pathlib.Path(self.input()['PrepareFolderDirectSunHours']['resources'].path, 'suns.mod')
+    def sky_matrix(self):
+        value = pathlib.Path(self.input()['PrepareFolderImagelessAnnualGlare']['resources'].path, 'sky.mtx')
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def sky_dome(self):
+        value = pathlib.Path(self.input()['PrepareFolderImagelessAnnualGlare']['resources'].path, 'sky.dome')
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def bsdfs(self):
         try:
-            pathlib.Path(self.input()['PrepareFolderDirectSunHours']['model_folder'].path, 'bsdf')
+            pathlib.Path(self.input()['PrepareFolderImagelessAnnualGlare']['model_folder'].path, 'bsdf')
         except TypeError:
             # optional artifact
             return None
-        value = pathlib.Path(self.input()['PrepareFolderDirectSunHours']['model_folder'].path, 'bsdf')
+        value = pathlib.Path(self.input()['PrepareFolderImagelessAnnualGlare']['model_folder'].path, 'bsdf')
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -236,13 +244,15 @@ class DirectSunHoursRaytracingLoop(luigi.Task):
         """Map task inputs to DAG inputs."""
         inputs = {
             'simulation_folder': self.execution_folder,
-            'timestep': self.timestep,
-            'sensor_count': self.sensor_count,
+            'radiance_parameters': self.radiance_parameters,
             'octree_file': self.octree_file,
             'grid_name': self.grid_name,
             'sensor_grid': self.sensor_grid,
-            'sun_modifiers': self.sun_modifiers,
-            'bsdfs': self.bsdfs
+            'sensor_count': self.sensor_count,
+            'sky_matrix': self.sky_matrix,
+            'sky_dome': self.sky_dome,
+            'bsdfs': self.bsdfs,
+            'luminance_factor': self.luminance_factor
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -253,27 +263,27 @@ class DirectSunHoursRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DirectSunHoursCalculation_131d7ce0Workerbee(_input_params=self.map_dag_inputs)]
-        done_file = pathlib.Path(self.execution_folder, 'direct_sun_hours_raytracing.done')
+        yield [ImagelessAnnualGlare_abf29326Workerbee(_input_params=self.map_dag_inputs)]
+        done_file = pathlib.Path(self.execution_folder, 'annual_imageless_glare.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
 
     def requires(self):
-        return {'PrepareFolderDirectSunHours': PrepareFolderDirectSunHours(_input_params=self._input_params)}
+        return {'PrepareFolderImagelessAnnualGlare': PrepareFolderImagelessAnnualGlare(_input_params=self._input_params)}
 
     def output(self):
         return {
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'direct_sun_hours_raytracing.done').resolve().as_posix())
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'annual_imageless_glare.done').resolve().as_posix())
         }
 
 
-class DirectSunHoursRaytracing(luigi.Task):
+class AnnualImagelessGlare(luigi.Task):
     """No description is provided."""
     # global parameters
     _input_params = luigi.DictParameter()
     @property
     def sensor_grids(self):
-        value = pathlib.Path(self.input()['PrepareFolderDirectSunHours']['sensor_grids'].path)
+        value = pathlib.Path(self.input()['PrepareFolderImagelessAnnualGlare']['sensor_grids'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -284,11 +294,11 @@ class DirectSunHoursRaytracing(luigi.Task):
             return qb_load_input_param(self.sensor_grids)
         except:
             # it is a parameter
-            return self.input()['PrepareFolderDirectSunHours']['sensor_grids'].path
+            return self.input()['PrepareFolderImagelessAnnualGlare']['sensor_grids'].path
 
     def run(self):
-        yield [DirectSunHoursRaytracingLoop(item=item, _input_params=self._input_params) for item in self.items]
-        done_file = pathlib.Path(self.execution_folder, 'direct_sun_hours_raytracing.done')
+        yield [AnnualImagelessGlareLoop(item=item, _input_params=self._input_params) for item in self.items]
+        done_file = pathlib.Path(self.execution_folder, 'annual_imageless_glare.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
 
@@ -305,15 +315,15 @@ class DirectSunHoursRaytracing(luigi.Task):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def requires(self):
-        return {'PrepareFolderDirectSunHours': PrepareFolderDirectSunHours(_input_params=self._input_params)}
+        return {'PrepareFolderImagelessAnnualGlare': PrepareFolderImagelessAnnualGlare(_input_params=self._input_params)}
 
     def output(self):
         return {
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'direct_sun_hours_raytracing.done').resolve().as_posix())
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'annual_imageless_glare.done').resolve().as_posix())
         }
 
 
-class PostprocessDirectSunHours(QueenbeeTask):
+class PostprocessImagelessAnnualGlare(QueenbeeTask):
     """No description is provided."""
 
     # DAG Input parameters
@@ -322,32 +332,35 @@ class PostprocessDirectSunHours(QueenbeeTask):
 
     # Task inputs
     @property
+    def glare_threshold(self):
+        return self._input_params['glare_threshold']
+
+    @property
     def input_folder(self):
-        value = pathlib.Path(self.input()['PrepareFolderDirectSunHours']['initial_results'].path)
+        value = pathlib.Path(self.input()['PrepareFolderImagelessAnnualGlare']['initial_results'].path, 'dgp')
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def schedule(self):
+        try:
+            pathlib.Path(self._input_params['schedule'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['schedule'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def grids_info(self):
-        value = pathlib.Path(self.input()['PrepareFolderDirectSunHours']['resources'].path, 'grids_info.json')
+        value = pathlib.Path(self.input()['PrepareFolderImagelessAnnualGlare']['resources'].path, 'grids_info.json')
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def sun_up_hours(self):
-        value = pathlib.Path(self.input()['PrepareFolderDirectSunHours']['resources'].path, 'sun-up-hours.txt')
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def timestep(self):
-        value = pathlib.Path(self.input()['PrepareFolderDirectSunHours']['resources'].path, 'timestep.txt')
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def wea(self):
-        value = pathlib.Path(self._input_params['wea'])
+        value = pathlib.Path(self.input()['PrepareFolderImagelessAnnualGlare']['resources'].path, 'sun-up-hours.txt')
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -369,10 +382,10 @@ class PostprocessDirectSunHours(QueenbeeTask):
         inputs = {
             'simulation_folder': self.execution_folder,
             'input_folder': self.input_folder,
+            'schedule': self.schedule,
+            'glare_threshold': self.glare_threshold,
             'grids_info': self.grids_info,
-            'sun_up_hours': self.sun_up_hours,
-            'timestep': self.timestep,
-            'wea': self.wea
+            'sun_up_hours': self.sun_up_hours
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -383,21 +396,25 @@ class PostprocessDirectSunHours(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [DirectSunHoursPostprocess_131d7ce0Workerbee(_input_params=self.map_dag_inputs)]
+        yield [ImagelessAnnualGlarePostprocess_abf29326Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
-        pathlib.Path(self.execution_folder, 'postprocess_direct_sun_hours.done').write_text('done!')
+        pathlib.Path(self.execution_folder, 'postprocess_imageless_annual_glare.done').write_text('done!')
 
     def requires(self):
-        return {'PrepareFolderDirectSunHours': PrepareFolderDirectSunHours(_input_params=self._input_params), 'DirectSunHoursRaytracing': DirectSunHoursRaytracing(_input_params=self._input_params)}
+        return {'PrepareFolderImagelessAnnualGlare': PrepareFolderImagelessAnnualGlare(_input_params=self._input_params), 'AnnualImagelessGlare': AnnualImagelessGlare(_input_params=self._input_params)}
 
     def output(self):
         return {
             'results': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'results').resolve().as_posix()
             ),
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'postprocess_direct_sun_hours.done').resolve().as_posix())
+            
+            'metrics': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix()
+            ),
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'postprocess_imageless_annual_glare.done').resolve().as_posix())
         }
 
     @property
@@ -408,10 +425,17 @@ class PostprocessDirectSunHours(QueenbeeTask):
                 'to': pathlib.Path(self.execution_folder, 'results').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
+            },
+                
+            {
+                'name': 'metrics', 'from': 'metrics',
+                'to': pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
             }]
 
 
-class _Main_131d7ce0Orchestrator(luigi.WrapperTask):
+class _Main_abf29326Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -423,4 +447,4 @@ class _Main_131d7ce0Orchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [PostprocessDirectSunHours(_input_params=self.input_values)]
+        yield [PostprocessImagelessAnnualGlare(_input_params=self.input_values)]

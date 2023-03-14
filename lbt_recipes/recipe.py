@@ -251,7 +251,7 @@ class Recipe(object):
                 Windows (True) or with a command window (False). (Default: False).
             debug_folder: An optional path to a debug folder. If debug folder is
                 provided all the steps of the simulation will be executed inside
-                the debug folder which can be used for furthur inspection.
+                the debug folder which can be used for further inspection.
 
         Returns:
             Path to the project folder containing the recipe results.
@@ -359,6 +359,29 @@ class Recipe(object):
                     summary_lines.append(line)
         return ''.join(summary_lines)
 
+    def error_summary(self, project_folder=None):
+        """Get a string of the error summary after the recipe has run.
+
+        Args:
+            project_folder: The full path to the project folder containing
+                completed recipe logs. If None, the default_project_folder on
+                this recipe will be assumed. (Default: None).
+        """
+        # determine the log file path from the project folder
+        proj = self.default_project_folder if project_folder is None else project_folder
+        sim_path = os.path.join(proj, self.simulation_id)
+        log_file = os.path.join(sim_path, '__logs__', 'err.log')
+        if not os.path.isfile(log_file):
+            return ''
+        # open the file and load the summary
+        error_lines = []
+        with open(log_file) as lf:
+            for line in lf:
+                if line == '\n':
+                    continue
+                error_lines.append(line)
+        return ''.join(error_lines)
+
     def failure_message(self, project_folder=None):
         """Get a string of a recipe failure message that gives a summary of failed tasks.
 
@@ -367,9 +390,11 @@ class Recipe(object):
                 completed recipe logs. If None, the default_project_folder on
                 this recipe will be assumed. (Default: None).
         """
-        st_msg = 'The recipe failed to run with the following summary:\n'
-        end_msg = 'Use the report_out attribute of recipe settings to see a full report.'
-        return ''.join([st_msg, self.luigi_execution_summary(project_folder), end_msg])
+        st_msg = '\nThe recipe failed to run with the following error(s):\n\n'
+        return ''.join([
+            st_msg, self.error_summary(project_folder),
+            '\nExecution Summary', self.luigi_execution_summary(project_folder)
+        ])
 
     def ToString(self):
         return self.__repr__()

@@ -111,7 +111,7 @@ class DirectSky(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(fixed_radiance_parameters=self.fixed_radiance_parameters, header=self.header, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, order_by=self.order_by, output_format=self.output_format, conversion=self.conversion)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, header=self.header, order_by=self.order_by)
 
     def output(self):
         return {
@@ -221,7 +221,7 @@ class DirectSunlight(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(fixed_radiance_parameters=self.fixed_radiance_parameters, header=self.header, radiance_parameters=self.radiance_parameters, calculate_values=self.calculate_values, sensor_count=self.sensor_count, order_by=self.order_by, output_format=self.output_format, conversion=self.conversion)
+        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, calculate_values=self.calculate_values, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, header=self.header, order_by=self.order_by)
 
     def output(self):
         return {
@@ -333,7 +333,7 @@ class TotalSky(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(fixed_radiance_parameters=self.fixed_radiance_parameters, header=self.header, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, order_by=self.order_by, output_format=self.output_format, conversion=self.conversion)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, header=self.header, order_by=self.order_by)
 
     def output(self):
         return {
@@ -415,7 +415,7 @@ class OutputMatrixMath(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance-postprocess post-process two-phase rgb-to-illuminance "{total_sky_matrix}" "{direct_sky_matrix}" "{sunlight_matrix}"'.format(total_sky_matrix=self.total_sky_matrix, sunlight_matrix=self.sunlight_matrix, direct_sky_matrix=self.direct_sky_matrix)
+        return 'honeybee-radiance-postprocess post-process two-phase rgb-to-illuminance "{total_sky_matrix}" "{direct_sky_matrix}" "{sunlight_matrix}"'.format(sunlight_matrix=self.sunlight_matrix, direct_sky_matrix=self.direct_sky_matrix, total_sky_matrix=self.total_sky_matrix)
 
     def requires(self):
         return {'DirectSunlight': DirectSunlight(_input_params=self._input_params), 'TotalSky': TotalSky(_input_params=self._input_params), 'DirectSky': DirectSky(_input_params=self._input_params)}

@@ -1,5 +1,5 @@
 """
-This file is auto-generated from sky-view:1.2.4.
+This file is auto-generated from sky-view:1.2.6.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -23,7 +23,7 @@ from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 from luigi.execution_summary import LuigiStatusCode
 
-import flow.main_ce8e2bf9 as sky_view_workerbee
+import flow.main_961c2ad4 as sky_view_workerbee
 
 
 _recipe_default_inputs = {   'cloudy_sky': 'uniform',
@@ -39,7 +39,7 @@ class LetSkyViewFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [sky_view_workerbee._Main_ce8e2bf9Orchestrator(_input_params=self._input_params)]
+        yield [sky_view_workerbee._Main_961c2ad4Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -70,14 +70,18 @@ def start(project_folder, user_values, workers):
         from_ = pathlib.Path(project_folder, input_params[artifact]).resolve().as_posix()
         to_ = pathlib.Path(simulation_folder, input_params[artifact]).resolve().as_posix()
         _copy_artifacts(from_, to_)
+        # update the value to the new local value
+        input_params[artifact] = to_
 
     # set up logs
     log_folder = pathlib.Path(simulation_folder, '__logs__')
     log_folder.mkdir(exist_ok=True)
     cfg_file = pathlib.Path(simulation_folder, '__logs__', 'logs.cfg')
     log_file = pathlib.Path(simulation_folder, '__logs__', 'logs.log').as_posix()
+    err_file = pathlib.Path(simulation_folder, '__logs__', 'err.log').as_posix()
     with cfg_file.open('w') as lf:
-        lf.write(LOGS_CONFIG.replace('WORKFLOW.LOG', log_file))
+        log_config_content = LOGS_CONFIG.replace('WORKFLOW.LOG', log_file).replace('ERROR.LOG', err_file)
+        lf.write(log_config_content)
 
     status_file = log_folder.joinpath('status.json')
     if status_file.exists():
@@ -89,6 +93,24 @@ def start(project_folder, user_values, workers):
 
     now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
     status = json.loads(status_file.read_text())
+    # update the input/output values in status
+    for inp in status['status']['inputs']:
+        try:
+            value = input_params[inp['name'].replace('-', '_')]
+        except KeyError:
+            continue
+        if 'source' in inp:
+            inp['source']['path'] = value
+        else:
+            inp['value'] = value
+
+    for out in status['status']['outputs']:
+        if 'source' in out:
+            value = pathlib.Path(simulation_folder, out['source']['path'])
+            out['source']['path'] = value.as_posix()
+        else:
+            value = pathlib.Path(simulation_folder, out['path'])
+            out['path'] = value.as_posix()
     status['status']['started_at'] = now
     status['status']['status'] = 'Running'
     status_file.write_text(json.dumps(status))
@@ -114,6 +136,7 @@ def start(project_folder, user_values, workers):
         status['status']['status'] = 'Failed'
     elif summary.status == LuigiStatusCode.SUCCESS:
         status['status']['status'] = 'Succeeded'
+    status['meta']['progress']['running'] = 0
     status_file.write_text(json.dumps(status))
 
     cpu_usage = status['meta']['resources_duration']['cpu']
@@ -122,7 +145,7 @@ def start(project_folder, user_values, workers):
 
     print(f'Duration: {duration}    CPU Usage: {datetime.timedelta(seconds=cpu_usage)}')
 
-    print(f'More info:\n{log_file}')
+    print(f'More info:\n - {log_file}\n - {err_file}')
 
 
 if __name__ == '__main__':

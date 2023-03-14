@@ -1,10 +1,10 @@
 """
-This file is auto-generated from daylight-factor:0.8.8.
+This file is auto-generated from sky-view:1.2.6.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
 Contact the recipe maintainers with additional questions.
-    mostapha: mostapha@ladybug.tools
+    chris: chris@ladybug.tools
     ladybug-tools: info@ladybug.tools
 
 This file is licensed under "PolyForm Shield License 1.0.0".
@@ -17,20 +17,21 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.daylight_factor_post_process_results import _DaylightFactorPostProcessResults_6d0b4083Orchestrator as DaylightFactorPostProcessResults_6d0b4083Workerbee
-from .dependencies.daylight_factor_prepare_folder import _DaylightFactorPrepareFolder_6d0b4083Orchestrator as DaylightFactorPrepareFolder_6d0b4083Workerbee
+from .dependencies.sky_view_postprocess import _SkyViewPostprocess_961c2ad4Orchestrator as SkyViewPostprocess_961c2ad4Workerbee
+from .dependencies.sky_view_prepare_folder import _SkyViewPrepareFolder_961c2ad4Orchestrator as SkyViewPrepareFolder_961c2ad4Workerbee
 
 
-_default_inputs = {   'cpu_count': 50,
+_default_inputs = {   'cloudy_sky': 'uniform',
+    'cpu_count': 50,
     'grid_filter': '*',
     'min_sensor_count': 500,
     'model': None,
     'params_folder': '__params',
-    'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64',
+    'radiance_parameters': '-aa 0.1 -ad 2048 -ar 64',
     'simulation_folder': '.'}
 
 
-class PrepareDaylightFactorFolder(QueenbeeTask):
+class PrepareFolderSkyView(QueenbeeTask):
     """No description is provided."""
 
     # DAG Input parameters
@@ -47,8 +48,14 @@ class PrepareDaylightFactorFolder(QueenbeeTask):
         return self._input_params['min_sensor_count']
 
     @property
+    def cloudy_sky(self):
+        return self._input_params['cloudy_sky']
+
+    @property
     def grid_filter(self):
         return self._input_params['grid_filter']
+
+    radiance_parameters = luigi.Parameter(default='-aa 0.1 -ad 2048 -ar 64')
 
     @property
     def model(self):
@@ -73,10 +80,11 @@ class PrepareDaylightFactorFolder(QueenbeeTask):
         """Map task inputs to DAG inputs."""
         inputs = {
             'simulation_folder': self.execution_folder,
+            'model': self.model,
             'cpu_count': self.cpu_count,
             'min_sensor_count': self.min_sensor_count,
-            'grid_filter': self.grid_filter,
-            'model': self.model
+            'cloudy_sky': self.cloudy_sky,
+            'grid_filter': self.grid_filter
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -87,11 +95,11 @@ class PrepareDaylightFactorFolder(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [DaylightFactorPrepareFolder_6d0b4083Workerbee(_input_params=self.map_dag_inputs)]
+        yield [SkyViewPrepareFolder_961c2ad4Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
-        pathlib.Path(self.execution_folder, 'prepare_daylight_factor_folder.done').write_text('done!')
+        pathlib.Path(self.execution_folder, 'prepare_folder_sky_view.done').write_text('done!')
 
     def output(self):
         return {
@@ -112,7 +120,7 @@ class PrepareDaylightFactorFolder(QueenbeeTask):
                     self.params_folder,
                     'resources/grid/_info.json').resolve().as_posix()
                 ),
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'prepare_daylight_factor_folder.done').resolve().as_posix())
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'prepare_folder_sky_view.done').resolve().as_posix())
         }
 
     @property
@@ -144,8 +152,8 @@ class PrepareDaylightFactorFolder(QueenbeeTask):
         return [{'name': 'sensor-grids', 'from': 'resources/grid/_info.json', 'to': pathlib.Path(self.params_folder, 'resources/grid/_info.json').resolve().as_posix()}]
 
 
-class DaylightFactorRayTracingLoop(QueenbeeTask):
-    """Run ray-tracing and post-process the results for a daylight factor simulation."""
+class SkyViewRayTracingLoop(QueenbeeTask):
+    """Run ray-tracing and post-process the results for a skyview simulation."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
@@ -156,30 +164,28 @@ class DaylightFactorRayTracingLoop(QueenbeeTask):
     def radiance_parameters(self):
         return self._input_params['radiance_parameters']
 
-    fixed_radiance_parameters = luigi.Parameter(default='-I -h')
-
-    sky_illum = luigi.Parameter(default='100000')
+    fixed_radiance_parameters = luigi.Parameter(default='-I -ab 1 -h')
 
     @property
     def scene_file(self):
-        value = pathlib.Path(self.input()['PrepareDaylightFactorFolder']['resources'].path, 'scene.oct')
+        value = pathlib.Path(self.input()['PrepareFolderSkyView']['resources'].path, 'scene.oct')
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def grid(self):
-        value = pathlib.Path(self.input()['PrepareDaylightFactorFolder']['resources'].path, 'grid/{item_full_id}.pts'.format(item_full_id=self.item['full_id']))
+        value = pathlib.Path(self.input()['PrepareFolderSkyView']['resources'].path, 'grid/{item_full_id}.pts'.format(item_full_id=self.item['full_id']))
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def bsdf_folder(self):
         try:
-            pathlib.Path(self.input()['PrepareDaylightFactorFolder']['model_folder'].path)
+            pathlib.Path(self.input()['PrepareFolderSkyView']['model_folder'].path, 'bsdf')
         except TypeError:
             # optional artifact
             return None
-        value = pathlib.Path(self.input()['PrepareDaylightFactorFolder']['model_folder'].path)
+        value = pathlib.Path(self.input()['PrepareFolderSkyView']['model_folder'].path, 'bsdf')
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -202,10 +208,10 @@ class DaylightFactorRayTracingLoop(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance raytrace daylight-factor scene.oct grid.pts --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --sky-illum {sky_illum} --output grid.res'.format(sky_illum=self.sky_illum, fixed_radiance_parameters=self.fixed_radiance_parameters, radiance_parameters=self.radiance_parameters)
+        return 'honeybee-radiance raytrace daylight-factor scene.oct grid.pts --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --output grid.res'.format(radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters)
 
     def requires(self):
-        return {'PrepareDaylightFactorFolder': PrepareDaylightFactorFolder(_input_params=self._input_params)}
+        return {'PrepareFolderSkyView': PrepareFolderSkyView(_input_params=self._input_params)}
 
     def output(self):
         return {
@@ -233,20 +239,20 @@ class DaylightFactorRayTracingLoop(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class DaylightFactorRayTracing(luigi.Task):
-    """Run ray-tracing and post-process the results for a daylight factor simulation."""
+class SkyViewRayTracing(luigi.Task):
+    """Run ray-tracing and post-process the results for a skyview simulation."""
     # global parameters
     _input_params = luigi.DictParameter()
     @property
     def sensor_grids(self):
-        value = pathlib.Path(self.input()['PrepareDaylightFactorFolder']['sensor_grids'].path)
+        value = pathlib.Path(self.input()['PrepareFolderSkyView']['sensor_grids'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -257,11 +263,11 @@ class DaylightFactorRayTracing(luigi.Task):
             return qb_load_input_param(self.sensor_grids)
         except:
             # it is a parameter
-            return self.input()['PrepareDaylightFactorFolder']['sensor_grids'].path
+            return self.input()['PrepareFolderSkyView']['sensor_grids'].path
 
     def run(self):
-        yield [DaylightFactorRayTracingLoop(item=item, _input_params=self._input_params) for item in self.items]
-        done_file = pathlib.Path(self.execution_folder, 'daylight_factor_ray_tracing.done')
+        yield [SkyViewRayTracingLoop(item=item, _input_params=self._input_params) for item in self.items]
+        done_file = pathlib.Path(self.execution_folder, 'sky_view_ray_tracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
 
@@ -278,23 +284,23 @@ class DaylightFactorRayTracing(luigi.Task):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def requires(self):
-        return {'PrepareDaylightFactorFolder': PrepareDaylightFactorFolder(_input_params=self._input_params)}
+        return {'PrepareFolderSkyView': PrepareFolderSkyView(_input_params=self._input_params)}
 
     def output(self):
         return {
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'daylight_factor_ray_tracing.done').resolve().as_posix())
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'sky_view_ray_tracing.done').resolve().as_posix())
         }
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class PostProcessResults(QueenbeeTask):
+class PostprocessSkyView(QueenbeeTask):
     """No description is provided."""
 
     # DAG Input parameters
@@ -303,14 +309,14 @@ class PostProcessResults(QueenbeeTask):
 
     # Task inputs
     @property
-    def results_folder(self):
-        value = pathlib.Path('initial_results')
+    def input_folder(self):
+        value = pathlib.Path(self.input()['PrepareFolderSkyView']['initial_results'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
     def grids_info(self):
-        value = pathlib.Path('resources/grids_info.json')
+        value = pathlib.Path(self.input()['PrepareFolderSkyView']['resources'].path, 'grids_info.json')
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -331,7 +337,7 @@ class PostProcessResults(QueenbeeTask):
         """Map task inputs to DAG inputs."""
         inputs = {
             'simulation_folder': self.execution_folder,
-            'results_folder': self.results_folder,
+            'input_folder': self.input_folder,
             'grids_info': self.grids_info
         }
         try:
@@ -343,21 +349,21 @@ class PostProcessResults(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [DaylightFactorPostProcessResults_6d0b4083Workerbee(_input_params=self.map_dag_inputs)]
+        yield [SkyViewPostprocess_961c2ad4Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
-        pathlib.Path(self.execution_folder, 'post_process_results.done').write_text('done!')
+        pathlib.Path(self.execution_folder, 'postprocess_sky_view.done').write_text('done!')
 
     def requires(self):
-        return {'DaylightFactorRayTracing': DaylightFactorRayTracing(_input_params=self._input_params)}
+        return {'PrepareFolderSkyView': PrepareFolderSkyView(_input_params=self._input_params), 'SkyViewRayTracing': SkyViewRayTracing(_input_params=self._input_params)}
 
     def output(self):
         return {
             'results': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'results').resolve().as_posix()
             ),
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'post_process_results.done').resolve().as_posix())
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'postprocess_sky_view.done').resolve().as_posix())
         }
 
     @property
@@ -371,7 +377,7 @@ class PostProcessResults(QueenbeeTask):
             }]
 
 
-class _Main_6d0b4083Orchestrator(luigi.WrapperTask):
+class _Main_961c2ad4Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -383,4 +389,4 @@ class _Main_6d0b4083Orchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [PostProcessResults(_input_params=self.input_values)]
+        yield [PostprocessSkyView(_input_params=self.input_values)]

@@ -191,14 +191,14 @@ class CalculateAnnualMetrics(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.147'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.163'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _Main_9fa63057Orchestrator(luigi.WrapperTask):
+class _Main_47d8887dOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
