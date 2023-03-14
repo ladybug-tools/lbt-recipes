@@ -89,7 +89,7 @@ class ComputeSphericalViewFactors(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance view-factor contrib scene.oct grid.pts scene.mod --ray-count {ray_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --name view_factor'.format(radiance_parameters=self.radiance_parameters, ray_count=self.ray_count, fixed_radiance_parameters=self.fixed_radiance_parameters)
+        return 'honeybee-radiance view-factor contrib scene.oct grid.pts scene.mod --ray-count {ray_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --name view_factor'.format(fixed_radiance_parameters=self.fixed_radiance_parameters, ray_count=self.ray_count, radiance_parameters=self.radiance_parameters)
 
     def output(self):
         return {
@@ -117,7 +117,7 @@ class ComputeSphericalViewFactors(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
@@ -192,7 +192,7 @@ class GetEnclosureInfo(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
@@ -271,7 +271,7 @@ class MirrorTheGrid(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
@@ -349,7 +349,7 @@ class DirectSky(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(output_format=self.output_format, order_by=self.order_by, fixed_radiance_parameters=self.fixed_radiance_parameters, sensor_count=self.sensor_count, header=self.header, radiance_parameters=self.radiance_parameters, conversion=self.conversion)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, radiance_parameters=self.radiance_parameters, conversion=self.conversion, header=self.header, sensor_count=self.sensor_count, order_by=self.order_by)
 
     def requires(self):
         return {'MirrorTheGrid': MirrorTheGrid(_input_params=self._input_params)}
@@ -381,7 +381,7 @@ class DirectSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
@@ -460,7 +460,7 @@ class DirectSun(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(output_format=self.output_format, order_by=self.order_by, fixed_radiance_parameters=self.fixed_radiance_parameters, calculate_values=self.calculate_values, sensor_count=self.sensor_count, header=self.header, radiance_parameters=self.radiance_parameters, conversion=self.conversion)
+        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(calculate_values=self.calculate_values, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, radiance_parameters=self.radiance_parameters, conversion=self.conversion, header=self.header, sensor_count=self.sensor_count, order_by=self.order_by)
 
     def requires(self):
         return {'MirrorTheGrid': MirrorTheGrid(_input_params=self._input_params)}
@@ -491,7 +491,7 @@ class DirectSun(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
@@ -573,7 +573,7 @@ class GroundReflectedSky(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(output_format=self.output_format, order_by=self.order_by, fixed_radiance_parameters=self.fixed_radiance_parameters, sensor_count=self.sensor_count, header=self.header, radiance_parameters=self.radiance_parameters, conversion=self.conversion)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, radiance_parameters=self.radiance_parameters, conversion=self.conversion, header=self.header, sensor_count=self.sensor_count, order_by=self.order_by)
 
     def requires(self):
         return {'MirrorTheGrid': MirrorTheGrid(_input_params=self._input_params)}
@@ -605,7 +605,7 @@ class GroundReflectedSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
@@ -683,7 +683,7 @@ class TotalSky(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(output_format=self.output_format, order_by=self.order_by, fixed_radiance_parameters=self.fixed_radiance_parameters, sensor_count=self.sensor_count, header=self.header, radiance_parameters=self.radiance_parameters, conversion=self.conversion)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, radiance_parameters=self.radiance_parameters, conversion=self.conversion, header=self.header, sensor_count=self.sensor_count, order_by=self.order_by)
 
     def requires(self):
         return {'MirrorTheGrid': MirrorTheGrid(_input_params=self._input_params)}
@@ -715,7 +715,7 @@ class TotalSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
@@ -765,7 +765,7 @@ class OutputMatrixMath(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance mtxop operate-two sky.ill sky_dir.ill --operator "-" --{header}-header --conversion "{conversion}" --output-mtx final.ill --output-format {output_format}'.format(output_format=self.output_format, conversion=self.conversion, header=self.header)
+        return 'honeybee-radiance mtxop operate-two sky.ill sky_dir.ill --operator "-" --{header}-header --conversion "{conversion}" --output-mtx final.ill --output-format {output_format}'.format(conversion=self.conversion, header=self.header, output_format=self.output_format)
 
     def requires(self):
         return {'TotalSky': TotalSky(_input_params=self._input_params), 'DirectSky': DirectSky(_input_params=self._input_params)}
@@ -795,14 +795,14 @@ class OutputMatrixMath(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _RadianceMappingEntryPoint_6c6f2571Orchestrator(luigi.WrapperTask):
+class _RadianceMappingEntryPoint_11dd2a9eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

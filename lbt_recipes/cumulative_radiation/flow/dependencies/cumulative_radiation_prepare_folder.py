@@ -171,7 +171,7 @@ class CreateSky(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(sun_up_hours=self.sun_up_hours, north=self.north, output_format=self.output_format, sky_density=self.sky_density, sky_type=self.sky_type, output_type=self.output_type, cumulative=self.cumulative)
+        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(output_format=self.output_format, sky_type=self.sky_type, output_type=self.output_type, cumulative=self.cumulative, north=self.north, sky_density=self.sky_density, sun_up_hours=self.sun_up_hours)
 
     def output(self):
         return {
@@ -351,7 +351,7 @@ class CreateOctree(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out}'.format(include_aperture=self.include_aperture, black_out=self.black_out)
+        return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out}'.format(black_out=self.black_out, include_aperture=self.include_aperture)
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
@@ -431,7 +431,7 @@ class SplitGridFolder(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(min_sensor_count=self.min_sensor_count, cpu_count=self.cpu_count, cpus_per_grid=self.cpus_per_grid)
+        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(cpus_per_grid=self.cpus_per_grid, min_sensor_count=self.min_sensor_count, cpu_count=self.cpu_count)
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
@@ -478,7 +478,7 @@ class SplitGridFolder(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _CumulativeRadiationPrepareFolder_f645822fOrchestrator(luigi.WrapperTask):
+class _CumulativeRadiationPrepareFolder_c4e2265aOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

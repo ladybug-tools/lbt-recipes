@@ -111,7 +111,7 @@ class DirectSkyShadeGroup(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(output_format=self.output_format, radiance_parameters=self.radiance_parameters, order_by=self.order_by, header=self.header, sensor_count=self.sensor_count, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(header=self.header, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, order_by=self.order_by, sensor_count=self.sensor_count, conversion=self.conversion)
 
     def output(self):
         return {
@@ -223,7 +223,7 @@ class DirectSunShadeGroup(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(output_format=self.output_format, radiance_parameters=self.radiance_parameters, order_by=self.order_by, header=self.header, sensor_count=self.sensor_count, calculate_values=self.calculate_values, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion)
+        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(calculate_values=self.calculate_values, header=self.header, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, order_by=self.order_by, sensor_count=self.sensor_count, conversion=self.conversion)
 
     def output(self):
         return {
@@ -337,7 +337,7 @@ class GroundReflectedSkyShadeGroup(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(output_format=self.output_format, radiance_parameters=self.radiance_parameters, order_by=self.order_by, header=self.header, sensor_count=self.sensor_count, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(header=self.header, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, order_by=self.order_by, sensor_count=self.sensor_count, conversion=self.conversion)
 
     def output(self):
         return {
@@ -448,7 +448,7 @@ class TotalSkySpecShadeGroup(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(output_format=self.output_format, radiance_parameters=self.radiance_parameters, order_by=self.order_by, header=self.header, sensor_count=self.sensor_count, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(header=self.header, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, order_by=self.order_by, sensor_count=self.sensor_count, conversion=self.conversion)
 
     def output(self):
         return {
@@ -531,7 +531,7 @@ class OutputMatrixMathShadeGroup(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance mtxop operate-two sky.ill sky_dir.ill --operator "-" --{header}-header --conversion "{conversion}" --output-mtx final.ill --output-format {output_format}'.format(output_format=self.output_format, header=self.header, conversion=self.conversion)
+        return 'honeybee-radiance mtxop operate-two sky.ill sky_dir.ill --operator "-" --{header}-header --conversion "{conversion}" --output-mtx final.ill --output-format {output_format}'.format(conversion=self.conversion, output_format=self.output_format, header=self.header)
 
     def requires(self):
         return {'TotalSkySpecShadeGroup': TotalSkySpecShadeGroup(_input_params=self._input_params), 'DirectSkyShadeGroup': DirectSkyShadeGroup(_input_params=self._input_params)}

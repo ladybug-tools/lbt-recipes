@@ -1,5 +1,5 @@
 """
-This file is auto-generated from sky-view:1.2.4.
+This file is auto-generated from sky-view:1.2.6.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -64,7 +64,6 @@ class CreateRadFolder(QueenbeeTask):
 
     def output(self):
         return {
-            
             'model_folder': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
             ),
@@ -74,13 +73,8 @@ class CreateRadFolder(QueenbeeTask):
             ),
             
             'model_sensor_grids_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'results/sky_view/grids_info.json').resolve().as_posix()
-            ),
-            'sensor_grids': luigi.LocalTarget(
-                pathlib.Path(
-                    self.params_folder,
-                    'model/grid/_info.json').resolve().as_posix()
-                )
+                pathlib.Path(self.execution_folder, 'resources/grids_info.json').resolve().as_posix()
+            )
         }
 
     @property
@@ -107,18 +101,14 @@ class CreateRadFolder(QueenbeeTask):
                 
             {
                 'name': 'model-sensor-grids-file', 'from': 'model/grid/_model_grids_info.json',
-                'to': pathlib.Path(self.execution_folder, 'results/sky_view/grids_info.json').resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'resources/grids_info.json').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
 
     @property
-    def output_parameters(self):
-        return [{'name': 'sensor-grids', 'from': 'model/grid/_info.json', 'to': pathlib.Path(self.params_folder, 'model/grid/_info.json').resolve().as_posix()}]
-
-    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
@@ -156,7 +146,7 @@ class GenerateSky(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance sky illuminance {illuminance} --ground {ground_reflectance} --{uniform} --name output.sky'.format(uniform=self.uniform, illuminance=self.illuminance, ground_reflectance=self.ground_reflectance)
+        return 'honeybee-radiance sky illuminance {illuminance} --ground {ground_reflectance} --{uniform} --name output.sky'.format(ground_reflectance=self.ground_reflectance, illuminance=self.illuminance, uniform=self.uniform)
 
     def output(self):
         return {
@@ -177,7 +167,7 @@ class GenerateSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
@@ -221,7 +211,7 @@ class CreateOctree(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out} --add-before sky.sky'.format(include_aperture=self.include_aperture, black_out=self.black_out)
+        return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out} --add-before sky.sky'.format(black_out=self.black_out, include_aperture=self.include_aperture)
 
     def requires(self):
         return {'GenerateSky': GenerateSky(_input_params=self._input_params), 'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
@@ -251,7 +241,7 @@ class CreateOctree(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
@@ -302,26 +292,20 @@ class SplitGridFolder(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(cpus_per_grid=self.cpus_per_grid, min_sensor_count=self.min_sensor_count, cpu_count=self.cpu_count)
+        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(cpu_count=self.cpu_count, cpus_per_grid=self.cpus_per_grid, min_sensor_count=self.min_sensor_count)
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
 
     def output(self):
         return {
-            
             'output_folder': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'resources/grid').resolve().as_posix()
             ),
             
             'dist_info': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'initial_results/_redist_info.json').resolve().as_posix()
-            ),
-            'sensor_grids': luigi.LocalTarget(
-                pathlib.Path(
-                    self.params_folder,
-                    'output_folder/_info.json').resolve().as_posix()
-                )
+            )
         }
 
     @property
@@ -347,234 +331,15 @@ class SplitGridFolder(QueenbeeTask):
             }]
 
     @property
-    def output_parameters(self):
-        return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
-
-    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class SkyViewRayTracingLoop(QueenbeeTask):
-    """Run ray-tracing and post-process the results for a skyview simulation."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-    _status_lock = _queenbee_status_lock_
-
-    # Task inputs
-    @property
-    def radiance_parameters(self):
-        return self._input_params['radiance_parameters']
-
-    fixed_radiance_parameters = luigi.Parameter(default='-I -ab 1 -h')
-
-    @property
-    def scene_file(self):
-        value = pathlib.Path(self.input()['CreateOctree']['scene_file'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def grid(self):
-        value = pathlib.Path(self.input()['SplitGridFolder']['output_folder'].path, '{item_full_id}.pts'.format(item_full_id=self.item['full_id']))
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def bsdf_folder(self):
-        try:
-            pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
-        except TypeError:
-            # optional artifact
-            return None
-        value = pathlib.Path(self.input()['CreateRadFolder']['bsdf_folder'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    # get item for loop
-    try:
-        item = luigi.DictParameter()
-    except Exception:
-        item = luigi.Parameter()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder'], 'initial_results/{item_full_id}'.format(item_full_id=self.item['full_id'])).resolve().as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'honeybee-radiance raytrace daylight-factor scene.oct grid.pts --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --output grid.res'.format(radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters)
-
-    def requires(self):
-        return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params), 'SplitGridFolder': SplitGridFolder(_input_params=self._input_params), 'CreateOctree': CreateOctree(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'result': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '../{item_name}.res'.format(item_name=self.item['name'])).resolve().as_posix()
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False},
-            {'name': 'grid', 'to': 'grid.pts', 'from': self.grid, 'optional': False},
-            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': True}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'result', 'from': 'grid.res',
-                'to': pathlib.Path(self.execution_folder, '../{item_name}.res'.format(item_name=self.item['name'])).resolve().as_posix(),
-                'optional': False,
-                'type': 'file'
-            }]
-
-    @property
-    def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
-
-    @property
-    def image_workdir(self):
-        return '/home/ladybugbot/run'
-
-
-class SkyViewRayTracing(luigi.Task):
-    """Run ray-tracing and post-process the results for a skyview simulation."""
-    # global parameters
-    _input_params = luigi.DictParameter()
-    @property
-    def sensor_grids(self):
-        value = pathlib.Path(self.input()['SplitGridFolder']['sensor_grids'].path)
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def items(self):
-        try:
-            # assume the input is a file
-            return qb_load_input_param(self.sensor_grids)
-        except:
-            # it is a parameter
-            return self.input()['SplitGridFolder']['sensor_grids'].path
-
-    def run(self):
-        yield [SkyViewRayTracingLoop(item=item, _input_params=self._input_params) for item in self.items]
-        done_file = pathlib.Path(self.execution_folder, 'sky_view_ray_tracing.done')
-        done_file.parent.mkdir(parents=True, exist_ok=True)
-        done_file.write_text('done!')
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def requires(self):
-        return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params), 'SplitGridFolder': SplitGridFolder(_input_params=self._input_params), 'CreateOctree': CreateOctree(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'sky_view_ray_tracing.done').resolve().as_posix())
-        }
-
-    @property
-    def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
-
-    @property
-    def image_workdir(self):
-        return '/home/ladybugbot/run'
-
-
-class RestructureResults(QueenbeeTask):
-    """Restructure files in a distributed folder."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-    _status_lock = _queenbee_status_lock_
-
-    # Task inputs
-    @property
-    def extension(self):
-        return 'res'
-
-    @property
-    def input_folder(self):
-        value = pathlib.Path('initial_results')
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
-
-    def requires(self):
-        return {'SkyViewRayTracing': SkyViewRayTracing(_input_params=self._input_params)}
-
-    def output(self):
-        return {
-            'output_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'results/sky_view').resolve().as_posix()
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'input_folder', 'to': 'input_folder', 'from': self.input_folder, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'output-folder', 'from': 'output_folder',
-                'to': pathlib.Path(self.execution_folder, 'results/sky_view').resolve().as_posix(),
-                'optional': False,
-                'type': 'folder'
-            }]
-
-    @property
-    def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
-
-    @property
-    def image_workdir(self):
-        return '/home/ladybugbot/run'
-
-
-class _Main_ce8e2bf9Orchestrator(luigi.WrapperTask):
+class _SkyViewPrepareFolder_961c2ad4Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -586,4 +351,4 @@ class _Main_ce8e2bf9Orchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [RestructureResults(_input_params=self.input_values)]
+        yield [CreateOctree(_input_params=self.input_values), SplitGridFolder(_input_params=self.input_values)]

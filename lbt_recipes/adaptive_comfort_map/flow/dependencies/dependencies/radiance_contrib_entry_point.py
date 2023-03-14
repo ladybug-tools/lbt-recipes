@@ -113,7 +113,7 @@ class DirectSkyGroup(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, fixed_radiance_parameters=self.fixed_radiance_parameters, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, output_format=self.output_format, order_by=self.order_by, header=self.header)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(order_by=self.order_by, sensor_count=self.sensor_count, header=self.header, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, radiance_parameters=self.radiance_parameters, conversion=self.conversion)
 
     def output(self):
         return {
@@ -225,7 +225,7 @@ class DirectSunGroup(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, fixed_radiance_parameters=self.fixed_radiance_parameters, calculate_values=self.calculate_values, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, output_format=self.output_format, order_by=self.order_by, header=self.header)
+        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(order_by=self.order_by, calculate_values=self.calculate_values, sensor_count=self.sensor_count, header=self.header, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, radiance_parameters=self.radiance_parameters, conversion=self.conversion)
 
     def output(self):
         return {
@@ -339,7 +339,7 @@ class GroundReflectedSkyDiffGroup(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, fixed_radiance_parameters=self.fixed_radiance_parameters, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, output_format=self.output_format, order_by=self.order_by, header=self.header)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(order_by=self.order_by, sensor_count=self.sensor_count, header=self.header, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, radiance_parameters=self.radiance_parameters, conversion=self.conversion)
 
     def output(self):
         return {
@@ -454,7 +454,7 @@ class GroundReflectedSkySpecGroup(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, fixed_radiance_parameters=self.fixed_radiance_parameters, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, output_format=self.output_format, order_by=self.order_by, header=self.header)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(order_by=self.order_by, sensor_count=self.sensor_count, header=self.header, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, radiance_parameters=self.radiance_parameters, conversion=self.conversion)
 
     def output(self):
         return {
@@ -569,7 +569,7 @@ class TotalSkyDiffGroup(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, fixed_radiance_parameters=self.fixed_radiance_parameters, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, output_format=self.output_format, order_by=self.order_by, header=self.header)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(order_by=self.order_by, sensor_count=self.sensor_count, header=self.header, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, radiance_parameters=self.radiance_parameters, conversion=self.conversion)
 
     def output(self):
         return {
@@ -680,7 +680,7 @@ class TotalSkySpecGroup(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, fixed_radiance_parameters=self.fixed_radiance_parameters, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, output_format=self.output_format, order_by=self.order_by, header=self.header)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(order_by=self.order_by, sensor_count=self.sensor_count, header=self.header, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, radiance_parameters=self.radiance_parameters, conversion=self.conversion)
 
     def output(self):
         return {
@@ -763,7 +763,7 @@ class OutputMatrixMathGroup(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance mtxop operate-two sky.ill sky_dir.ill --operator "-" --{header}-header --conversion "{conversion}" --output-mtx final.ill --output-format {output_format}'.format(output_format=self.output_format, conversion=self.conversion, header=self.header)
+        return 'honeybee-radiance mtxop operate-two sky.ill sky_dir.ill --operator "-" --{header}-header --conversion "{conversion}" --output-mtx final.ill --output-format {output_format}'.format(header=self.header, output_format=self.output_format, conversion=self.conversion)
 
     def requires(self):
         return {'TotalSkySpecGroup': TotalSkySpecGroup(_input_params=self._input_params), 'DirectSkyGroup': DirectSkyGroup(_input_params=self._input_params)}
@@ -879,7 +879,7 @@ class CreateIrradianceContribMap(QueenbeeTask):
     def output(self):
         return {
             'result_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'dynamic/final/{grid}/{aperture_id}'.format(grid=self.grid, aperture_id=self.aperture_id)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'dynamic/final/{grid}/{aperture_id}'.format(aperture_id=self.aperture_id, grid=self.grid)).resolve().as_posix()
             )
         }
 
@@ -899,7 +899,7 @@ class CreateIrradianceContribMap(QueenbeeTask):
         return [
             {
                 'name': 'result-folder', 'from': 'output',
-                'to': pathlib.Path(self.execution_folder, 'dynamic/final/{grid}/{aperture_id}'.format(grid=self.grid, aperture_id=self.aperture_id)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'dynamic/final/{grid}/{aperture_id}'.format(aperture_id=self.aperture_id, grid=self.grid)).resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]

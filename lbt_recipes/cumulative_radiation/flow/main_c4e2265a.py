@@ -17,8 +17,8 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.cumulative_radiation_postprocess import _CumulativeRadiationPostprocess_f645822fOrchestrator as CumulativeRadiationPostprocess_f645822fWorkerbee
-from .dependencies.cumulative_radiation_prepare_folder import _CumulativeRadiationPrepareFolder_f645822fOrchestrator as CumulativeRadiationPrepareFolder_f645822fWorkerbee
+from .dependencies.cumulative_radiation_postprocess import _CumulativeRadiationPostprocess_c4e2265aOrchestrator as CumulativeRadiationPostprocess_c4e2265aWorkerbee
+from .dependencies.cumulative_radiation_prepare_folder import _CumulativeRadiationPrepareFolder_c4e2265aOrchestrator as CumulativeRadiationPrepareFolder_c4e2265aWorkerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -115,7 +115,7 @@ class PrepareFolderCumulativeRadiation(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [CumulativeRadiationPrepareFolder_f645822fWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [CumulativeRadiationPrepareFolder_c4e2265aWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -275,7 +275,7 @@ class SkyRadiationRaytracingLoop(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(sensor_count=self.sensor_count, order_by=self.order_by, header=self.header, output_format=self.output_format, conversion=self.conversion, fixed_radiance_parameters=self.fixed_radiance_parameters, radiance_parameters=self.radiance_parameters)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(output_format=self.output_format, order_by=self.order_by, sensor_count=self.sensor_count, fixed_radiance_parameters=self.fixed_radiance_parameters, radiance_parameters=self.radiance_parameters, conversion=self.conversion, header=self.header)
 
     def requires(self):
         return {'PrepareFolderCumulativeRadiation': PrepareFolderCumulativeRadiation(_input_params=self._input_params)}
@@ -501,7 +501,7 @@ class CumulativeRadiationPostprocessLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [CumulativeRadiationPostprocess_f645822fWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [CumulativeRadiationPostprocess_c4e2265aWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'cumulative_radiation_postprocess.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -561,7 +561,7 @@ class CumulativeRadiationPostprocess(luigi.Task):
         }
 
 
-class _Main_f645822fOrchestrator(luigi.WrapperTask):
+class _Main_c4e2265aOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

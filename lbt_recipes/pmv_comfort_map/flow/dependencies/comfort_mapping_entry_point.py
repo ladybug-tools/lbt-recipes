@@ -101,7 +101,7 @@ class CreateAirSpeedJson(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort epw air-speed-json weather.epw enclosure_info.json --multiply-by {multiply_by} --indoor-air-speed in_speed.txt --outdoor-air-speed out_speed.txt --run-period "{run_period}" --output-file air_speed.json'.format(run_period=self.run_period, multiply_by=self.multiply_by)
+        return 'ladybug-comfort epw air-speed-json weather.epw enclosure_info.json --multiply-by {multiply_by} --indoor-air-speed in_speed.txt --outdoor-air-speed out_speed.txt --run-period "{run_period}" --output-file air_speed.json'.format(multiply_by=self.multiply_by, run_period=self.run_period)
 
     def output(self):
         return {
@@ -192,7 +192,7 @@ class CreateAirTemperatureMap(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort map air result.sql enclosure_info.json weather.epw --run-period "{run_period}" --{metric} --output-file air.csv'.format(run_period=self.run_period, metric=self.metric)
+        return 'ladybug-comfort map air result.sql enclosure_info.json weather.epw --run-period "{run_period}" --{metric} --output-file air.csv'.format(metric=self.metric, run_period=self.run_period)
 
     def output(self):
         return {
@@ -384,7 +384,7 @@ class CreateRelHumidityMap(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort map air result.sql enclosure_info.json weather.epw --run-period "{run_period}" --{metric} --output-file air.csv'.format(run_period=self.run_period, metric=self.metric)
+        return 'ladybug-comfort map air result.sql enclosure_info.json weather.epw --run-period "{run_period}" --{metric} --output-file air.csv'.format(metric=self.metric, run_period=self.run_period)
 
     def output(self):
         return {
@@ -517,7 +517,7 @@ class CreateShortwaveMrtMap(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort map shortwave-mrt weather.epw indirect.ill direct.ill ref.ill sun-up-hours.txt --contributions dynamic --transmittance-contribs dyn_shade --trans-schedule-json trans_schedules.json --solarcal-par "{solarcal_par}" --run-period "{run_period}" --{indirect_is_total} --output-file shortwave.csv'.format(run_period=self.run_period, indirect_is_total=self.indirect_is_total, solarcal_par=self.solarcal_par)
+        return 'ladybug-comfort map shortwave-mrt weather.epw indirect.ill direct.ill ref.ill sun-up-hours.txt --contributions dynamic --transmittance-contribs dyn_shade --trans-schedule-json trans_schedules.json --solarcal-par "{solarcal_par}" --run-period "{run_period}" --{indirect_is_total} --output-file shortwave.csv'.format(indirect_is_total=self.indirect_is_total, solarcal_par=self.solarcal_par, run_period=self.run_period)
 
     def output(self):
         return {
@@ -642,7 +642,7 @@ class ProcessPmvMatrix(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     def command(self):
-        return 'ladybug-comfort mtx pmv air_temperature.csv rel_humidity.csv --rad-temperature-mtx rad_temperature.csv --rad-delta-mtx rad_delta.csv --air-speed-json air_speed.json --met-rate met.txt --clo-value clo.txt --comfort-par "{comfort_par}" --{write_set_map} --folder output'.format(comfort_par=self.comfort_par, write_set_map=self.write_set_map)
+        return 'ladybug-comfort mtx pmv air_temperature.csv rel_humidity.csv --rad-temperature-mtx rad_temperature.csv --rad-delta-mtx rad_delta.csv --air-speed-json air_speed.json --met-rate met.txt --clo-value clo.txt --comfort-par "{comfort_par}" --{write_set_map} --folder output'.format(write_set_map=self.write_set_map, comfort_par=self.comfort_par)
 
     def requires(self):
         return {'CreateLongwaveMrtMap': CreateLongwaveMrtMap(_input_params=self._input_params), 'CreateShortwaveMrtMap': CreateShortwaveMrtMap(_input_params=self._input_params), 'CreateAirTemperatureMap': CreateAirTemperatureMap(_input_params=self._input_params), 'CreateRelHumidityMap': CreateRelHumidityMap(_input_params=self._input_params), 'CreateAirSpeedJson': CreateAirSpeedJson(_input_params=self._input_params)}

@@ -290,7 +290,7 @@ class RestructureCumulativeResults(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
@@ -357,14 +357,14 @@ class RestructureTimestepResults(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _DirectSunHoursPostprocess_131d7ce0Orchestrator(luigi.WrapperTask):
+class _DirectSunHoursPostprocess_f24da6c6Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
