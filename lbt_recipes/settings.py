@@ -30,21 +30,27 @@ class RecipeSettings(object):
             be useful for debugging and capturing what's happening in the process
             but recipe reports can often be very long and so it can slow
             Grasshopper slightly. (Default: False).
+        debug_folder: An optional path to a debug folder. If debug folder is
+            provided all the steps of the simulation will be executed inside
+            the debug folder which can be used for further inspection.
 
     Properties:
         * folder
         * workers
         * reload_old
         * report_out
+        * debug_folder
     """
-    __slots__ = ('_folder', '_workers', '_reload_old', '_report_out')
+    __slots__ = ('_folder', '_workers', '_reload_old', '_report_out', '_debug_folder')
 
-    def __init__(self, folder=None, workers=None, reload_old=False, report_out=False):
+    def __init__(self, folder=None, workers=None, reload_old=False, report_out=False,
+                 debug_folder=None):
         """Initialize RecipeSettings."""
         self.folder = folder
         self.workers = workers
         self.reload_old = reload_old
         self.report_out = report_out
+        self.debug_folder = debug_folder
 
     @classmethod
     def from_string(cls, settings_string):
@@ -55,13 +61,15 @@ class RecipeSettings(object):
         parser.add_argument('--workers', action="store", dest="workers", type=int)
         parser.add_argument('--reload-old', action="store_true", default=False)
         parser.add_argument('--report-out', action="store_true", default=False)
+        parser.add_argument('--debug-folder', action="store", dest="debug_folder")
         argument_list = shlex.split(settings_string)
         args = parser.parse_args(argument_list)
 
         # assign the properties
         folder = args.folder if 'folder' in args else None
         workers = int(args.workers) if 'workers' in args else None
-        return cls(folder, workers, args.reload_old, args.report_out)
+        debug_folder = args.debug_folder if 'debug_folder' in args else None
+        return cls(folder, workers, args.reload_old, args.report_out, debug_folder)
 
     @property
     def folder(self):
@@ -111,6 +119,20 @@ class RecipeSettings(object):
     def report_out(self, value):
         self._report_out = bool(value)
 
+    @property
+    def debug_folder(self):
+        """Get or set the path to a folder in which the simulation steps are executed.
+        """
+        return self._debug_folder
+
+    @debug_folder.setter
+    def debug_folder(self, value):
+        if value is not None:
+            value = str(value).replace('\\', '/')
+            if value.endswith('/'):
+                value = value[:-1]
+        self._debug_folder = value
+
     def ToString(self):
         """Overwrite .NET ToString."""
         return self.__repr__()
@@ -139,11 +161,13 @@ class RecipeSettings(object):
 
     def __copy__(self):
         return RecipeSettings(
-            self.folder, self.workers, self.reload_old, self.report_out)
+            self.folder, self.workers, self.reload_old, self.report_out,
+            self.debug_folder)
 
     def __key(self):
         """A tuple based on the object properties, useful for hashing."""
-        return (self.folder, self.workers, self.reload_old, self.report_out)
+        return (self.folder, self.workers, self.reload_old,
+                self.report_out, self.debug_folder)
 
     def __hash__(self):
         return hash(self.__key())
@@ -162,4 +186,6 @@ class RecipeSettings(object):
             rep_str += ' --reload-old'
         if self.report_out:
             rep_str += ' --report-out'
+        if self.debug_folder:
+            rep_str += '--debug-folder "{}"'.format(self.debug_folder)
         return rep_str
