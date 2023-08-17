@@ -38,7 +38,7 @@ def test_recipe_init():
             assert isinstance(inp.value, str)
 
 
-def pass_test_recipe_run():
+def test_recipe_run():
     # create a model for simulation
     room = Room.from_box('TinyHouseZone', 5, 10, 3)
     south_face = room[3]
