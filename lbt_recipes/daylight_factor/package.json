@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "daylight-factor",
-    "tag": "0.8.8",
+    "tag": "0.8.12",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -97,6 +97,44 @@
       "spec": null
     },
     {
+      "type": "DAGFileInput",
+      "annotations": {},
+      "name": "grid-metrics",
+      "description": "A JSON file with additional custom metrics to calculate.",
+      "default": null,
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "grid_metrics",
+          "description": "A JSON file with custom metrics. This can also be a string or a list of grid metrics.",
+          "platform": [
+            "grasshopper",
+            "rhino",
+            "revit"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.postprocess",
+              "function": "grid_metrics",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": false,
+          "spec": null
+        }
+      ],
+      "required": false,
+      "spec": null,
+      "extensions": [
+        "json"
+      ]
+    },
+    {
       "type": "DAGIntegerInput",
       "annotations": {},
       "name": "min-sensor-count",
@@ -136,7 +174,8 @@
           "name": "model",
           "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
           "platform": [
-            "grasshopper"
+            "grasshopper",
+            "rhino"
           ],
           "handler": [
             {
@@ -161,20 +200,20 @@
           "spec": null
         },
         {
-          "type": "DAGLinkedInputAlias",
+          "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "model",
-          "description": "This input links the model to Rhino model.",
+          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
           "platform": [
-            "rhino"
+            "revit"
           ],
           "handler": [
             {
               "type": "IOAliasHandler",
               "annotations": {},
-              "language": "csharp",
-              "module": "Pollination.RhinoHandlers",
-              "function": "RhinoHBModelToJSON",
+              "language": "python",
+              "module": "pollination_handlers.inputs.model",
+              "function": "model_to_json_grid_check",
               "index": 0
             }
           ],
@@ -219,6 +258,39 @@
     }
   ],
   "outputs": [
+    {
+      "type": "DAGFileOutput",
+      "annotations": {},
+      "name": "grid-summary",
+      "description": "Grid summary of metrics.",
+      "from": {
+        "type": "FileReference",
+        "annotations": {},
+        "path": "grid_summary.csv"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "grid_metrics",
+          "description": "CSV file with grid metrics.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_grid_metrics",
+              "index": 0
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
     {
       "type": "DAGFolderOutput",
       "annotations": {},

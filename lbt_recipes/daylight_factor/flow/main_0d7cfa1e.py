@@ -1,5 +1,5 @@
 """
-This file is auto-generated from daylight-factor:0.8.8.
+This file is auto-generated from daylight-factor:0.8.12.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,12 +17,13 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.daylight_factor_post_process_results import _DaylightFactorPostProcessResults_afc7c61dOrchestrator as DaylightFactorPostProcessResults_afc7c61dWorkerbee
-from .dependencies.daylight_factor_prepare_folder import _DaylightFactorPrepareFolder_afc7c61dOrchestrator as DaylightFactorPrepareFolder_afc7c61dWorkerbee
+from .dependencies.daylight_factor_post_process_results import _DaylightFactorPostProcessResults_0d7cfa1eOrchestrator as DaylightFactorPostProcessResults_0d7cfa1eWorkerbee
+from .dependencies.daylight_factor_prepare_folder import _DaylightFactorPrepareFolder_0d7cfa1eOrchestrator as DaylightFactorPrepareFolder_0d7cfa1eWorkerbee
 
 
 _default_inputs = {   'cpu_count': 50,
     'grid_filter': '*',
+    'grid_metrics': None,
     'min_sensor_count': 500,
     'model': None,
     'params_folder': '__params',
@@ -87,7 +88,7 @@ class PrepareDaylightFactorFolder(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [DaylightFactorPrepareFolder_afc7c61dWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [DaylightFactorPrepareFolder_0d7cfa1eWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -201,8 +202,16 @@ class DaylightFactorRayTracingLoop(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'daylight_factor_ray_tracing.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance raytrace daylight-factor scene.oct grid.pts --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --sky-illum {sky_illum} --output grid.res'.format(radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, sky_illum=self.sky_illum)
+        return 'honeybee-radiance raytrace daylight-factor scene.oct grid.pts --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --sky-illum {sky_illum} --output grid.res'.format(sky_illum=self.sky_illum, fixed_radiance_parameters=self.fixed_radiance_parameters, radiance_parameters=self.radiance_parameters)
 
     def requires(self):
         return {'PrepareDaylightFactorFolder': PrepareDaylightFactorFolder(_input_params=self._input_params)}
@@ -232,8 +241,15 @@ class DaylightFactorRayTracingLoop(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'radiance_parameters': self.radiance_parameters,
+            'fixed_radiance_parameters': self.fixed_radiance_parameters,
+            'sky_illum': self.sky_illum}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
 
     @property
     def image_workdir(self):
@@ -287,7 +303,7 @@ class DaylightFactorRayTracing(luigi.Task):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
 
     @property
     def image_workdir(self):
@@ -315,6 +331,23 @@ class PostProcessResults(QueenbeeTask):
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
+    def model(self):
+        value = pathlib.Path(self._input_params['model'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def grid_metrics(self):
+        try:
+            pathlib.Path(self._input_params['grid_metrics'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['grid_metrics'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
     def execution_folder(self):
         return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
@@ -332,7 +365,9 @@ class PostProcessResults(QueenbeeTask):
         inputs = {
             'simulation_folder': self.execution_folder,
             'results_folder': self.results_folder,
-            'grids_info': self.grids_info
+            'grids_info': self.grids_info,
+            'model': self.model,
+            'grid_metrics': self.grid_metrics
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -343,7 +378,7 @@ class PostProcessResults(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [DaylightFactorPostProcessResults_afc7c61dWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [DaylightFactorPostProcessResults_0d7cfa1eWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -357,6 +392,10 @@ class PostProcessResults(QueenbeeTask):
             'results': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'results').resolve().as_posix()
             ),
+            
+            'grid_summary': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'grid_summary.csv').resolve().as_posix()
+            ),
             'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'post_process_results.done').resolve().as_posix())
         }
 
@@ -368,10 +407,17 @@ class PostProcessResults(QueenbeeTask):
                 'to': pathlib.Path(self.execution_folder, 'results').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
+            },
+                
+            {
+                'name': 'grid-summary', 'from': 'grid_summary.csv',
+                'to': pathlib.Path(self.execution_folder, 'grid_summary.csv').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
             }]
 
 
-class _Main_afc7c61dOrchestrator(luigi.WrapperTask):
+class _Main_0d7cfa1eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
