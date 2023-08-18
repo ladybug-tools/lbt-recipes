@@ -1,5 +1,5 @@
 """
-This file is auto-generated from daylight-factor:0.8.8.
+This file is auto-generated from daylight-factor:0.8.12.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -23,11 +23,12 @@ from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 from luigi.execution_summary import LuigiStatusCode
 
-import flow.main_afc7c61d as daylight_factor_workerbee
+import flow.main_0d7cfa1e as daylight_factor_workerbee
 
 
 _recipe_default_inputs = {   'cpu_count': 50,
     'grid_filter': '*',
+    'grid_metrics': None,
     'min_sensor_count': 500,
     'model': None,
     'radiance_parameters': '-ab 2 -aa 0.1 -ad 2048 -ar 64'}
@@ -38,7 +39,7 @@ class LetDaylightFactorFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [daylight_factor_workerbee._Main_afc7c61dOrchestrator(_input_params=self._input_params)]
+        yield [daylight_factor_workerbee._Main_0d7cfa1eOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -58,8 +59,8 @@ def start(project_folder, user_values, workers):
         simulation_folder = input_params['simulation_folder']
 
     # copy project folder content to simulation folder
-    artifacts = ['model']
-    optional_artifacts = []
+    artifacts = ['grid_metrics', 'model']
+    optional_artifacts = ['grid_metrics']
     for artifact in artifacts:
         value = input_params[artifact]
         if value is None:
@@ -123,7 +124,16 @@ def start(project_folder, user_values, workers):
     )
 
     now = datetime.datetime.utcnow()
-    status = json.loads(status_file.read_text())
+    try:
+        status = json.loads(status_file.read_text())
+    except json.JSONDecodeError:
+        time.sleep(2)
+        try:
+            status = json.loads(status_file.read_text())
+        except json.JSONDecodeError:
+            # the status will be wrong
+            print('Failed to read the latest status.')
+            pass
     duration = now - datetime.datetime.strptime(
         status['status']['started_at'], '%Y-%m-%dT%H:%M:%SZ'
     )
@@ -136,6 +146,7 @@ def start(project_folder, user_values, workers):
     elif summary.status == LuigiStatusCode.SUCCESS:
         status['status']['status'] = 'Succeeded'
     status['meta']['progress']['running'] = 0
+    status['meta']['progress']['completed'] = status['meta']['progress']['total']
     status_file.write_text(json.dumps(status))
 
     cpu_usage = status['meta']['resources_duration']['cpu']

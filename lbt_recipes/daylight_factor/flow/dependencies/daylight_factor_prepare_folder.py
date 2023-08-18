@@ -1,5 +1,5 @@
 """
-This file is auto-generated from daylight-factor:0.8.8.
+This file is auto-generated from daylight-factor:0.8.12.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -57,6 +57,14 @@ class CreateRadFolder(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_rad_folder.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid "{grid_filter}" --grid-check'.format(grid_filter=self.grid_filter)
 
@@ -94,8 +102,13 @@ class CreateRadFolder(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'grid_filter': self.grid_filter}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
 
     @property
     def image_workdir(self):
@@ -128,8 +141,16 @@ class GenerateSky(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'generate_sky.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance sky illuminance {illuminance} --ground {ground_reflectance} --{uniform} --name output.sky'.format(uniform=self.uniform, illuminance=self.illuminance, ground_reflectance=self.ground_reflectance)
+        return 'honeybee-radiance sky illuminance {illuminance} --ground {ground_reflectance} --{uniform} --name output.sky'.format(ground_reflectance=self.ground_reflectance, uniform=self.uniform, illuminance=self.illuminance)
 
     def output(self):
         return {
@@ -149,8 +170,15 @@ class GenerateSky(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'ground_reflectance': self.ground_reflectance,
+            'illuminance': self.illuminance,
+            'uniform': self.uniform}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
 
     @property
     def image_workdir(self):
@@ -193,8 +221,16 @@ class CreateOctree(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_octree.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out} --add-before sky.sky'.format(include_aperture=self.include_aperture, black_out=self.black_out)
+        return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out} --add-before sky.sky'.format(black_out=self.black_out, include_aperture=self.include_aperture)
 
     def requires(self):
         return {'GenerateSky': GenerateSky(_input_params=self._input_params), 'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
@@ -223,8 +259,14 @@ class CreateOctree(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'black_out': self.black_out,
+            'include_aperture': self.include_aperture}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
 
     @property
     def image_workdir(self):
@@ -250,7 +292,7 @@ class SplitGridFolder(QueenbeeTask):
 
     @property
     def cpus_per_grid(self):
-        return '3'
+        return '1'
 
     @property
     def min_sensor_count(self):
@@ -274,8 +316,16 @@ class SplitGridFolder(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'split_grid_folder.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(min_sensor_count=self.min_sensor_count, cpus_per_grid=self.cpus_per_grid, cpu_count=self.cpu_count)
+        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(min_sensor_count=self.min_sensor_count, cpu_count=self.cpu_count, cpus_per_grid=self.cpus_per_grid)
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
@@ -314,15 +364,22 @@ class SplitGridFolder(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'cpu_count': self.cpu_count,
+            'cpus_per_grid': self.cpus_per_grid,
+            'min_sensor_count': self.min_sensor_count}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _DaylightFactorPrepareFolder_afc7c61dOrchestrator(luigi.WrapperTask):
+class _DaylightFactorPrepareFolder_0d7cfa1eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
