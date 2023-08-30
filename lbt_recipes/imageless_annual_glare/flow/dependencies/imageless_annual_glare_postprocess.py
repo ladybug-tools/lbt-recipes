@@ -1,5 +1,5 @@
 """
-This file is auto-generated from imageless-annual-glare:0.1.5.
+This file is auto-generated from imageless-annual-glare:0.1.6.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -54,6 +54,14 @@ class CopyGridInfo(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'copy_grid_info.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'echo copying input path...'
 
@@ -91,6 +99,11 @@ class CopyGridInfo(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+}
+
+    @property
     def task_image(self):
         return 'docker.io/python:3.7-slim'
 
@@ -125,6 +138,14 @@ class CopySunUpHours(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'copy_sun_up_hours.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'echo copying input file...'
 
@@ -149,6 +170,11 @@ class CopySunUpHours(QueenbeeTask):
                 'optional': False,
                 'type': 'file'
             }]
+
+    @property
+    def input_parameters(self):
+        return {
+}
 
     @property
     def task_image(self):
@@ -189,6 +215,14 @@ class RestructureDaylightGlareProbabilityResults(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'restructure_daylight_glare_probability_results.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
@@ -218,8 +252,13 @@ class RestructureDaylightGlareProbabilityResults(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'extension': self.extension}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -267,6 +306,14 @@ class DaylightGlareAutonomy(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'daylight_glare_autonomy.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance post-process annual-glare raw_results --schedule schedule.txt --glare-threshold {glare_threshold} --sub_folder ../metrics'.format(glare_threshold=self.glare_threshold)
 
@@ -297,15 +344,20 @@ class DaylightGlareAutonomy(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'glare_threshold': self.glare_threshold}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _ImagelessAnnualGlarePostprocess_abf29326Orchestrator(luigi.WrapperTask):
+class _ImagelessAnnualGlarePostprocess_25082223Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

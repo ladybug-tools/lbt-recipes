@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight:0.9.10.
+This file is auto-generated from annual-daylight-enhanced:0.0.2.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,7 +17,7 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.two_phase_ray_tracing import _TwoPhaseRayTracing_acc750a6Orchestrator as TwoPhaseRayTracing_acc750a6Workerbee
+from .dependencies.two_phase_ray_tracing import _TwoPhaseRayTracing_33a9e3b7Orchestrator as TwoPhaseRayTracing_33a9e3b7Workerbee
 
 
 _default_inputs = {   'bsdf_folder': None,
@@ -162,7 +162,7 @@ class TwoPhaseRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [TwoPhaseRayTracing_acc750a6Workerbee(_input_params=self.map_dag_inputs)]
+        yield [TwoPhaseRayTracing_33a9e3b7Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'two_phase_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -270,6 +270,14 @@ class RestructureDirectSunlightResults(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'restructure_direct_sunlight_results.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance-postprocess grid merge-folder ./input_folder ./output_folder {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
@@ -279,7 +287,7 @@ class RestructureDirectSunlightResults(QueenbeeTask):
     def output(self):
         return {
             'output_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/direct'.format(identifier=self.identifier, light_path=self.light_path, results_folder=self.results_folder)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/direct'.format(light_path=self.light_path, results_folder=self.results_folder, identifier=self.identifier)).resolve().as_posix()
             )
         }
 
@@ -294,14 +302,22 @@ class RestructureDirectSunlightResults(QueenbeeTask):
         return [
             {
                 'name': 'output-folder', 'from': 'output_folder',
-                'to': pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/direct'.format(identifier=self.identifier, light_path=self.light_path, results_folder=self.results_folder)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/direct'.format(light_path=self.light_path, results_folder=self.results_folder, identifier=self.identifier)).resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'identifier': self.identifier,
+            'light_path': self.light_path,
+            'extension': self.extension,
+            'results_folder': self.results_folder}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.147'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.231'
 
     @property
     def image_workdir(self):
@@ -361,6 +377,14 @@ class RestructureTotalResults(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'restructure_total_results.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance-postprocess grid merge-folder ./input_folder ./output_folder {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
@@ -370,7 +394,7 @@ class RestructureTotalResults(QueenbeeTask):
     def output(self):
         return {
             'output_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/total'.format(identifier=self.identifier, light_path=self.light_path, results_folder=self.results_folder)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/total'.format(light_path=self.light_path, results_folder=self.results_folder, identifier=self.identifier)).resolve().as_posix()
             )
         }
 
@@ -385,21 +409,29 @@ class RestructureTotalResults(QueenbeeTask):
         return [
             {
                 'name': 'output-folder', 'from': 'output_folder',
-                'to': pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/total'.format(identifier=self.identifier, light_path=self.light_path, results_folder=self.results_folder)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/total'.format(light_path=self.light_path, results_folder=self.results_folder, identifier=self.identifier)).resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'identifier': self.identifier,
+            'light_path': self.light_path,
+            'extension': self.extension,
+            'results_folder': self.results_folder}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.147'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.231'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _TwoPhaseSimulation_acc750a6Orchestrator(luigi.WrapperTask):
+class _TwoPhaseSimulation_33a9e3b7Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

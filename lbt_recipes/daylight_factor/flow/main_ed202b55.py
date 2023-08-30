@@ -1,5 +1,5 @@
 """
-This file is auto-generated from daylight-factor:0.8.12.
+This file is auto-generated from daylight-factor:0.8.13.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,8 +17,8 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.daylight_factor_post_process_results import _DaylightFactorPostProcessResults_0d7cfa1eOrchestrator as DaylightFactorPostProcessResults_0d7cfa1eWorkerbee
-from .dependencies.daylight_factor_prepare_folder import _DaylightFactorPrepareFolder_0d7cfa1eOrchestrator as DaylightFactorPrepareFolder_0d7cfa1eWorkerbee
+from .dependencies.daylight_factor_post_process_results import _DaylightFactorPostProcessResults_ed202b55Orchestrator as DaylightFactorPostProcessResults_ed202b55Workerbee
+from .dependencies.daylight_factor_prepare_folder import _DaylightFactorPrepareFolder_ed202b55Orchestrator as DaylightFactorPrepareFolder_ed202b55Workerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -88,7 +88,7 @@ class PrepareDaylightFactorFolder(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [DaylightFactorPrepareFolder_0d7cfa1eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [DaylightFactorPrepareFolder_ed202b55Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -211,7 +211,7 @@ class DaylightFactorRayTracingLoop(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance raytrace daylight-factor scene.oct grid.pts --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --sky-illum {sky_illum} --output grid.res'.format(sky_illum=self.sky_illum, fixed_radiance_parameters=self.fixed_radiance_parameters, radiance_parameters=self.radiance_parameters)
+        return 'honeybee-radiance raytrace daylight-factor scene.oct grid.pts --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --sky-illum {sky_illum} --output grid.res'.format(fixed_radiance_parameters=self.fixed_radiance_parameters, sky_illum=self.sky_illum, radiance_parameters=self.radiance_parameters)
 
     def requires(self):
         return {'PrepareDaylightFactorFolder': PrepareDaylightFactorFolder(_input_params=self._input_params)}
@@ -249,7 +249,7 @@ class DaylightFactorRayTracingLoop(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -303,7 +303,7 @@ class DaylightFactorRayTracing(luigi.Task):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -378,7 +378,7 @@ class PostProcessResults(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [DaylightFactorPostProcessResults_0d7cfa1eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [DaylightFactorPostProcessResults_ed202b55Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -417,7 +417,7 @@ class PostProcessResults(QueenbeeTask):
             }]
 
 
-class _Main_0d7cfa1eOrchestrator(luigi.WrapperTask):
+class _Main_ed202b55Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

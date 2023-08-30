@@ -1,5 +1,5 @@
 """
-This file is auto-generated from pmv-comfort-map:0.8.16.
+This file is auto-generated from pmv-comfort-map:0.8.17.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -100,6 +100,14 @@ class CreateAirSpeedJson(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_air_speed_json.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'ladybug-comfort epw air-speed-json weather.epw enclosure_info.json --multiply-by {multiply_by} --indoor-air-speed in_speed.txt --outdoor-air-speed out_speed.txt --run-period "{run_period}" --output-file air_speed.json'.format(multiply_by=self.multiply_by, run_period=self.run_period)
 
@@ -126,6 +134,13 @@ class CreateAirSpeedJson(QueenbeeTask):
                 'optional': False,
                 'type': 'file'
             }]
+
+    @property
+    def input_parameters(self):
+        return {
+            'multiply_by': self.multiply_by,
+            'run_period': self.run_period,
+            'name': self.name}
 
     @property
     def task_image(self):
@@ -191,6 +206,14 @@ class CreateAirTemperatureMap(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_air_temperature_map.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'ladybug-comfort map air result.sql enclosure_info.json weather.epw --run-period "{run_period}" --{metric} --output-file air.csv'.format(metric=self.metric, run_period=self.run_period)
 
@@ -217,6 +240,13 @@ class CreateAirTemperatureMap(QueenbeeTask):
                 'optional': False,
                 'type': 'file'
             }]
+
+    @property
+    def input_parameters(self):
+        return {
+            'run_period': self.run_period,
+            'metric': self.metric,
+            'name': self.name}
 
     @property
     def task_image(self):
@@ -290,6 +320,14 @@ class CreateLongwaveMrtMap(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_longwave_mrt_map.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'ladybug-comfort map longwave-mrt result.sql view_factors.csv view_factors.mod enclosure_info.json weather.epw --run-period "{run_period}" --output-file longwave.csv'.format(run_period=self.run_period)
 
@@ -318,6 +356,12 @@ class CreateLongwaveMrtMap(QueenbeeTask):
                 'optional': False,
                 'type': 'file'
             }]
+
+    @property
+    def input_parameters(self):
+        return {
+            'run_period': self.run_period,
+            'name': self.name}
 
     @property
     def task_image(self):
@@ -383,6 +427,14 @@ class CreateRelHumidityMap(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_rel_humidity_map.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'ladybug-comfort map air result.sql enclosure_info.json weather.epw --run-period "{run_period}" --{metric} --output-file air.csv'.format(metric=self.metric, run_period=self.run_period)
 
@@ -409,6 +461,13 @@ class CreateRelHumidityMap(QueenbeeTask):
                 'optional': False,
                 'type': 'file'
             }]
+
+    @property
+    def input_parameters(self):
+        return {
+            'run_period': self.run_period,
+            'metric': self.metric,
+            'name': self.name}
 
     @property
     def task_image(self):
@@ -516,8 +575,16 @@ class CreateShortwaveMrtMap(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_shortwave_mrt_map.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'ladybug-comfort map shortwave-mrt weather.epw indirect.ill direct.ill ref.ill sun-up-hours.txt --contributions dynamic --transmittance-contribs dyn_shade --trans-schedule-json trans_schedules.json --solarcal-par "{solarcal_par}" --run-period "{run_period}" --{indirect_is_total} --output-file shortwave.csv'.format(indirect_is_total=self.indirect_is_total, solarcal_par=self.solarcal_par, run_period=self.run_period)
+        return 'ladybug-comfort map shortwave-mrt weather.epw indirect.ill direct.ill ref.ill sun-up-hours.txt --contributions dynamic --transmittance-contribs dyn_shade --trans-schedule-json trans_schedules.json --solarcal-par "{solarcal_par}" --run-period "{run_period}" --{indirect_is_total} --output-file shortwave.csv'.format(solarcal_par=self.solarcal_par, run_period=self.run_period, indirect_is_total=self.indirect_is_total)
 
     def output(self):
         return {
@@ -547,6 +614,14 @@ class CreateShortwaveMrtMap(QueenbeeTask):
                 'optional': False,
                 'type': 'file'
             }]
+
+    @property
+    def input_parameters(self):
+        return {
+            'solarcal_par': self.solarcal_par,
+            'run_period': self.run_period,
+            'name': self.name,
+            'indirect_is_total': self.indirect_is_total}
 
     @property
     def task_image(self):
@@ -641,8 +716,16 @@ class ProcessPmvMatrix(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'process_pmv_matrix.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'ladybug-comfort mtx pmv air_temperature.csv rel_humidity.csv --rad-temperature-mtx rad_temperature.csv --rad-delta-mtx rad_delta.csv --air-speed-json air_speed.json --met-rate met.txt --clo-value clo.txt --comfort-par "{comfort_par}" --{write_set_map} --folder output'.format(write_set_map=self.write_set_map, comfort_par=self.comfort_par)
+        return 'ladybug-comfort mtx pmv air_temperature.csv rel_humidity.csv --rad-temperature-mtx rad_temperature.csv --rad-delta-mtx rad_delta.csv --air-speed-json air_speed.json --met-rate met.txt --clo-value clo.txt --comfort-par "{comfort_par}" --{write_set_map} --folder output'.format(comfort_par=self.comfort_par, write_set_map=self.write_set_map)
 
     def requires(self):
         return {'CreateLongwaveMrtMap': CreateLongwaveMrtMap(_input_params=self._input_params), 'CreateShortwaveMrtMap': CreateShortwaveMrtMap(_input_params=self._input_params), 'CreateAirTemperatureMap': CreateAirTemperatureMap(_input_params=self._input_params), 'CreateRelHumidityMap': CreateRelHumidityMap(_input_params=self._input_params), 'CreateAirSpeedJson': CreateAirSpeedJson(_input_params=self._input_params)}
@@ -698,6 +781,13 @@ class ProcessPmvMatrix(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'comfort_par': self.comfort_par,
+            'write_set_map': self.write_set_map,
+            'name': self.name}
+
+    @property
     def task_image(self):
         return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
 
@@ -747,6 +837,14 @@ class ComputeTcp(QueenbeeTask):
     @property
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'compute_tcp.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
 
     def command(self):
         return 'ladybug-comfort map tcp condition.csv enclosure_info.json --schedule schedule.txt --occ-schedule-json occ_schedule.json --folder output'
@@ -801,6 +899,11 @@ class ComputeTcp(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'name': self.name}
+
+    @property
     def task_image(self):
         return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
 
@@ -809,7 +912,7 @@ class ComputeTcp(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _ComfortMappingEntryPoint_6b2d7cbaOrchestrator(luigi.WrapperTask):
+class _ComfortMappingEntryPoint_5972ee0cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

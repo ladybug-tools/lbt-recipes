@@ -55,6 +55,14 @@ class RestructureResults(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'restructure_results.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
@@ -81,8 +89,13 @@ class RestructureResults(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'extension': self.extension}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.31'
 
     @property
     def image_workdir(self):
@@ -115,6 +128,14 @@ class CopyGridInfo(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'copy_grid_info.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'echo copying input file...'
 
@@ -144,6 +165,11 @@ class CopyGridInfo(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+}
+
+    @property
     def task_image(self):
         return 'docker.io/python:3.7-slim'
 
@@ -152,7 +178,7 @@ class CopyGridInfo(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _PointInTimeGridPostProcess_05de3fd9Orchestrator(luigi.WrapperTask):
+class _PointInTimeGridPostProcess_266428f6Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

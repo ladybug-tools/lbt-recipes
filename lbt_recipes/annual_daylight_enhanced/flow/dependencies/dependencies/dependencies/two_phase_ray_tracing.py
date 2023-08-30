@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight:0.9.10.
+This file is auto-generated from annual-daylight-enhanced:0.0.2.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -110,8 +110,16 @@ class DirectSky(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'direct_sky.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, header=self.header, order_by=self.order_by)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(order_by=self.order_by, sensor_count=self.sensor_count, conversion=self.conversion, header=self.header, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format)
 
     def output(self):
         return {
@@ -140,8 +148,19 @@ class DirectSky(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'radiance_parameters': self.radiance_parameters,
+            'fixed_radiance_parameters': self.fixed_radiance_parameters,
+            'sensor_count': self.sensor_count,
+            'conversion': self.conversion,
+            'header': self.header,
+            'order_by': self.order_by,
+            'output_format': self.output_format}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
 
     @property
     def image_workdir(self):
@@ -220,8 +239,16 @@ class DirectSunlight(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'direct_sunlight.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, calculate_values=self.calculate_values, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, header=self.header, order_by=self.order_by)
+        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(calculate_values=self.calculate_values, order_by=self.order_by, sensor_count=self.sensor_count, conversion=self.conversion, header=self.header, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format)
 
     def output(self):
         return {
@@ -249,8 +276,20 @@ class DirectSunlight(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'radiance_parameters': self.radiance_parameters,
+            'fixed_radiance_parameters': self.fixed_radiance_parameters,
+            'sensor_count': self.sensor_count,
+            'calculate_values': self.calculate_values,
+            'conversion': self.conversion,
+            'header': self.header,
+            'order_by': self.order_by,
+            'output_format': self.output_format}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
 
     @property
     def image_workdir(self):
@@ -332,8 +371,16 @@ class TotalSky(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'total_sky.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, header=self.header, order_by=self.order_by)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(order_by=self.order_by, sensor_count=self.sensor_count, conversion=self.conversion, header=self.header, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format)
 
     def output(self):
         return {
@@ -362,8 +409,19 @@ class TotalSky(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'radiance_parameters': self.radiance_parameters,
+            'fixed_radiance_parameters': self.fixed_radiance_parameters,
+            'sensor_count': self.sensor_count,
+            'conversion': self.conversion,
+            'header': self.header,
+            'order_by': self.order_by,
+            'output_format': self.output_format}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
 
     @property
     def image_workdir(self):
@@ -414,8 +472,16 @@ class OutputMatrixMath(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'output_matrix_math.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance-postprocess post-process two-phase rgb-to-illuminance "{total_sky_matrix}" "{direct_sky_matrix}" "{sunlight_matrix}"'.format(sunlight_matrix=self.sunlight_matrix, direct_sky_matrix=self.direct_sky_matrix, total_sky_matrix=self.total_sky_matrix)
+        return 'honeybee-radiance-postprocess post-process two-phase rgb-to-illuminance "{total_sky_matrix}" "{direct_sky_matrix}" "{sunlight_matrix}"'.format(direct_sky_matrix=self.direct_sky_matrix, sunlight_matrix=self.sunlight_matrix, total_sky_matrix=self.total_sky_matrix)
 
     def requires(self):
         return {'DirectSunlight': DirectSunlight(_input_params=self._input_params), 'TotalSky': TotalSky(_input_params=self._input_params), 'DirectSky': DirectSky(_input_params=self._input_params)}
@@ -456,15 +522,20 @@ class OutputMatrixMath(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'name': self.name}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.147'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.231'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _TwoPhaseRayTracing_acc750a6Orchestrator(luigi.WrapperTask):
+class _TwoPhaseRayTracing_33a9e3b7Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

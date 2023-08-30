@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "cumulative-radiation",
-    "tag": "0.3.8",
+    "tag": "0.3.9",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -137,7 +137,8 @@
           "name": "model",
           "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
           "platform": [
-            "grasshopper"
+            "grasshopper",
+            "rhino"
           ],
           "handler": [
             {
@@ -162,20 +163,20 @@
           "spec": null
         },
         {
-          "type": "DAGLinkedInputAlias",
+          "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "model",
-          "description": "This input links the model to Rhino model.",
+          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
           "platform": [
-            "rhino"
+            "revit"
           ],
           "handler": [
             {
               "type": "IOAliasHandler",
               "annotations": {},
-              "language": "csharp",
-              "module": "Pollination.RhinoHandlers",
-              "function": "RhinoHBModelToJSON",
+              "language": "python",
+              "module": "pollination_handlers.inputs.model",
+              "function": "model_to_json_grid_check",
               "index": 0
             }
           ],
@@ -247,7 +248,7 @@
             "grasshopper"
           ],
           "handler": [],
-          "default": "-ab 2 -ad 5000 -lw 2e-05",
+          "default": "-ab 2 -ad 5000 -lw 2e-05 -dr 0",
           "required": false,
           "spec": null
         }
@@ -295,7 +296,9 @@
           "name": "wea",
           "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
           "platform": [
-            "grasshopper"
+            "grasshopper",
+            "rhino",
+            "revit"
           ],
           "handler": [
             {

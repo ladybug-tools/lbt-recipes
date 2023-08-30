@@ -1,20 +1,20 @@
 {
-  "id": "4f5f6f29-8e19-4c7a-9e70-916a9a7fbe24",
+  "id": "10ef7387-3205-419e-bc50-b2e23a0aad1d",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
     "name": "ladybugbot",
     "display_name": "info@ladybug.tools",
     "description": "Your favorite bot!",
-    "picture_url": "https://avatars1.githubusercontent.com/u/38131342"
+    "picture_url": "https://avatars.githubusercontent.com/u/46136343"
   },
   "owner": {
-    "id": "1da45dba-a1a1-4449-9e41-b5df2f28e3bd",
+    "id": "8c2991d1-a6e4-4275-8789-4e9405b43508",
     "account_type": "org",
-    "name": "ladybug-tools",
-    "display_name": "Ladybug Tools",
+    "name": "pollination",
+    "display_name": "Pollination",
     "description": "...",
-    "picture_url": "https://avatars1.githubusercontent.com/u/38131342"
+    "picture_url": "https://avatars.githubusercontent.com/u/46136343"
   },
   "recipe": {
     "type": "RecipeInterface",
@@ -24,7 +24,7 @@
       "type": "MetaData",
       "annotations": {},
       "name": "point-in-time-view",
-      "tag": "0.4.0",
+      "tag": "0.4.1",
       "app_version": null,
       "keywords": [
         "honeybee",
@@ -145,7 +145,8 @@
             "name": "model",
             "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have views assigned to it.",
             "platform": [
-              "grasshopper"
+              "grasshopper",
+              "rhino"
             ],
             "handler": [
               {
@@ -170,20 +171,20 @@
             "spec": null
           },
           {
-            "type": "DAGLinkedInputAlias",
+            "type": "DAGGenericInputAlias",
             "annotations": {},
             "name": "model",
-            "description": "This input links the model to Rhino model.",
+            "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have views assigned to it.",
             "platform": [
-              "rhino"
+              "revit"
             ],
             "handler": [
               {
                 "type": "IOAliasHandler",
                 "annotations": {},
-                "language": "csharp",
-                "module": "Pollination.RhinoHandlers",
-                "function": "RhinoHBModelToJSON",
+                "language": "python",
+                "module": "pollination_handlers.inputs.model",
+                "function": "model_to_json_view_check",
                 "index": 0
               }
             ],
@@ -423,7 +424,8 @@
             "name": "model",
             "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have views assigned to it.",
             "platform": [
-              "grasshopper"
+              "grasshopper",
+              "rhino"
             ],
             "handler": [
               {
@@ -448,20 +450,20 @@
             "spec": null
           },
           {
-            "type": "DAGLinkedInputAlias",
+            "type": "DAGGenericInputAlias",
             "annotations": {},
             "name": "model",
-            "description": "This input links the model to Rhino model.",
+            "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have views assigned to it.",
             "platform": [
-              "rhino"
+              "revit"
             ],
             "handler": [
               {
                 "type": "IOAliasHandler",
                 "annotations": {},
-                "language": "csharp",
-                "module": "Pollination.RhinoHandlers",
-                "function": "RhinoHBModelToJSON",
+                "language": "python",
+                "module": "pollination_handlers.inputs.model",
+                "function": "model_to_json_view_check",
                 "index": 0
               }
             ],
@@ -604,12 +606,12 @@
       }
     ],
     "message": null,
-    "started_at": "2023-03-14T20:09:32+00:00",
+    "started_at": "2023-08-29T23:21:42+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "4f5f6f29-8e19-4c7a-9e70-916a9a7fbe24_00",
-    "job_id": "4f5f6f29-8e19-4c7a-9e70-916a9a7fbe24",
+    "id": "10ef7387-3205-419e-bc50-b2e23a0aad1d_00",
+    "job_id": "10ef7387-3205-419e-bc50-b2e23a0aad1d",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}

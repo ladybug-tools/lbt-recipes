@@ -1,5 +1,5 @@
 """
-This file is auto-generated from daylight-factor:0.8.12.
+This file is auto-generated from daylight-factor:0.8.13.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -23,7 +23,7 @@ from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 from luigi.execution_summary import LuigiStatusCode
 
-import flow.main_0d7cfa1e as daylight_factor_workerbee
+import flow.main_ed202b55 as daylight_factor_workerbee
 
 
 _recipe_default_inputs = {   'cpu_count': 50,
@@ -39,7 +39,7 @@ class LetDaylightFactorFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [daylight_factor_workerbee._Main_0d7cfa1eOrchestrator(_input_params=self._input_params)]
+        yield [daylight_factor_workerbee._Main_ed202b55Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

@@ -1,5 +1,5 @@
 """
-This file is auto-generated from pmv-comfort-map:0.8.16.
+This file is auto-generated from pmv-comfort-map:0.8.17.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,7 +17,7 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.radiance_contrib_entry_point import _RadianceContribEntryPoint_6b2d7cbaOrchestrator as RadianceContribEntryPoint_6b2d7cbaWorkerbee
+from .dependencies.radiance_contrib_entry_point import _RadianceContribEntryPoint_5972ee0cOrchestrator as RadianceContribEntryPoint_5972ee0cWorkerbee
 
 
 _default_inputs = {   'group_name': None,
@@ -63,6 +63,14 @@ class ReadGrids(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'read_grids.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'echo parsing JSON information to a list...'
 
@@ -78,6 +86,11 @@ class ReadGrids(QueenbeeTask):
     def input_artifacts(self):
         return [
             {'name': 'src', 'to': 'input_path', 'from': self.src, 'optional': False}]
+
+    @property
+    def input_parameters(self):
+        return {
+}
 
     @property
     def output_parameters(self):
@@ -230,7 +243,7 @@ class RunRadianceWindowContribLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [RadianceContribEntryPoint_6b2d7cbaWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [RadianceContribEntryPoint_5972ee0cWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_window_contrib.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -290,7 +303,7 @@ class RunRadianceWindowContrib(luigi.Task):
         }
 
 
-class _DynamicContributionEntryPoint_6b2d7cbaOrchestrator(luigi.WrapperTask):
+class _DynamicContributionEntryPoint_5972ee0cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

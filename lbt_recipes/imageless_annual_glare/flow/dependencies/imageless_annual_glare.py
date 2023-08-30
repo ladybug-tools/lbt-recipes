@@ -1,5 +1,5 @@
 """
-This file is auto-generated from imageless-annual-glare:0.1.5.
+This file is auto-generated from imageless-annual-glare:0.1.6.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -56,6 +56,8 @@ class DirectSky(QueenbeeTask):
     def sensor_count(self):
         return self._input_params['sensor_count']
 
+    conversion = luigi.Parameter(default='')
+
     header = luigi.Parameter(default='keep')
 
     input_format = luigi.Parameter(default='a')
@@ -101,8 +103,16 @@ class DirectSky(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'direct_sky.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance dc coeff scene.oct grid.pts sky.dome --sensor-count {sensor_count} --output results.mtx --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --input-format {input_format} --output-format {output_format} --{header}-header'.format(input_format=self.input_format, header=self.header, sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format)
+        return 'honeybee-radiance dc coeff scene.oct grid.pts sky.dome --sensor-count {sensor_count} --output results.mtx --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --input-format {input_format} --output-format {output_format} --{header}-header'.format(input_format=self.input_format, header=self.header, conversion=self.conversion, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, sensor_count=self.sensor_count, output_format=self.output_format)
 
     def output(self):
         return {
@@ -130,8 +140,19 @@ class DirectSky(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'radiance_parameters': self.radiance_parameters,
+            'fixed_radiance_parameters': self.fixed_radiance_parameters,
+            'output_format': self.output_format,
+            'sensor_count': self.sensor_count,
+            'conversion': self.conversion,
+            'header': self.header,
+            'input_format': self.input_format}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -162,6 +183,8 @@ class TotalSky(QueenbeeTask):
     def sensor_count(self):
         return self._input_params['sensor_count']
 
+    conversion = luigi.Parameter(default='')
+
     header = luigi.Parameter(default='keep')
 
     input_format = luigi.Parameter(default='a')
@@ -207,8 +230,16 @@ class TotalSky(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'total_sky.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance dc coeff scene.oct grid.pts sky.dome --sensor-count {sensor_count} --output results.mtx --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --input-format {input_format} --output-format {output_format} --{header}-header'.format(input_format=self.input_format, header=self.header, sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format)
+        return 'honeybee-radiance dc coeff scene.oct grid.pts sky.dome --sensor-count {sensor_count} --output results.mtx --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --input-format {input_format} --output-format {output_format} --{header}-header'.format(input_format=self.input_format, header=self.header, conversion=self.conversion, radiance_parameters=self.radiance_parameters, fixed_radiance_parameters=self.fixed_radiance_parameters, sensor_count=self.sensor_count, output_format=self.output_format)
 
     def output(self):
         return {
@@ -236,8 +267,19 @@ class TotalSky(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'radiance_parameters': self.radiance_parameters,
+            'fixed_radiance_parameters': self.fixed_radiance_parameters,
+            'output_format': self.output_format,
+            'sensor_count': self.sensor_count,
+            'conversion': self.conversion,
+            'header': self.header,
+            'input_format': self.input_format}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -299,6 +341,14 @@ class DaylightGlareProbability(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'daylight_glare_probability.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance dcglare two-phase dc_direct.mtx dc_total.mtx sky.smx view_rays.ray --threshold-factor {threshold_factor} --occupancy-schedule schedule.txt --output view_rays.dgp'.format(threshold_factor=self.threshold_factor)
 
@@ -331,15 +381,21 @@ class DaylightGlareProbability(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'name': self.name,
+            'threshold_factor': self.threshold_factor}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _ImagelessAnnualGlare_abf29326Orchestrator(luigi.WrapperTask):
+class _ImagelessAnnualGlare_25082223Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -1,5 +1,5 @@
 """
-This file is auto-generated from pmv-comfort-map:0.8.16.
+This file is auto-generated from pmv-comfort-map:0.8.17.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,10 +17,10 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_6b2d7cbaOrchestrator as ComfortMappingEntryPoint_6b2d7cbaWorkerbee
-from .dependencies.dynamic_contribution_entry_point import _DynamicContributionEntryPoint_6b2d7cbaOrchestrator as DynamicContributionEntryPoint_6b2d7cbaWorkerbee
-from .dependencies.dynamic_shade_contrib_entry_point import _DynamicShadeContribEntryPoint_6b2d7cbaOrchestrator as DynamicShadeContribEntryPoint_6b2d7cbaWorkerbee
-from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_6b2d7cbaOrchestrator as RadianceMappingEntryPoint_6b2d7cbaWorkerbee
+from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_5972ee0cOrchestrator as ComfortMappingEntryPoint_5972ee0cWorkerbee
+from .dependencies.dynamic_contribution_entry_point import _DynamicContributionEntryPoint_5972ee0cOrchestrator as DynamicContributionEntryPoint_5972ee0cWorkerbee
+from .dependencies.dynamic_shade_contrib_entry_point import _DynamicShadeContribEntryPoint_5972ee0cOrchestrator as DynamicShadeContribEntryPoint_5972ee0cWorkerbee
+from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_5972ee0cOrchestrator as RadianceMappingEntryPoint_5972ee0cWorkerbee
 
 
 _default_inputs = {   'additional_idf': None,
@@ -78,6 +78,14 @@ class CreateModelOccSchedules(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_model_occ_schedules.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-energy translate model-occ-schedules model.json --threshold {threshold} --period "{period}" --output-file occ_schedules.json'.format(threshold=self.threshold, period=self.period)
 
@@ -104,8 +112,14 @@ class CreateModelOccSchedules(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'period': self.period,
+            'threshold': self.threshold}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-energy:1.99.1'
+        return 'docker.io/ladybugtools/honeybee-energy:1.100.2'
 
     @property
     def image_workdir(self):
@@ -142,6 +156,14 @@ class CreateModelTransSchedules(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_model_trans_schedules.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-energy translate model-transmittance-schedules model.json --period "{period}" --output-file trans_schedules.json'.format(period=self.period)
 
@@ -168,8 +190,13 @@ class CreateModelTransSchedules(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'period': self.period}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-energy:1.99.1'
+        return 'docker.io/ladybugtools/honeybee-energy:1.100.2'
 
     @property
     def image_workdir(self):
@@ -207,6 +234,14 @@ class CreateResultInfo(QueenbeeTask):
     @property
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_result_info.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
 
     def command(self):
         return 'ladybug-comfort map map-result-info {comfort_model} --run-period "{run_period}" --qualifier "{qualifier}" --folder output --log-file results_info.json'.format(qualifier=self.qualifier, comfort_model=self.comfort_model, run_period=self.run_period)
@@ -284,6 +319,13 @@ class CreateResultInfo(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'comfort_model': self.comfort_model,
+            'run_period': self.run_period,
+            'qualifier': self.qualifier}
+
+    @property
     def task_image(self):
         return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
 
@@ -341,8 +383,16 @@ class CreateSimPar(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_sim_par.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-energy settings comfort-sim-par input.ddy --run-period "{run_period}" --north {north} --{filter_des_days} --output-file sim_par.json'.format(filter_des_days=self.filter_des_days, north=self.north, run_period=self.run_period)
+        return 'honeybee-energy settings comfort-sim-par input.ddy --run-period "{run_period}" --north {north} --{filter_des_days} --output-file sim_par.json'.format(north=self.north, run_period=self.run_period, filter_des_days=self.filter_des_days)
 
     def output(self):
         return {
@@ -367,8 +417,19 @@ class CreateSimPar(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'run_period': self.run_period,
+            'north': self.north,
+            'building_type': self.building_type,
+            'climate_zone': self.climate_zone,
+            'efficiency_standard': self.efficiency_standard,
+            'filter_des_days': self.filter_des_days,
+            'reporting_frequency': self.reporting_frequency}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-energy:1.99.1'
+        return 'docker.io/ladybugtools/honeybee-energy:1.100.2'
 
     @property
     def image_workdir(self):
@@ -397,6 +458,14 @@ class CreateSkyDome(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_sky_dome.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance sky skydome --name rflux_sky.sky --sky-density {sky_density}'.format(sky_density=self.sky_density)
 
@@ -418,8 +487,13 @@ class CreateSkyDome(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'sky_density': self.sky_density}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -464,8 +538,16 @@ class CreateViewFactorModifiers(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_view_factor_modifiers.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance view-factor modifiers model.hbjson --{include_sky}-sky --{include_ground}-ground --{grouped_shades}-shades --name scene'.format(include_ground=self.include_ground, include_sky=self.include_sky, grouped_shades=self.grouped_shades)
+        return 'honeybee-radiance view-factor modifiers model.hbjson --{include_sky}-sky --{include_ground}-ground --{grouped_shades}-shades --name scene'.format(include_sky=self.include_sky, grouped_shades=self.grouped_shades, include_ground=self.include_ground)
 
     def output(self):
         return {
@@ -501,8 +583,15 @@ class CreateViewFactorModifiers(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'include_sky': self.include_sky,
+            'include_ground': self.include_ground,
+            'grouped_shades': self.grouped_shades}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -541,6 +630,14 @@ class CreateWea(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_wea.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'ladybug translate epw-to-wea weather.epw --analysis-period "{period}" --timestep {timestep} --output-file weather.wea'.format(timestep=self.timestep, period=self.period)
 
@@ -565,6 +662,12 @@ class CreateWea(QueenbeeTask):
                 'optional': False,
                 'type': 'file'
             }]
+
+    @property
+    def input_parameters(self):
+        return {
+            'period': self.period,
+            'timestep': self.timestep}
 
     @property
     def task_image(self):
@@ -612,6 +715,14 @@ class DynamicConstructionOutputs(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'dynamic_construction_outputs.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-energy settings dynamic-window-outputs model.json --base-idf base.idf --output-file base.idf'
 
@@ -639,8 +750,13 @@ class DynamicConstructionOutputs(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-energy:1.99.1'
+        return 'docker.io/ladybugtools/honeybee-energy:1.100.2'
 
     @property
     def image_workdir(self):
@@ -690,8 +806,16 @@ class SetModifiersFromConstructions(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'set_modifiers_from_constructions.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-energy edit modifiers-from-constructions model.hbjson --{use_visible} --{dynamic_behavior}-groups --{dynamic_shade}-groups --exterior-offset {exterior_offset} --output-file new_model.hbjson'.format(use_visible=self.use_visible, dynamic_behavior=self.dynamic_behavior, dynamic_shade=self.dynamic_shade, exterior_offset=self.exterior_offset)
+        return 'honeybee-energy edit modifiers-from-constructions model.hbjson --{use_visible} --{dynamic_behavior}-groups --{dynamic_shade}-groups --exterior-offset {exterior_offset} --output-file new_model.hbjson'.format(use_visible=self.use_visible, exterior_offset=self.exterior_offset, dynamic_behavior=self.dynamic_behavior, dynamic_shade=self.dynamic_shade)
 
     def output(self):
         return {
@@ -714,6 +838,14 @@ class SetModifiersFromConstructions(QueenbeeTask):
                 'optional': False,
                 'type': 'file'
             }]
+
+    @property
+    def input_parameters(self):
+        return {
+            'use_visible': self.use_visible,
+            'exterior_offset': self.exterior_offset,
+            'dynamic_behavior': self.dynamic_behavior,
+            'dynamic_shade': self.dynamic_shade}
 
     @property
     def task_image(self):
@@ -750,6 +882,14 @@ class CopyResultInfo(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'copy_result_info.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'echo copying input path...'
 
@@ -777,6 +917,11 @@ class CopyResultInfo(QueenbeeTask):
                 'optional': False,
                 'type': 'folder'
             }]
+
+    @property
+    def input_parameters(self):
+        return {
+}
 
     @property
     def task_image(self):
@@ -835,8 +980,16 @@ class CreateDirectSky(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_direct_sky.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(cumulative=self.cumulative, sun_up_hours=self.sun_up_hours, sky_density=self.sky_density, sky_type=self.sky_type, north=self.north, output_type=self.output_type, output_format=self.output_format)
+        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(output_format=self.output_format, north=self.north, cumulative=self.cumulative, sky_type=self.sky_type, sky_density=self.sky_density, sun_up_hours=self.sun_up_hours, output_type=self.output_type)
 
     def requires(self):
         return {'CreateWea': CreateWea(_input_params=self._input_params)}
@@ -864,8 +1017,19 @@ class CreateDirectSky(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'north': self.north,
+            'sky_type': self.sky_type,
+            'output_type': self.output_type,
+            'sun_up_hours': self.sun_up_hours,
+            'cumulative': self.cumulative,
+            'output_format': self.output_format,
+            'sky_density': self.sky_density}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -900,8 +1064,16 @@ class CreateRadFolder(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_rad_folder.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid "{grid_filter}" --grid-check'.format(grid_filter=self.grid_filter)
+        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid " {grid_filter} " --grid-check'.format(grid_filter=self.grid_filter)
 
     def requires(self):
         return {'SetModifiersFromConstructions': SetModifiersFromConstructions(_input_params=self._input_params)}
@@ -946,12 +1118,17 @@ class CreateRadFolder(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'grid_filter': self.grid_filter}
+
+    @property
     def output_parameters(self):
         return [{'name': 'sensor-grids', 'from': 'model/grid/_info.json', 'to': pathlib.Path(self.params_folder, 'model/grid/_info.json').resolve().as_posix()}]
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -1006,8 +1183,16 @@ class CreateTotalSky(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_total_sky.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(cumulative=self.cumulative, sun_up_hours=self.sun_up_hours, sky_density=self.sky_density, sky_type=self.sky_type, north=self.north, output_type=self.output_type, output_format=self.output_format)
+        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(output_format=self.output_format, north=self.north, cumulative=self.cumulative, sky_type=self.sky_type, sky_density=self.sky_density, sun_up_hours=self.sun_up_hours, output_type=self.output_type)
 
     def requires(self):
         return {'CreateWea': CreateWea(_input_params=self._input_params)}
@@ -1035,8 +1220,19 @@ class CreateTotalSky(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'north': self.north,
+            'sky_type': self.sky_type,
+            'output_type': self.output_type,
+            'sun_up_hours': self.sun_up_hours,
+            'cumulative': self.cumulative,
+            'output_format': self.output_format,
+            'sky_density': self.sky_density}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -1077,8 +1273,16 @@ class GenerateSunpath(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'generate_sunpath.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'gendaymtx -n -D sunpath.mtx -M suns.mod -O{output_type} -r {north} -v sky.wea'.format(output_type=self.output_type, north=self.north)
+        return 'gendaymtx -n -D sunpath.mtx -M suns.mod -O{output_type} -r {north} -v sky.wea'.format(north=self.north, output_type=self.output_type)
 
     def requires(self):
         return {'CreateWea': CreateWea(_input_params=self._input_params)}
@@ -1117,8 +1321,14 @@ class GenerateSunpath(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'north': self.north,
+            'output_type': self.output_type}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -1185,8 +1395,16 @@ class RunEnergySimulation(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'run_energy_simulation.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-energy simulate model model.hbjson weather.epw --sim-par-json sim-par.json --measures measures --additional-string "{additional_string}" --additional-idf additional.idf --report-units {report_units} --folder output {viz_variables}'.format(report_units=self.report_units, additional_string=self.additional_string, viz_variables=self.viz_variables)
+        return 'honeybee-energy simulate model model.hbjson weather.epw --sim-par-json sim-par.json --measures measures --additional-string "{additional_string}" --additional-idf additional.idf --report-units {report_units} --folder output {viz_variables}'.format(additional_string=self.additional_string, report_units=self.report_units, viz_variables=self.viz_variables)
 
     def requires(self):
         return {'CreateSimPar': CreateSimPar(_input_params=self._input_params), 'DynamicConstructionOutputs': DynamicConstructionOutputs(_input_params=self._input_params)}
@@ -1228,8 +1446,15 @@ class RunEnergySimulation(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'additional_string': self.additional_string,
+            'report_units': self.report_units,
+            'viz_variables': self.viz_variables}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-energy:1.99.1'
+        return 'docker.io/ladybugtools/honeybee-energy:1.100.2'
 
     @property
     def image_workdir(self):
@@ -1261,6 +1486,14 @@ class CopyGridInfo(QueenbeeTask):
     @property
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'copy_grid_info.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
 
     def command(self):
         return 'echo copying input path...'
@@ -1346,6 +1579,11 @@ class CopyGridInfo(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+}
+
+    @property
     def task_image(self):
         return 'docker.io/python:3.7-slim'
 
@@ -1391,6 +1629,14 @@ class CreateDynamicOctrees(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_dynamic_octrees.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance octree from-abstracted-groups model --sun-path sunpath.mtx --output-folder octree'
 
@@ -1427,12 +1673,17 @@ class CreateDynamicOctrees(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+}
+
+    @property
     def output_parameters(self):
         return [{'name': 'scene-info', 'from': 'octree/group_info.json', 'to': pathlib.Path(self.params_folder, 'octree/group_info.json').resolve().as_posix()}]
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -1469,6 +1720,14 @@ class CreateOctree(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_octree.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out}'.format(black_out=self.black_out, include_aperture=self.include_aperture)
 
@@ -1498,8 +1757,14 @@ class CreateOctree(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'black_out': self.black_out,
+            'include_aperture': self.include_aperture}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -1542,6 +1807,14 @@ class CreateOctreeWithSuns(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_octree_with_suns.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out} --add-before sky.sky'.format(black_out=self.black_out, include_aperture=self.include_aperture)
 
@@ -1572,8 +1845,14 @@ class CreateOctreeWithSuns(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'black_out': self.black_out,
+            'include_aperture': self.include_aperture}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -1617,6 +1896,14 @@ class CreateShadeTransOctrees(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_shade_trans_octrees.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance octree from-shade-trans-groups model --sun-path sunpath.mtx --output-folder octree'
 
@@ -1653,12 +1940,17 @@ class CreateShadeTransOctrees(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+}
+
+    @property
     def output_parameters(self):
         return [{'name': 'scene-info', 'from': 'octree/trans_info.json', 'to': pathlib.Path(self.params_folder, 'octree/trans_info.json').resolve().as_posix()}]
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -1691,6 +1983,14 @@ class ParseSunUpHours(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'parse_sun_up_hours.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance sunpath parse-hours suns.mod --name sun-up-hours.txt'
 
@@ -1720,8 +2020,13 @@ class ParseSunUpHours(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -1771,8 +2076,16 @@ class SplitGridFolder(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'split_grid_folder.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(cpus_per_grid=self.cpus_per_grid, cpu_count=self.cpu_count, min_sensor_count=self.min_sensor_count)
+        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(min_sensor_count=self.min_sensor_count, cpu_count=self.cpu_count, cpus_per_grid=self.cpus_per_grid)
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
@@ -1828,12 +2141,19 @@ class SplitGridFolder(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'cpu_count': self.cpu_count,
+            'cpus_per_grid': self.cpus_per_grid,
+            'min_sensor_count': self.min_sensor_count}
+
+    @property
     def output_parameters(self):
         return [{'name': 'sensor-grids', 'from': 'output_folder/_info.json', 'to': pathlib.Path(self.params_folder, 'output_folder/_info.json').resolve().as_posix()}]
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -1865,6 +2185,14 @@ class CopyRedistInfo(QueenbeeTask):
     @property
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'copy_redist_info.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
 
     def command(self):
         return 'echo copying input path...'
@@ -1948,6 +2276,11 @@ class CopyRedistInfo(QueenbeeTask):
                 'optional': False,
                 'type': 'folder'
             }]
+
+    @property
+    def input_parameters(self):
+        return {
+}
 
     @property
     def task_image(self):
@@ -2084,7 +2417,7 @@ class RunRadianceSimulationLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [RadianceMappingEntryPoint_6b2d7cbaWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [RadianceMappingEntryPoint_5972ee0cWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_simulation.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -2168,7 +2501,7 @@ class RunRadianceDynamicContributionLoop(luigi.Task):
 
     @property
     def octree_file_spec(self):
-        value = pathlib.Path(self.input()['CreateDynamicOctrees']['scene_folder'].path, '{item_identifier}/{item_spec}'.format(item_identifier=self.item['identifier'], item_spec=self.item['spec']))
+        value = pathlib.Path(self.input()['CreateDynamicOctrees']['scene_folder'].path, '{item_identifier}/{item_spec}'.format(item_spec=self.item['spec'], item_identifier=self.item['identifier']))
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -2180,7 +2513,7 @@ class RunRadianceDynamicContributionLoop(luigi.Task):
 
     @property
     def octree_file_with_suns(self):
-        value = pathlib.Path(self.input()['CreateDynamicOctrees']['scene_folder'].path, '{item_identifier}/{item_sun}'.format(item_identifier=self.item['identifier'], item_sun=self.item['sun']))
+        value = pathlib.Path(self.input()['CreateDynamicOctrees']['scene_folder'].path, '{item_identifier}/{item_sun}'.format(item_sun=self.item['sun'], item_identifier=self.item['identifier']))
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -2272,7 +2605,7 @@ class RunRadianceDynamicContributionLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DynamicContributionEntryPoint_6b2d7cbaWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [DynamicContributionEntryPoint_5972ee0cWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_dynamic_contribution.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -2446,7 +2779,7 @@ class RunRadianceShadeContributionLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DynamicShadeContribEntryPoint_6b2d7cbaWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [DynamicShadeContribEntryPoint_5972ee0cWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_shade_contribution.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -2713,7 +3046,7 @@ class RunComfortMapLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [ComfortMappingEntryPoint_6b2d7cbaWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [ComfortMappingEntryPoint_5972ee0cWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_comfort_map.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -2803,6 +3136,14 @@ class RestructureConditionIntensityResults(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'restructure_condition_intensity_results.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
@@ -2832,8 +3173,13 @@ class RestructureConditionIntensityResults(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'extension': self.extension}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -2870,6 +3216,14 @@ class RestructureConditionResults(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'restructure_condition_results.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
@@ -2899,8 +3253,13 @@ class RestructureConditionResults(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'extension': self.extension}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -2937,6 +3296,14 @@ class RestructureCspResults(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'restructure_csp_results.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
@@ -2966,8 +3333,13 @@ class RestructureCspResults(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'extension': self.extension}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -3004,6 +3376,14 @@ class RestructureHspResults(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'restructure_hsp_results.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
@@ -3033,8 +3413,13 @@ class RestructureHspResults(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'extension': self.extension}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -3071,6 +3456,14 @@ class RestructureTcpResults(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'restructure_tcp_results.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
@@ -3100,8 +3493,13 @@ class RestructureTcpResults(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'extension': self.extension}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -3138,6 +3536,14 @@ class RestructureTemperatureResults(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'restructure_temperature_results.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
@@ -3167,15 +3573,20 @@ class RestructureTemperatureResults(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'extension': self.extension}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.126'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _Main_6b2d7cbaOrchestrator(luigi.WrapperTask):
+class _Main_5972ee0cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -1,5 +1,5 @@
 """
-This file is auto-generated from cumulative-radiation:0.3.8.
+This file is auto-generated from cumulative-radiation:0.3.9.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -67,6 +67,14 @@ class AccumulateResults(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'accumulate_results.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance post-process cumulative-radiation avg_irr.mtx weather.wea --timestep {timestep} --output radiation.mtx'.format(timestep=self.timestep)
 
@@ -94,15 +102,21 @@ class AccumulateResults(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'name': self.name,
+            'timestep': self.timestep}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _CumulativeRadiationPostprocess_c4e2265aOrchestrator(luigi.WrapperTask):
+class _CumulativeRadiationPostprocess_49ddb174Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

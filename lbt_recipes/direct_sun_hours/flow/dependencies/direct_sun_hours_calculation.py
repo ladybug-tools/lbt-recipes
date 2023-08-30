@@ -1,5 +1,5 @@
 """
-This file is auto-generated from direct-sun-hours:0.5.14.
+This file is auto-generated from direct-sun-hours:0.5.18.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -106,8 +106,16 @@ class DirectIrradianceCalculation(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'direct_irradiance_calculation.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(calculate_values=self.calculate_values, header=self.header, sensor_count=self.sensor_count, conversion=self.conversion, order_by=self.order_by, fixed_radiance_parameters=self.fixed_radiance_parameters, radiance_parameters=self.radiance_parameters, output_format=self.output_format)
+        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(calculate_values=self.calculate_values, order_by=self.order_by, conversion=self.conversion, sensor_count=self.sensor_count, output_format=self.output_format, radiance_parameters=self.radiance_parameters, header=self.header, fixed_radiance_parameters=self.fixed_radiance_parameters)
 
     def output(self):
         return {
@@ -135,8 +143,21 @@ class DirectIrradianceCalculation(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'fixed_radiance_parameters': self.fixed_radiance_parameters,
+            'conversion': self.conversion,
+            'sensor_count': self.sensor_count,
+            'grid_name': self.grid_name,
+            'calculate_values': self.calculate_values,
+            'header': self.header,
+            'order_by': self.order_by,
+            'output_format': self.output_format,
+            'radiance_parameters': self.radiance_parameters}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -187,8 +208,16 @@ class ConvertToSunHours(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'convert_to_sun_hours.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
-        return 'honeybee-radiance post-process convert-to-binary input.mtx --output binary.mtx --maximum {maximum} --minimum {minimum} --{reverse} --{include_min}-min --{include_max}-max'.format(maximum=self.maximum, include_min=self.include_min, reverse=self.reverse, minimum=self.minimum, include_max=self.include_max)
+        return 'honeybee-radiance post-process convert-to-binary input.mtx --output binary.mtx --maximum {maximum} --minimum {minimum} --{reverse} --{include_min}-min --{include_max}-max'.format(reverse=self.reverse, include_max=self.include_max, include_min=self.include_min, minimum=self.minimum, maximum=self.maximum)
 
     def requires(self):
         return {'DirectIrradianceCalculation': DirectIrradianceCalculation(_input_params=self._input_params)}
@@ -216,8 +245,18 @@ class ConvertToSunHours(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'grid_name': self.grid_name,
+            'minimum': self.minimum,
+            'include_min': self.include_min,
+            'include_max': self.include_max,
+            'maximum': self.maximum,
+            'reverse': self.reverse}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -262,6 +301,14 @@ class CalculateCumulativeHours(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'calculate_cumulative_hours.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance post-process sum-row input.mtx --divisor {divisor} --output sum.mtx'.format(divisor=self.divisor)
 
@@ -291,8 +338,14 @@ class CalculateCumulativeHours(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'grid_name': self.grid_name,
+            'divisor': self.divisor}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -329,6 +382,14 @@ class CopySunHours(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'copy_sun_hours.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'echo copying input path...'
 
@@ -358,6 +419,11 @@ class CopySunHours(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'grid_name': self.grid_name}
+
+    @property
     def task_image(self):
         return 'docker.io/python:3.7-slim'
 
@@ -366,7 +432,7 @@ class CopySunHours(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _DirectSunHoursCalculation_f24da6c6Orchestrator(luigi.WrapperTask):
+class _DirectSunHoursCalculation_6aed763bOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

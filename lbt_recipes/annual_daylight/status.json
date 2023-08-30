@@ -1,20 +1,20 @@
 {
-  "id": "9db99d53-dfd9-45f4-adbe-e00134735784",
+  "id": "d27c7143-e0e3-4b1b-9d1d-a0ea3657be78",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
     "name": "ladybugbot",
     "display_name": "info@ladybug.tools",
     "description": "Your favorite bot!",
-    "picture_url": "https://avatars1.githubusercontent.com/u/38131342"
+    "picture_url": "https://avatars.githubusercontent.com/u/46136343"
   },
   "owner": {
-    "id": "1da45dba-a1a1-4449-9e41-b5df2f28e3bd",
+    "id": "8c2991d1-a6e4-4275-8789-4e9405b43508",
     "account_type": "org",
-    "name": "ladybug-tools",
-    "display_name": "Ladybug Tools",
+    "name": "pollination",
+    "display_name": "Pollination",
     "description": "...",
-    "picture_url": "https://avatars1.githubusercontent.com/u/38131342"
+    "picture_url": "https://avatars.githubusercontent.com/u/46136343"
   },
   "recipe": {
     "type": "RecipeInterface",
@@ -24,7 +24,7 @@
       "type": "MetaData",
       "annotations": {},
       "name": "annual-daylight",
-      "tag": "0.9.10",
+      "tag": "0.10.9",
       "app_version": null,
       "keywords": [
         "honeybee",
@@ -115,6 +115,44 @@
         "spec": null
       },
       {
+        "type": "DAGFileInput",
+        "annotations": {},
+        "name": "grid-metrics",
+        "description": "A JSON file with additional custom metrics to calculate.",
+        "default": null,
+        "alias": [
+          {
+            "type": "DAGGenericInputAlias",
+            "annotations": {},
+            "name": "grid_metrics",
+            "description": "A JSON file with custom metrics. This can also be a string or a list of grid metrics.",
+            "platform": [
+              "grasshopper",
+              "rhino",
+              "revit"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.inputs.postprocess",
+                "function": "grid_metrics",
+                "index": 0
+              }
+            ],
+            "default": null,
+            "required": false,
+            "spec": null
+          }
+        ],
+        "required": false,
+        "spec": null,
+        "extensions": [
+          "json"
+        ]
+      },
+      {
         "type": "DAGIntegerInput",
         "annotations": {},
         "name": "min-sensor-count",
@@ -154,7 +192,8 @@
             "name": "model",
             "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
             "platform": [
-              "grasshopper"
+              "grasshopper",
+              "rhino"
             ],
             "handler": [
               {
@@ -179,20 +218,20 @@
             "spec": null
           },
           {
-            "type": "DAGLinkedInputAlias",
+            "type": "DAGGenericInputAlias",
             "annotations": {},
             "name": "model",
-            "description": "This input links the model to Rhino model.",
+            "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
             "platform": [
-              "rhino"
+              "revit"
             ],
             "handler": [
               {
                 "type": "IOAliasHandler",
                 "annotations": {},
-                "language": "csharp",
-                "module": "Pollination.RhinoHandlers",
-                "function": "RhinoHBModelToJSON",
+                "language": "python",
+                "module": "pollination_handlers.inputs.model",
+                "function": "model_to_json_grid_check",
                 "index": 0
               }
             ],
@@ -346,7 +385,9 @@
             "name": "wea",
             "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
             "platform": [
-              "grasshopper"
+              "grasshopper",
+              "rhino",
+              "revit"
             ],
             "handler": [
               {
@@ -484,6 +525,39 @@
                 "language": "csharp",
                 "module": "Pollination.RhinoHandlers",
                 "function": "LoadMeshBasedResultsToRhino",
+                "index": 0
+              }
+            ]
+          }
+        ],
+        "required": true
+      },
+      {
+        "type": "DAGFileOutput",
+        "annotations": {},
+        "name": "grid-summary",
+        "description": "Grid summary of metrics.",
+        "from_": {
+          "type": "FileReference",
+          "annotations": {},
+          "path": "grid_summary.csv"
+        },
+        "alias": [
+          {
+            "type": "DAGGenericOutputAlias",
+            "annotations": {},
+            "name": "grid_metrics",
+            "description": "CSV file with grid metrics.",
+            "platform": [
+              "grasshopper"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.outputs.daylight",
+                "function": "read_grid_metrics",
                 "index": 0
               }
             ]
@@ -758,6 +832,50 @@
         "value": "*"
       },
       {
+        "type": "StepFileInput",
+        "annotations": {},
+        "name": "grid-metrics",
+        "description": "A JSON file with additional custom metrics to calculate.",
+        "default": null,
+        "alias": [
+          {
+            "type": "DAGGenericInputAlias",
+            "annotations": {},
+            "name": "grid_metrics",
+            "description": "A JSON file with custom metrics. This can also be a string or a list of grid metrics.",
+            "platform": [
+              "grasshopper",
+              "rhino",
+              "revit"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.inputs.postprocess",
+                "function": "grid_metrics",
+                "index": 0
+              }
+            ],
+            "default": null,
+            "required": false,
+            "spec": null
+          }
+        ],
+        "required": false,
+        "spec": null,
+        "path": null,
+        "extensions": [
+          "json"
+        ],
+        "source": {
+          "type": "ProjectFolder",
+          "annotations": {},
+          "path": "place.holder"
+        }
+      },
+      {
         "type": "StepIntegerInput",
         "annotations": {},
         "name": "min-sensor-count",
@@ -798,7 +916,8 @@
             "name": "model",
             "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
             "platform": [
-              "grasshopper"
+              "grasshopper",
+              "rhino"
             ],
             "handler": [
               {
@@ -823,20 +942,20 @@
             "spec": null
           },
           {
-            "type": "DAGLinkedInputAlias",
+            "type": "DAGGenericInputAlias",
             "annotations": {},
             "name": "model",
-            "description": "This input links the model to Rhino model.",
+            "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
             "platform": [
-              "rhino"
+              "revit"
             ],
             "handler": [
               {
                 "type": "IOAliasHandler",
                 "annotations": {},
-                "language": "csharp",
-                "module": "Pollination.RhinoHandlers",
-                "function": "RhinoHBModelToJSON",
+                "language": "python",
+                "module": "pollination_handlers.inputs.model",
+                "function": "model_to_json_grid_check",
                 "index": 0
               }
             ],
@@ -1005,7 +1124,9 @@
             "name": "wea",
             "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
             "platform": [
-              "grasshopper"
+              "grasshopper",
+              "rhino",
+              "revit"
             ],
             "handler": [
               {
@@ -1060,6 +1181,19 @@
           "type": "ProjectFolder",
           "annotations": {},
           "path": "metrics/da"
+        }
+      },
+      {
+        "type": "StepFileOutput",
+        "annotations": {},
+        "name": "grid-summary",
+        "description": "Grid summary of metrics.",
+        "path": "",
+        "required": true,
+        "source": {
+          "type": "ProjectFolder",
+          "annotations": {},
+          "path": "grid_summary.csv"
         }
       },
       {
@@ -1129,12 +1263,12 @@
       }
     ],
     "message": null,
-    "started_at": "2023-03-14T19:51:46+00:00",
+    "started_at": "2023-08-30T00:32:06+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "9db99d53-dfd9-45f4-adbe-e00134735784_00",
-    "job_id": "9db99d53-dfd9-45f4-adbe-e00134735784",
+    "id": "d27c7143-e0e3-4b1b-9d1d-a0ea3657be78_00",
+    "job_id": "d27c7143-e0e3-4b1b-9d1d-a0ea3657be78",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}
