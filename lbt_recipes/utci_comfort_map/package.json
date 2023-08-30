@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "utci-comfort-map",
-    "tag": "0.9.10",
+    "tag": "0.9.11",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -193,7 +193,8 @@
           "name": "model",
           "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
           "platform": [
-            "grasshopper"
+            "grasshopper",
+            "rhino"
           ],
           "handler": [
             {
@@ -218,20 +219,20 @@
           "spec": null
         },
         {
-          "type": "DAGLinkedInputAlias",
+          "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "model",
-          "description": "This input links the model to Rhino model.",
+          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
           "platform": [
-            "rhino"
+            "revit"
           ],
           "handler": [
             {
               "type": "IOAliasHandler",
               "annotations": {},
-              "language": "csharp",
-              "module": "Pollination.RhinoHandlers",
-              "function": "RhinoHBModelToJSON",
+              "language": "python",
+              "module": "pollination_handlers.inputs.model",
+              "function": "model_to_json_grid_check",
               "index": 0
             }
           ],

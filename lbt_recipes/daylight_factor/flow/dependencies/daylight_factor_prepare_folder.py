@@ -1,5 +1,5 @@
 """
-This file is auto-generated from daylight-factor:0.8.12.
+This file is auto-generated from daylight-factor:0.8.13.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -66,7 +66,7 @@ class CreateRadFolder(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid "{grid_filter}" --grid-check'.format(grid_filter=self.grid_filter)
+        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid " {grid_filter} " --grid-check'.format(grid_filter=self.grid_filter)
 
     def output(self):
         return {
@@ -108,7 +108,7 @@ class CreateRadFolder(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -150,7 +150,7 @@ class GenerateSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance sky illuminance {illuminance} --ground {ground_reflectance} --{uniform} --name output.sky'.format(ground_reflectance=self.ground_reflectance, uniform=self.uniform, illuminance=self.illuminance)
+        return 'honeybee-radiance sky illuminance {illuminance} --ground {ground_reflectance} --{uniform} --name output.sky'.format(illuminance=self.illuminance, ground_reflectance=self.ground_reflectance, uniform=self.uniform)
 
     def output(self):
         return {
@@ -178,7 +178,7 @@ class GenerateSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -266,7 +266,7 @@ class CreateOctree(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -325,7 +325,7 @@ class SplitGridFolder(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(min_sensor_count=self.min_sensor_count, cpu_count=self.cpu_count, cpus_per_grid=self.cpus_per_grid)
+        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(cpus_per_grid=self.cpus_per_grid, cpu_count=self.cpu_count, min_sensor_count=self.min_sensor_count)
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
@@ -372,14 +372,14 @@ class SplitGridFolder(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _DaylightFactorPrepareFolder_0d7cfa1eOrchestrator(luigi.WrapperTask):
+class _DaylightFactorPrepareFolder_ed202b55Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

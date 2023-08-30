@@ -1,5 +1,5 @@
 """
-This file is auto-generated from direct-sun-hours:0.5.14.
+This file is auto-generated from direct-sun-hours:0.5.18.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -54,6 +54,14 @@ class CopyGridInfo(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'copy_grid_info.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'echo copying input path...'
 
@@ -91,6 +99,11 @@ class CopyGridInfo(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+}
+
+    @property
     def task_image(self):
         return 'docker.io/python:3.7-slim'
 
@@ -124,6 +137,14 @@ class CopySunUpHours(QueenbeeTask):
     @property
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'copy_sun_up_hours.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
 
     def command(self):
         return 'echo copying input path...'
@@ -162,6 +183,11 @@ class CopySunUpHours(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+}
+
+    @property
     def task_image(self):
         return 'docker.io/python:3.7-slim'
 
@@ -196,6 +222,14 @@ class CopyTimestep(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'copy_timestep.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'echo copying input file...'
 
@@ -220,6 +254,11 @@ class CopyTimestep(QueenbeeTask):
                 'optional': False,
                 'type': 'file'
             }]
+
+    @property
+    def input_parameters(self):
+        return {
+}
 
     @property
     def task_image(self):
@@ -260,6 +299,14 @@ class RestructureCumulativeResults(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'restructure_cumulative_results.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
@@ -289,8 +336,13 @@ class RestructureCumulativeResults(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'extension': self.extension}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -327,6 +379,14 @@ class RestructureTimestepResults(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'restructure_timestep_results.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
 
@@ -356,15 +416,20 @@ class RestructureTimestepResults(QueenbeeTask):
             }]
 
     @property
+    def input_parameters(self):
+        return {
+            'extension': self.extension}
+
+    @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _DirectSunHoursPostprocess_f24da6c6Orchestrator(luigi.WrapperTask):
+class _DirectSunHoursPostprocess_6aed763bOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -1,5 +1,5 @@
 """
-This file is auto-generated from daylight-factor:0.8.13.
+This file is auto-generated from annual-daylight:0.10.9.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -19,16 +19,17 @@ from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
 
 
-_default_inputs = {   'grid_metrics': None,
+_default_inputs = {   'dist_info': None,
+    'grid_metrics': None,
     'grids_info': None,
+    'initial_results': None,
     'model': None,
     'params_folder': '__params',
-    'results_folder': None,
     'simulation_folder': '.'}
 
 
-class RestructureResults(QueenbeeTask):
-    """Restructure files in a distributed folder."""
+class RestructureMetrics(QueenbeeTask):
+    """Restructure annual daylight metrics in a distributed folder."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
@@ -36,84 +37,29 @@ class RestructureResults(QueenbeeTask):
 
     # Task inputs
     @property
-    def extension(self):
-        return 'res'
-
-    @property
     def input_folder(self):
-        value = pathlib.Path(self._input_params['results_folder'])
+        value = pathlib.Path(self._input_params['initial_results'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+    def dist_info(self):
+        try:
+            pathlib.Path(self._input_params['dist_info'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['dist_info'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    @property
-    def __script__(self):
-        return pathlib.Path(__file__).parent.joinpath('scripts', 'restructure_results.py').resolve()
-
-    @property
-    def is_script(self):
-        return False
-
-    def command(self):
-        return 'honeybee-radiance grid merge-folder ./input_folder ./output_folder  {extension} --dist-info dist_info.json'.format(extension=self.extension)
-
-    def output(self):
-        return {
-            'output_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'results').resolve().as_posix()
-            )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'input_folder', 'to': 'input_folder', 'from': self.input_folder, 'optional': False}]
-
-    @property
-    def output_artifacts(self):
-        return [
-            {
-                'name': 'output-folder', 'from': 'output_folder',
-                'to': pathlib.Path(self.execution_folder, 'results').resolve().as_posix(),
-                'optional': False,
-                'type': 'folder'
-            }]
-
-    @property
-    def input_parameters(self):
-        return {
-            'extension': self.extension}
-
-    @property
-    def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
-
-    @property
-    def image_workdir(self):
-        return '/home/ladybugbot/run'
-
-
-class CopyGridInfo(QueenbeeTask):
-    """Copy a file to a destination."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-    _status_lock = _queenbee_status_lock_
-
-    # Task inputs
-    @property
-    def src(self):
+    def grids_info(self):
+        try:
+            pathlib.Path(self._input_params['grids_info'])
+        except TypeError:
+            # optional artifact
+            return None
         value = pathlib.Path(self._input_params['grids_info'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
@@ -132,38 +78,37 @@ class CopyGridInfo(QueenbeeTask):
 
     @property
     def __script__(self):
-        return pathlib.Path(__file__).parent.joinpath('scripts', 'copy_grid_info.py').resolve()
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'restructure_metrics.py').resolve()
 
     @property
     def is_script(self):
         return False
 
     def command(self):
-        return 'echo copying input file...'
-
-    def requires(self):
-        return {'RestructureResults': RestructureResults(_input_params=self._input_params)}
+        return 'honeybee-radiance-postprocess grid merge-folder-metrics ./input_folder ./output_folder --dist-info dist_info.json --grids-info grids_info.json'
 
     def output(self):
         return {
-            'dst': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix()
+            'output_folder': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix()
             )
         }
 
     @property
     def input_artifacts(self):
         return [
-            {'name': 'src', 'to': 'input.path', 'from': self.src, 'optional': False}]
+            {'name': 'input_folder', 'to': 'input_folder', 'from': self.input_folder, 'optional': False},
+            {'name': 'dist_info', 'to': 'dist_info.json', 'from': self.dist_info, 'optional': True},
+            {'name': 'grids_info', 'to': 'grids_info.json', 'from': self.grids_info, 'optional': True}]
 
     @property
     def output_artifacts(self):
         return [
             {
-                'name': 'dst', 'from': 'input.path',
-                'to': pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix(),
+                'name': 'output-folder', 'from': 'output_folder',
+                'to': pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix(),
                 'optional': False,
-                'type': 'file'
+                'type': 'folder'
             }]
 
     @property
@@ -173,7 +118,7 @@ class CopyGridInfo(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/python:3.7-slim'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.231'
 
     @property
     def image_workdir(self):
@@ -190,11 +135,11 @@ class GridSummaryMetrics(QueenbeeTask):
     # Task inputs
     @property
     def folder_level(self):
-        return 'main-folder'
+        return 'sub-folder'
 
     @property
     def folder(self):
-        value = pathlib.Path(self.input()['RestructureResults']['output_folder'].path)
+        value = pathlib.Path(self.input()['RestructureMetrics']['output_folder'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -255,7 +200,7 @@ class GridSummaryMetrics(QueenbeeTask):
         return 'honeybee-radiance-postprocess post-process grid-summary metrics --model model.hbjson --grids-info grids_info.json --grid-metrics grid_metrics.json --{folder_level}'.format(folder_level=self.folder_level)
 
     def requires(self):
-        return {'RestructureResults': RestructureResults(_input_params=self._input_params)}
+        return {'RestructureMetrics': RestructureMetrics(_input_params=self._input_params)}
 
     def output(self):
         return {
@@ -296,7 +241,7 @@ class GridSummaryMetrics(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _DaylightFactorPostProcessResults_ed202b55Orchestrator(luigi.WrapperTask):
+class _AnnualDaylightPostProcess_025c6c2fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -308,4 +253,4 @@ class _DaylightFactorPostProcessResults_ed202b55Orchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [CopyGridInfo(_input_params=self.input_values), GridSummaryMetrics(_input_params=self.input_values)]
+        yield [GridSummaryMetrics(_input_params=self.input_values)]

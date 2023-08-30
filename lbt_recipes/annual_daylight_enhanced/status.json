@@ -1,5 +1,5 @@
 {
-  "id": "6ee6f3d8-d006-454c-9435-9535d90325db",
+  "id": "9f20fde6-a0e5-4c64-9b1d-227f46352c4e",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
@@ -23,22 +23,22 @@
     "metadata": {
       "type": "MetaData",
       "annotations": {},
-      "name": "utci-comfort-map",
-      "tag": "0.9.11",
+      "name": "annual-daylight-enhanced",
+      "tag": "0.0.2",
       "app_version": null,
       "keywords": [
         "honeybee",
+        "radiance",
         "ladybug-tools",
-        "thermal",
-        "comfort",
-        "utci"
+        "daylight",
+        "annual-daylight"
       ],
       "maintainers": [
         {
           "type": "Maintainer",
           "annotations": {},
-          "name": "chris",
-          "email": "chris@ladybug.tools"
+          "name": "mostapha",
+          "email": "mostapha@ladybug.tools"
         },
         {
           "type": "Maintainer",
@@ -47,11 +47,13 @@
           "email": "info@ladybug.tools"
         }
       ],
-      "home": "https://github.com/pollination/utci-comfort-map",
-      "sources": [],
-      "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/utcimap.png",
+      "home": "https://github.com/pollination/annual-daylight-enhanced",
+      "sources": [
+        "https://hub.docker.com/r/ladybugtools/honeybee-radiance"
+      ],
+      "icon": "https://raw.githubusercontent.com/ladybug-tools/artwork/master/icons_components/honeybee/png/annualrecipe.png",
       "deprecated": null,
-      "description": "UTCI thermal comfort map for Pollination.",
+      "description": "Annual daylight recipe for Pollination.",
       "license": {
         "type": "License",
         "annotations": {},
@@ -61,40 +63,6 @@
     },
     "source": null,
     "inputs": [
-      {
-        "type": "DAGFolderInput",
-        "annotations": {},
-        "name": "air-speed-matrices",
-        "description": "An optional folder with csv files that align with the model sensor grids. Each csv file should have the same name as the sensor grid identifier. Each csv file should contain a matrix of air speed values in m/s with one row per sensor and one column per timestep of the run period. Note that these values are not meteorological and should be AT HUMAN SUBJECT LEVEL. If specified, this overrides the wind speed input.",
-        "default": null,
-        "alias": [],
-        "required": false,
-        "spec": null
-      },
-      {
-        "type": "DAGStringInput",
-        "annotations": {},
-        "name": "comfort-parameters",
-        "description": "An UTCIParameter string to customize the assumptions of the UTCI comfort model.",
-        "default": "--cold 9 --heat 26",
-        "alias": [
-          {
-            "type": "DAGStringInputAlias",
-            "annotations": {},
-            "name": "comfort_par",
-            "description": "UTCIParameter string to customize the assumptions of the UTCI comfort model.",
-            "platform": [
-              "grasshopper"
-            ],
-            "handler": [],
-            "default": "--cold 9 --heat 26",
-            "required": false,
-            "spec": null
-          }
-        ],
-        "required": false,
-        "spec": null
-      },
       {
         "type": "DAGIntegerInput",
         "annotations": {},
@@ -123,52 +91,65 @@
         }
       },
       {
+        "type": "DAGStringInput",
+        "annotations": {},
+        "name": "grid-filter",
+        "description": "Text for a grid identifier or a pattern to filter the sensor grids of the model that are simulated. For instance, first_floor_* will simulate only the sensor grids that have an identifier that starts with first_floor_. By default, all grids in the model will be simulated.",
+        "default": "*",
+        "alias": [
+          {
+            "type": "DAGStringInputAlias",
+            "annotations": {},
+            "name": "grid_filter",
+            "description": "Text for a grid identifier or a pattern to filter the sensor grids of the model that are simulated. For instance, first_floor_* will simulate only the sensor grids that have an identifier that starts with first_floor_. By default, all grids in the model will be simulated.",
+            "platform": [
+              "grasshopper"
+            ],
+            "handler": [],
+            "default": "*",
+            "required": false,
+            "spec": null
+          }
+        ],
+        "required": false,
+        "spec": null
+      },
+      {
         "type": "DAGFileInput",
         "annotations": {},
-        "name": "ddy",
-        "description": "A DDY file with design days to be used for the initial sizing calculation.",
+        "name": "grid-metrics",
+        "description": "A JSON file with additional custom metrics to calculate.",
         "default": null,
         "alias": [
           {
             "type": "DAGGenericInputAlias",
             "annotations": {},
-            "name": "ddy",
-            "description": "The path to a .ddy file or an .epw file with design days to be used for the initial sizing calculation.",
+            "name": "grid_metrics",
+            "description": "A JSON file with custom metrics. This can also be a string or a list of grid metrics.",
             "platform": [
-              "grasshopper"
+              "grasshopper",
+              "rhino",
+              "revit"
             ],
             "handler": [
               {
                 "type": "IOAliasHandler",
                 "annotations": {},
                 "language": "python",
-                "module": "pollination_handlers.inputs.ddy",
-                "function": "ddy_handler",
+                "module": "pollination_handlers.inputs.postprocess",
+                "function": "grid_metrics",
                 "index": 0
               }
             ],
             "default": null,
-            "required": true,
+            "required": false,
             "spec": null
           }
         ],
         "required": false,
         "spec": null,
         "extensions": [
-          "ddy"
-        ]
-      },
-      {
-        "type": "DAGFileInput",
-        "annotations": {},
-        "name": "epw",
-        "description": "EPW weather file to be used for the comfort map simulation.",
-        "default": null,
-        "alias": [],
-        "required": true,
-        "spec": null,
-        "extensions": [
-          "epw"
+          "json"
         ]
       },
       {
@@ -202,7 +183,7 @@
         "type": "DAGFileInput",
         "annotations": {},
         "name": "model",
-        "description": "A Honeybee model in HBJSON file format.",
+        "description": "A Honeybee Model JSON file (HBJSON) or a Model pkl (HBpkl) file. This can also be a zipped version of a Radiance folder, in which case this recipe will simply unzip the file and simulate it as-is.",
         "default": null,
         "alias": [
           {
@@ -263,14 +244,17 @@
         "spec": null,
         "extensions": [
           "json",
-          "hbjson"
+          "hbjson",
+          "pkl",
+          "hbpkl",
+          "zip"
         ]
       },
       {
         "type": "DAGNumberInput",
         "annotations": {},
         "name": "north",
-        "description": "A a number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees.",
+        "description": "A number for rotation from north.",
         "default": 0.0,
         "alias": [
           {
@@ -299,7 +283,7 @@
         "required": false,
         "spec": {
           "type": "number",
-          "minimum": -360,
+          "minimum": 0,
           "maximum": 360
         }
       },
@@ -307,8 +291,8 @@
         "type": "DAGStringInput",
         "annotations": {},
         "name": "radiance-parameters",
-        "description": "Radiance parameters for ray tracing.",
-        "default": "-ab 2 -ad 5000 -lw 2e-05",
+        "description": "The radiance parameters for ray tracing.",
+        "default": "-ab 2 -ad 5000 -lw 2e-05 -dr 0",
         "alias": [
           {
             "type": "DAGStringInputAlias",
@@ -328,50 +312,17 @@
         "spec": null
       },
       {
-        "type": "DAGStringInput",
-        "annotations": {},
-        "name": "run-period",
-        "description": "An AnalysisPeriod string to set the start and end dates of the simulation (eg. \"6/21 to 9/21 between 0 and 23 @1\"). If None, the simulation will be annual.",
-        "default": "",
-        "alias": [
-          {
-            "type": "DAGStringInputAlias",
-            "annotations": {},
-            "name": "run_period",
-            "description": "An AnalysisPeriod to set the start and end dates of the simulation. If None, the simulation will be annual.",
-            "platform": [
-              "grasshopper"
-            ],
-            "handler": [
-              {
-                "type": "IOAliasHandler",
-                "annotations": {},
-                "language": "python",
-                "module": "pollination_handlers.inputs.runperiod",
-                "function": "run_period_to_str",
-                "index": 0
-              }
-            ],
-            "default": "",
-            "required": false,
-            "spec": null
-          }
-        ],
-        "required": false,
-        "spec": null
-      },
-      {
         "type": "DAGFileInput",
         "annotations": {},
         "name": "schedule",
-        "description": "An optional path to a CSV file to specify the relevant times during which comfort should be evaluated. If specified, this will be used for all sensors. Values should be 0-1 separated by new line.",
+        "description": "Path to an annual schedule file. Values should be 0-1 separated by new line. If not provided an 8-5 annual schedule will be created.",
         "default": null,
         "alias": [
           {
             "type": "DAGGenericInputAlias",
             "annotations": {},
             "name": "schedule",
-            "description": "A schedule to specify the relevant times during which comfort should be evaluated. This must either be a Ladybug Hourly Data Collection that aligns with the input run_period or the path to a CSV file with a number of rows equal to the length of the run_period. If unspecified, it will be assumed that all times are relevant for outdoor sensors and the energy model occupancy schedules will be used for indoor sensors.",
+            "description": "An annual occupancy schedule, either as a path to a csv file (with 8760 rows), a Ladybug Hourly Continuous Data Collection or a HB-Energy schedule object. This can also be the identifier of a schedule in your HB-Energy schedule library. Any value in this schedule that is 0.1 or above will be considered occupied.",
             "platform": [
               "grasshopper"
             ],
@@ -381,7 +332,7 @@
                 "annotations": {},
                 "language": "python",
                 "module": "pollination_handlers.inputs.schedule",
-                "function": "data_to_csv",
+                "function": "schedule_to_csv",
                 "index": 0
               }
             ],
@@ -400,20 +351,20 @@
       {
         "type": "DAGStringInput",
         "annotations": {},
-        "name": "solarcal-parameters",
-        "description": "A SolarCalParameter string to customize the assumptions of the SolarCal model.",
-        "default": "--posture standing --sharp 135 --absorptivity 0.7 --emissivity 0.95",
+        "name": "thresholds",
+        "description": "A string to change the threshold for daylight autonomy and useful daylight illuminance. Valid keys are -t for daylight autonomy threshold, -lt for the lower threshold for useful daylight illuminance and -ut for the upper threshold. The default is -t 300 -lt 100 -ut 3000. The order of the keys is not important and you can include one or all of them. For instance if you only want to change the upper threshold to 2000 lux you should use -ut 2000 as the input.",
+        "default": "-t 300 -lt 100 -ut 3000",
         "alias": [
           {
             "type": "DAGStringInputAlias",
             "annotations": {},
-            "name": "solar_body_par",
-            "description": "Optional solar body parameters from the \"LB Solar Body Parameters\" object to specify the properties of the human geometry assumed in the shortwave MRT calculation. The default assumes average skin/clothing absorptivity and a human subject always has their back to the sun at a 45-degree angle (SHARP = 135).",
+            "name": "thresholds",
+            "description": "A string to change the threshold for daylight autonomy (DA) and useful daylight illuminance (UDI). Valid keys are -t for daylight autonomy threshold, -lt for the lower threshold for useful daylight illuminance and -ut for the upper threshold. The order of the keys is not important and you can include one or all of them. For instance if you only want to change the upper threshold to 2000 lux you should use -ut 2000 as the input. (Default: -t 300 -lt 100 -ut 3000).",
             "platform": [
               "grasshopper"
             ],
             "handler": [],
-            "default": "--posture seated --sharp 135 --absorptivity 0.7 --emissivity 0.95",
+            "default": "-t 300 -lt 100 -ut 3000",
             "required": false,
             "spec": null
           }
@@ -424,38 +375,39 @@
       {
         "type": "DAGFileInput",
         "annotations": {},
-        "name": "wind-speed",
-        "description": "A CSV file containing a single number for meteorological wind speed in m/s or several rows of wind speeds that align with the length of the run period. This will be used for all outdoor comfort evaluation. Note that all sensors on the indoors will always use a wind speed of 0.5 m/s, which is the lowest acceptable value for the UTCI model. If None, the EPW wind speed will be used for all outdoor sensors.",
+        "name": "wea",
+        "description": "Wea file.",
         "default": null,
         "alias": [
           {
             "type": "DAGGenericInputAlias",
             "annotations": {},
-            "name": "wind_speed",
-            "description": "A single number for meteorological wind speed in m/s or an hourly data collection of wind speeds that align with the input run period. This can also be a CSV file with one wind speed per row for each step of the analysis.These values will be used for all outdoor comfort evaluation. Note that all sensors on the indoors will always use a wind speed of 0.5 m/s, which is the lowest acceptable value for the UTCI model. If unspecified, the EPW wind speed will be used for all outdoor sensors.",
+            "name": "wea",
+            "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
             "platform": [
-              "grasshopper"
+              "grasshopper",
+              "rhino",
+              "revit"
             ],
             "handler": [
               {
                 "type": "IOAliasHandler",
                 "annotations": {},
                 "language": "python",
-                "module": "pollination_handlers.inputs.data",
-                "function": "value_or_data_to_air_speed_file",
+                "module": "pollination_handlers.inputs.wea",
+                "function": "wea_handler_timestep_check",
                 "index": 0
               }
             ],
             "default": null,
-            "required": false,
+            "required": true,
             "spec": null
           }
         ],
-        "required": false,
+        "required": true,
         "spec": null,
         "extensions": [
-          "txt",
-          "csv"
+          "wea"
         ]
       }
     ],
@@ -463,67 +415,19 @@
       {
         "type": "DAGFolderOutput",
         "annotations": {},
-        "name": "category",
-        "description": "A folder containing CSV maps of the heat/cold stress categories for each sensor grid. -5 indicates extreme cold stress. +5 indicates extreme heat stress. 0 indicates no thermal stress. This can be used to understand not just whether conditions are acceptable but how uncomfortably hot or cold they are.",
+        "name": "cda",
+        "description": "Continuous daylight autonomy results.",
         "from_": {
           "type": "FolderReference",
           "annotations": {},
-          "path": "results/condition_intensity"
+          "path": "metrics/cda"
         },
         "alias": [
           {
             "type": "DAGGenericOutputAlias",
             "annotations": {},
-            "name": "category",
-            "description": "A folder containing CSV maps of the heat/cold stress categories for each sensor grid at each time step of the analysis. This can be connected to the \"HB Read Thermal Matrix\" component to parse detailed results into Grasshopper. This can be used to understand not just whether conditions are acceptable but how uncomfortably hot or cold they are. Values indicate the following. -5 = extreme cold stress. -4 = very strong cold stress. -3 = strong cold stress. -2 = moderate cold stress. -1 = slight cold stress.  0 = no thermal stress. +1 = slight heat stress. +2 = moderate heat stress. +3 = strong heat stress. +4 = very strong heat stress. +5 = extreme heat stress",
-            "platform": [
-              "grasshopper"
-            ],
-            "handler": []
-          }
-        ],
-        "required": true
-      },
-      {
-        "type": "DAGFolderOutput",
-        "annotations": {},
-        "name": "condition",
-        "description": "A folder containing CSV maps of comfort conditions for each sensor grid. -1 indicates unacceptably cold conditions. +1 indicates unacceptably hot conditions. 0 indicates neutral (comfortable) conditions.",
-        "from_": {
-          "type": "FolderReference",
-          "annotations": {},
-          "path": "results/condition"
-        },
-        "alias": [
-          {
-            "type": "DAGGenericOutputAlias",
-            "annotations": {},
-            "name": "condition",
-            "description": "A folder containing CSV maps of comfort conditions for each sensor grid at each time step of the analysis. This can be connected to the \"HB Read Thermal Matrix\" component to parse detailed results into Grasshopper. -1 indicates unacceptably cold conditions. +1 indicates unacceptably hot conditions. 0 indicates neutral (comfortable) conditions.",
-            "platform": [
-              "grasshopper"
-            ],
-            "handler": []
-          }
-        ],
-        "required": true
-      },
-      {
-        "type": "DAGFolderOutput",
-        "annotations": {},
-        "name": "csp",
-        "description": "A folder containing CSV values for Cold Sensation Percent (CSP). CSP is the percentage of occupied time where thermal conditions are colder than what is considered acceptable/comfortable.",
-        "from_": {
-          "type": "FolderReference",
-          "annotations": {},
-          "path": "metrics/CSP"
-        },
-        "alias": [
-          {
-            "type": "DAGGenericOutputAlias",
-            "annotations": {},
-            "name": "CSP",
-            "description": "Lists of values between 0 and 100 for the Cold Sensation Percent (CSP). These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize uncomfortably cold locations. CSP is the percentage of occupied time where thermal conditions are colder than what is considered acceptable/comfortable. Occupied hours are determined from the occupancy schedules of each room (any time where the occupancy schedule is >= 0.1 will be considered occupied). Outdoor sensors are considered occupied at all times. More custom CSP studies can be done by post-processing the condition results.",
+            "name": "cDA",
+            "description": "Continuous daylight autonomy values for each sensor. These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize results.",
             "platform": [
               "grasshopper"
             ],
@@ -532,8 +436,8 @@
                 "type": "IOAliasHandler",
                 "annotations": {},
                 "language": "python",
-                "module": "pollination_handlers.outputs.comfort",
-                "function": "read_comfort_percent_from_folder",
+                "module": "pollination_handlers.outputs.daylight",
+                "function": "read_cda_from_folder",
                 "index": 0
               }
             ]
@@ -541,7 +445,7 @@
           {
             "type": "DAGLinkedOutputAlias",
             "annotations": {},
-            "name": "CSP",
+            "name": "cDA Results",
             "description": null,
             "platform": [
               "rhino"
@@ -551,8 +455,8 @@
                 "type": "IOAliasHandler",
                 "annotations": {},
                 "language": "python",
-                "module": "pollination_handlers.outputs.comfort",
-                "function": "read_comfort_percent_from_folder",
+                "module": "pollination_handlers.outputs.daylight",
+                "function": "read_cda_from_folder",
                 "index": 0
               },
               {
@@ -571,43 +475,19 @@
       {
         "type": "DAGFolderOutput",
         "annotations": {},
-        "name": "environmental-conditions",
-        "description": "A folder containing the environmental conditions that were input to the thermal comfort model. This include the MRT, air temperature, longwave MRT, shortwave MRT delta, and relative humidity.",
+        "name": "da",
+        "description": "Daylight autonomy results.",
         "from_": {
           "type": "FolderReference",
           "annotations": {},
-          "path": "initial_results/conditions"
+          "path": "metrics/da"
         },
         "alias": [
           {
             "type": "DAGGenericOutputAlias",
             "annotations": {},
-            "name": "env_conds",
-            "description": "A folder containing the environmental conditions that were input to the comfort model. These can be loaded into Grasshopper using the \"HB Read Environment Matrix\" component. Load-able metrics include the MRT, air temperature, longwave MRT and shortwave MRT delta.",
-            "platform": [
-              "grasshopper"
-            ],
-            "handler": []
-          }
-        ],
-        "required": true
-      },
-      {
-        "type": "DAGFolderOutput",
-        "annotations": {},
-        "name": "hsp",
-        "description": "A folder containing CSV values for Heat Sensation Percent (HSP). HSP is the percentage of occupied time where thermal conditions are hotter than what is considered acceptable/comfortable.",
-        "from_": {
-          "type": "FolderReference",
-          "annotations": {},
-          "path": "metrics/HSP"
-        },
-        "alias": [
-          {
-            "type": "DAGGenericOutputAlias",
-            "annotations": {},
-            "name": "HSP",
-            "description": "Lists of values between 0 and 100 for the Heat Sensation Percent (HSP). These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize uncomfortably hot locations. HSP is the percentage of occupied time where thermal conditions are hotter than what is considered acceptable/comfortable. Occupied hours are determined from the occupancy schedules of each room (any time where the occupancy schedule is >= 0.1 will be considered occupied). Outdoor sensors are considered occupied at all times. More custom HSP studies can be done by post-processing the condition results.",
+            "name": "DA",
+            "description": "Daylight autonomy values for each sensor. These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize results.",
             "platform": [
               "grasshopper"
             ],
@@ -616,8 +496,8 @@
                 "type": "IOAliasHandler",
                 "annotations": {},
                 "language": "python",
-                "module": "pollination_handlers.outputs.comfort",
-                "function": "read_comfort_percent_from_folder",
+                "module": "pollination_handlers.outputs.daylight",
+                "function": "read_da_from_folder",
                 "index": 0
               }
             ]
@@ -625,7 +505,7 @@
           {
             "type": "DAGLinkedOutputAlias",
             "annotations": {},
-            "name": "HSP",
+            "name": "DA Results",
             "description": null,
             "platform": [
               "rhino"
@@ -635,8 +515,127 @@
                 "type": "IOAliasHandler",
                 "annotations": {},
                 "language": "python",
-                "module": "pollination_handlers.outputs.comfort",
-                "function": "read_comfort_percent_from_folder",
+                "module": "pollination_handlers.outputs.daylight",
+                "function": "read_da_from_folder",
+                "index": 0
+              },
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "LoadMeshBasedResultsToRhino",
+                "index": 0
+              }
+            ]
+          }
+        ],
+        "required": true
+      },
+      {
+        "type": "DAGFileOutput",
+        "annotations": {},
+        "name": "grid-summary",
+        "description": "Grid summary of metrics.",
+        "from_": {
+          "type": "FileReference",
+          "annotations": {},
+          "path": "grid_summary.csv"
+        },
+        "alias": [
+          {
+            "type": "DAGGenericOutputAlias",
+            "annotations": {},
+            "name": "grid_metrics",
+            "description": "CSV file with grid metrics.",
+            "platform": [
+              "grasshopper"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.outputs.daylight",
+                "function": "read_grid_metrics",
+                "index": 0
+              }
+            ]
+          }
+        ],
+        "required": true
+      },
+      {
+        "type": "DAGFolderOutput",
+        "annotations": {},
+        "name": "metrics",
+        "description": "Annual metrics folder.",
+        "from_": {
+          "type": "FolderReference",
+          "annotations": {},
+          "path": "metrics"
+        },
+        "alias": [],
+        "required": true
+      },
+      {
+        "type": "DAGFolderOutput",
+        "annotations": {},
+        "name": "results",
+        "description": "Folder with raw result files (.ill) that contain illuminance matrices for each sensor at each timestep of the analysis.",
+        "from_": {
+          "type": "FolderReference",
+          "annotations": {},
+          "path": "results"
+        },
+        "alias": [],
+        "required": true
+      },
+      {
+        "type": "DAGFolderOutput",
+        "annotations": {},
+        "name": "udi",
+        "description": "Useful daylight illuminance results.",
+        "from_": {
+          "type": "FolderReference",
+          "annotations": {},
+          "path": "metrics/udi"
+        },
+        "alias": [
+          {
+            "type": "DAGGenericOutputAlias",
+            "annotations": {},
+            "name": "UDI",
+            "description": "Useful daylight autonomy values for each sensor. These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize results.",
+            "platform": [
+              "grasshopper"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.outputs.daylight",
+                "function": "read_udi_from_folder",
+                "index": 0
+              }
+            ]
+          },
+          {
+            "type": "DAGLinkedOutputAlias",
+            "annotations": {},
+            "name": "UDI Results",
+            "description": null,
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.outputs.daylight",
+                "function": "read_udi_from_folder",
                 "index": 0
               },
               {
@@ -655,19 +654,19 @@
       {
         "type": "DAGFolderOutput",
         "annotations": {},
-        "name": "tcp",
-        "description": "A folder containing CSV values for Thermal Comfort Percent (TCP). TCP is the percentage of occupied time where thermal conditions are acceptable/comfortable. Note that outdoor sensors are considered always occupied.",
+        "name": "udi-lower",
+        "description": "Results for the percent of time that is below the lower threshold of useful daylight illuminance.",
         "from_": {
           "type": "FolderReference",
           "annotations": {},
-          "path": "metrics/TCP"
+          "path": "metrics/udi_lower"
         },
         "alias": [
           {
             "type": "DAGGenericOutputAlias",
             "annotations": {},
-            "name": "TCP",
-            "description": "Lists of values between 0 and 100 for the Thermal Comfort Percent (TCP). These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize spatial thermal comfort. TCP is the percentage of occupied time where thermal conditions are acceptable/comfortable. Occupied hours are determined from the occupancy schedules of each room (any time where the occupancy schedule is >= 0.1 will be considered occupied). Outdoor sensors are considered occupied at all times. More custom TCP studies can be done by post-processing the condition results.",
+            "name": "UDI_low",
+            "description": "Values for the percent of time that is below the lower threshold of useful daylight illuminance. These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize results.",
             "platform": [
               "grasshopper"
             ],
@@ -676,8 +675,8 @@
                 "type": "IOAliasHandler",
                 "annotations": {},
                 "language": "python",
-                "module": "pollination_handlers.outputs.comfort",
-                "function": "read_comfort_percent_from_folder",
+                "module": "pollination_handlers.outputs.daylight",
+                "function": "read_udi_from_folder",
                 "index": 0
               }
             ]
@@ -685,7 +684,7 @@
           {
             "type": "DAGLinkedOutputAlias",
             "annotations": {},
-            "name": "TCP",
+            "name": "UDI low Results",
             "description": null,
             "platform": [
               "rhino"
@@ -695,8 +694,8 @@
                 "type": "IOAliasHandler",
                 "annotations": {},
                 "language": "python",
-                "module": "pollination_handlers.outputs.comfort",
-                "function": "read_comfort_percent_from_folder",
+                "module": "pollination_handlers.outputs.daylight",
+                "function": "read_udi_from_folder",
                 "index": 0
               },
               {
@@ -715,23 +714,59 @@
       {
         "type": "DAGFolderOutput",
         "annotations": {},
-        "name": "utci",
-        "description": "A folder containing CSV maps of Universal Thermal Climate Index (UTCI) temperatures for each sensor grid. Values are in Celsius.",
+        "name": "udi-upper",
+        "description": "Results for the percent of time that is above the upper threshold of useful daylight illuminance.",
         "from_": {
           "type": "FolderReference",
           "annotations": {},
-          "path": "results/temperature"
+          "path": "metrics/udi_upper"
         },
         "alias": [
           {
             "type": "DAGGenericOutputAlias",
             "annotations": {},
-            "name": "utci",
-            "description": "A folder containing CSV maps of Universal Thermal Climate Index (UTCI) temperatures for each sensor grid at each time step of the analysis. This can be connected to the \"HB Read Thermal Matrix\" component to parse detailed results into Grasshopper. Values are in Celsius.",
+            "name": "UDI_up",
+            "description": "Values for the percent of time that is above the upper threshold of useful daylight illuminance. These can be plugged into the \"LB Spatial Heatmap\" component along with meshes of the sensor grids to visualize results.",
             "platform": [
               "grasshopper"
             ],
-            "handler": []
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.outputs.daylight",
+                "function": "read_udi_from_folder",
+                "index": 0
+              }
+            ]
+          },
+          {
+            "type": "DAGLinkedOutputAlias",
+            "annotations": {},
+            "name": "UDI up Results",
+            "description": null,
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.outputs.daylight",
+                "function": "read_udi_from_folder",
+                "index": 0
+              },
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "LoadMeshBasedResultsToRhino",
+                "index": 0
+              }
+            ]
           }
         ],
         "required": true
@@ -743,47 +778,6 @@
     "type": "RunStatus",
     "annotations": {},
     "inputs": [
-      {
-        "type": "StepFolderInput",
-        "annotations": {},
-        "name": "air-speed-matrices",
-        "description": "An optional folder with csv files that align with the model sensor grids. Each csv file should have the same name as the sensor grid identifier. Each csv file should contain a matrix of air speed values in m/s with one row per sensor and one column per timestep of the run period. Note that these values are not meteorological and should be AT HUMAN SUBJECT LEVEL. If specified, this overrides the wind speed input.",
-        "default": null,
-        "alias": [],
-        "required": false,
-        "spec": null,
-        "path": null,
-        "source": {
-          "type": "ProjectFolder",
-          "annotations": {},
-          "path": "place.holder"
-        }
-      },
-      {
-        "type": "StepStringInput",
-        "annotations": {},
-        "name": "comfort-parameters",
-        "description": "An UTCIParameter string to customize the assumptions of the UTCI comfort model.",
-        "default": "--cold 9 --heat 26",
-        "alias": [
-          {
-            "type": "DAGStringInputAlias",
-            "annotations": {},
-            "name": "comfort_par",
-            "description": "UTCIParameter string to customize the assumptions of the UTCI comfort model.",
-            "platform": [
-              "grasshopper"
-            ],
-            "handler": [],
-            "default": "--cold 9 --heat 26",
-            "required": false,
-            "spec": null
-          }
-        ],
-        "required": false,
-        "spec": null,
-        "value": "--cold 9 --heat 26"
-      },
       {
         "type": "StepIntegerInput",
         "annotations": {},
@@ -813,32 +807,59 @@
         "value": 50
       },
       {
+        "type": "StepStringInput",
+        "annotations": {},
+        "name": "grid-filter",
+        "description": "Text for a grid identifier or a pattern to filter the sensor grids of the model that are simulated. For instance, first_floor_* will simulate only the sensor grids that have an identifier that starts with first_floor_. By default, all grids in the model will be simulated.",
+        "default": "*",
+        "alias": [
+          {
+            "type": "DAGStringInputAlias",
+            "annotations": {},
+            "name": "grid_filter",
+            "description": "Text for a grid identifier or a pattern to filter the sensor grids of the model that are simulated. For instance, first_floor_* will simulate only the sensor grids that have an identifier that starts with first_floor_. By default, all grids in the model will be simulated.",
+            "platform": [
+              "grasshopper"
+            ],
+            "handler": [],
+            "default": "*",
+            "required": false,
+            "spec": null
+          }
+        ],
+        "required": false,
+        "spec": null,
+        "value": "*"
+      },
+      {
         "type": "StepFileInput",
         "annotations": {},
-        "name": "ddy",
-        "description": "A DDY file with design days to be used for the initial sizing calculation.",
+        "name": "grid-metrics",
+        "description": "A JSON file with additional custom metrics to calculate.",
         "default": null,
         "alias": [
           {
             "type": "DAGGenericInputAlias",
             "annotations": {},
-            "name": "ddy",
-            "description": "The path to a .ddy file or an .epw file with design days to be used for the initial sizing calculation.",
+            "name": "grid_metrics",
+            "description": "A JSON file with custom metrics. This can also be a string or a list of grid metrics.",
             "platform": [
-              "grasshopper"
+              "grasshopper",
+              "rhino",
+              "revit"
             ],
             "handler": [
               {
                 "type": "IOAliasHandler",
                 "annotations": {},
                 "language": "python",
-                "module": "pollination_handlers.inputs.ddy",
-                "function": "ddy_handler",
+                "module": "pollination_handlers.inputs.postprocess",
+                "function": "grid_metrics",
                 "index": 0
               }
             ],
             "default": null,
-            "required": true,
+            "required": false,
             "spec": null
           }
         ],
@@ -846,26 +867,7 @@
         "spec": null,
         "path": null,
         "extensions": [
-          "ddy"
-        ],
-        "source": {
-          "type": "ProjectFolder",
-          "annotations": {},
-          "path": "place.holder"
-        }
-      },
-      {
-        "type": "StepFileInput",
-        "annotations": {},
-        "name": "epw",
-        "description": "EPW weather file to be used for the comfort map simulation.",
-        "default": null,
-        "alias": [],
-        "required": true,
-        "spec": null,
-        "path": null,
-        "extensions": [
-          "epw"
+          "json"
         ],
         "source": {
           "type": "ProjectFolder",
@@ -905,7 +907,7 @@
         "type": "StepFileInput",
         "annotations": {},
         "name": "model",
-        "description": "A Honeybee model in HBJSON file format.",
+        "description": "A Honeybee Model JSON file (HBJSON) or a Model pkl (HBpkl) file. This can also be a zipped version of a Radiance folder, in which case this recipe will simply unzip the file and simulate it as-is.",
         "default": null,
         "alias": [
           {
@@ -967,7 +969,10 @@
         "path": null,
         "extensions": [
           "json",
-          "hbjson"
+          "hbjson",
+          "pkl",
+          "hbpkl",
+          "zip"
         ],
         "source": {
           "type": "ProjectFolder",
@@ -979,7 +984,7 @@
         "type": "StepNumberInput",
         "annotations": {},
         "name": "north",
-        "description": "A a number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees.",
+        "description": "A number for rotation from north.",
         "default": 0.0,
         "alias": [
           {
@@ -1008,7 +1013,7 @@
         "required": false,
         "spec": {
           "type": "number",
-          "minimum": -360,
+          "minimum": 0,
           "maximum": 360
         },
         "value": 0.0
@@ -1017,8 +1022,8 @@
         "type": "StepStringInput",
         "annotations": {},
         "name": "radiance-parameters",
-        "description": "Radiance parameters for ray tracing.",
-        "default": "-ab 2 -ad 5000 -lw 2e-05",
+        "description": "The radiance parameters for ray tracing.",
+        "default": "-ab 2 -ad 5000 -lw 2e-05 -dr 0",
         "alias": [
           {
             "type": "DAGStringInputAlias",
@@ -1036,54 +1041,20 @@
         ],
         "required": false,
         "spec": null,
-        "value": "-ab 2 -ad 5000 -lw 2e-05"
-      },
-      {
-        "type": "StepStringInput",
-        "annotations": {},
-        "name": "run-period",
-        "description": "An AnalysisPeriod string to set the start and end dates of the simulation (eg. \"6/21 to 9/21 between 0 and 23 @1\"). If None, the simulation will be annual.",
-        "default": "",
-        "alias": [
-          {
-            "type": "DAGStringInputAlias",
-            "annotations": {},
-            "name": "run_period",
-            "description": "An AnalysisPeriod to set the start and end dates of the simulation. If None, the simulation will be annual.",
-            "platform": [
-              "grasshopper"
-            ],
-            "handler": [
-              {
-                "type": "IOAliasHandler",
-                "annotations": {},
-                "language": "python",
-                "module": "pollination_handlers.inputs.runperiod",
-                "function": "run_period_to_str",
-                "index": 0
-              }
-            ],
-            "default": "",
-            "required": false,
-            "spec": null
-          }
-        ],
-        "required": false,
-        "spec": null,
-        "value": "0"
+        "value": "-ab 2 -ad 5000 -lw 2e-05 -dr 0"
       },
       {
         "type": "StepFileInput",
         "annotations": {},
         "name": "schedule",
-        "description": "An optional path to a CSV file to specify the relevant times during which comfort should be evaluated. If specified, this will be used for all sensors. Values should be 0-1 separated by new line.",
+        "description": "Path to an annual schedule file. Values should be 0-1 separated by new line. If not provided an 8-5 annual schedule will be created.",
         "default": null,
         "alias": [
           {
             "type": "DAGGenericInputAlias",
             "annotations": {},
             "name": "schedule",
-            "description": "A schedule to specify the relevant times during which comfort should be evaluated. This must either be a Ladybug Hourly Data Collection that aligns with the input run_period or the path to a CSV file with a number of rows equal to the length of the run_period. If unspecified, it will be assumed that all times are relevant for outdoor sensors and the energy model occupancy schedules will be used for indoor sensors.",
+            "description": "An annual occupancy schedule, either as a path to a csv file (with 8760 rows), a Ladybug Hourly Continuous Data Collection or a HB-Energy schedule object. This can also be the identifier of a schedule in your HB-Energy schedule library. Any value in this schedule that is 0.1 or above will be considered occupied.",
             "platform": [
               "grasshopper"
             ],
@@ -1093,7 +1064,7 @@
                 "annotations": {},
                 "language": "python",
                 "module": "pollination_handlers.inputs.schedule",
-                "function": "data_to_csv",
+                "function": "schedule_to_csv",
                 "index": 0
               }
             ],
@@ -1118,64 +1089,65 @@
       {
         "type": "StepStringInput",
         "annotations": {},
-        "name": "solarcal-parameters",
-        "description": "A SolarCalParameter string to customize the assumptions of the SolarCal model.",
-        "default": "--posture standing --sharp 135 --absorptivity 0.7 --emissivity 0.95",
+        "name": "thresholds",
+        "description": "A string to change the threshold for daylight autonomy and useful daylight illuminance. Valid keys are -t for daylight autonomy threshold, -lt for the lower threshold for useful daylight illuminance and -ut for the upper threshold. The default is -t 300 -lt 100 -ut 3000. The order of the keys is not important and you can include one or all of them. For instance if you only want to change the upper threshold to 2000 lux you should use -ut 2000 as the input.",
+        "default": "-t 300 -lt 100 -ut 3000",
         "alias": [
           {
             "type": "DAGStringInputAlias",
             "annotations": {},
-            "name": "solar_body_par",
-            "description": "Optional solar body parameters from the \"LB Solar Body Parameters\" object to specify the properties of the human geometry assumed in the shortwave MRT calculation. The default assumes average skin/clothing absorptivity and a human subject always has their back to the sun at a 45-degree angle (SHARP = 135).",
+            "name": "thresholds",
+            "description": "A string to change the threshold for daylight autonomy (DA) and useful daylight illuminance (UDI). Valid keys are -t for daylight autonomy threshold, -lt for the lower threshold for useful daylight illuminance and -ut for the upper threshold. The order of the keys is not important and you can include one or all of them. For instance if you only want to change the upper threshold to 2000 lux you should use -ut 2000 as the input. (Default: -t 300 -lt 100 -ut 3000).",
             "platform": [
               "grasshopper"
             ],
             "handler": [],
-            "default": "--posture seated --sharp 135 --absorptivity 0.7 --emissivity 0.95",
+            "default": "-t 300 -lt 100 -ut 3000",
             "required": false,
             "spec": null
           }
         ],
         "required": false,
         "spec": null,
-        "value": "--posture standing --sharp 135 --absorptivity 0.7 --emissivity 0.95"
+        "value": "-t 300 -lt 100 -ut 3000"
       },
       {
         "type": "StepFileInput",
         "annotations": {},
-        "name": "wind-speed",
-        "description": "A CSV file containing a single number for meteorological wind speed in m/s or several rows of wind speeds that align with the length of the run period. This will be used for all outdoor comfort evaluation. Note that all sensors on the indoors will always use a wind speed of 0.5 m/s, which is the lowest acceptable value for the UTCI model. If None, the EPW wind speed will be used for all outdoor sensors.",
+        "name": "wea",
+        "description": "Wea file.",
         "default": null,
         "alias": [
           {
             "type": "DAGGenericInputAlias",
             "annotations": {},
-            "name": "wind_speed",
-            "description": "A single number for meteorological wind speed in m/s or an hourly data collection of wind speeds that align with the input run period. This can also be a CSV file with one wind speed per row for each step of the analysis.These values will be used for all outdoor comfort evaluation. Note that all sensors on the indoors will always use a wind speed of 0.5 m/s, which is the lowest acceptable value for the UTCI model. If unspecified, the EPW wind speed will be used for all outdoor sensors.",
+            "name": "wea",
+            "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
             "platform": [
-              "grasshopper"
+              "grasshopper",
+              "rhino",
+              "revit"
             ],
             "handler": [
               {
                 "type": "IOAliasHandler",
                 "annotations": {},
                 "language": "python",
-                "module": "pollination_handlers.inputs.data",
-                "function": "value_or_data_to_air_speed_file",
+                "module": "pollination_handlers.inputs.wea",
+                "function": "wea_handler_timestep_check",
                 "index": 0
               }
             ],
             "default": null,
-            "required": false,
+            "required": true,
             "spec": null
           }
         ],
-        "required": false,
+        "required": true,
         "spec": null,
         "path": null,
         "extensions": [
-          "txt",
-          "csv"
+          "wea"
         ],
         "source": {
           "type": "ProjectFolder",
@@ -1188,102 +1160,115 @@
       {
         "type": "StepFolderOutput",
         "annotations": {},
-        "name": "category",
-        "description": "A folder containing CSV maps of the heat/cold stress categories for each sensor grid. -5 indicates extreme cold stress. +5 indicates extreme heat stress. 0 indicates no thermal stress. This can be used to understand not just whether conditions are acceptable but how uncomfortably hot or cold they are.",
+        "name": "cda",
+        "description": "Continuous daylight autonomy results.",
         "path": "",
         "required": true,
         "source": {
           "type": "ProjectFolder",
           "annotations": {},
-          "path": "results/condition_intensity"
+          "path": "metrics/cda"
         }
       },
       {
         "type": "StepFolderOutput",
         "annotations": {},
-        "name": "condition",
-        "description": "A folder containing CSV maps of comfort conditions for each sensor grid. -1 indicates unacceptably cold conditions. +1 indicates unacceptably hot conditions. 0 indicates neutral (comfortable) conditions.",
+        "name": "da",
+        "description": "Daylight autonomy results.",
         "path": "",
         "required": true,
         "source": {
           "type": "ProjectFolder",
           "annotations": {},
-          "path": "results/condition"
+          "path": "metrics/da"
+        }
+      },
+      {
+        "type": "StepFileOutput",
+        "annotations": {},
+        "name": "grid-summary",
+        "description": "Grid summary of metrics.",
+        "path": "",
+        "required": true,
+        "source": {
+          "type": "ProjectFolder",
+          "annotations": {},
+          "path": "grid_summary.csv"
         }
       },
       {
         "type": "StepFolderOutput",
         "annotations": {},
-        "name": "csp",
-        "description": "A folder containing CSV values for Cold Sensation Percent (CSP). CSP is the percentage of occupied time where thermal conditions are colder than what is considered acceptable/comfortable.",
+        "name": "metrics",
+        "description": "Annual metrics folder.",
         "path": "",
         "required": true,
         "source": {
           "type": "ProjectFolder",
           "annotations": {},
-          "path": "metrics/CSP"
+          "path": "metrics"
         }
       },
       {
         "type": "StepFolderOutput",
         "annotations": {},
-        "name": "environmental-conditions",
-        "description": "A folder containing the environmental conditions that were input to the thermal comfort model. This include the MRT, air temperature, longwave MRT, shortwave MRT delta, and relative humidity.",
+        "name": "results",
+        "description": "Folder with raw result files (.ill) that contain illuminance matrices for each sensor at each timestep of the analysis.",
         "path": "",
         "required": true,
         "source": {
           "type": "ProjectFolder",
           "annotations": {},
-          "path": "initial_results/conditions"
+          "path": "results"
         }
       },
       {
         "type": "StepFolderOutput",
         "annotations": {},
-        "name": "hsp",
-        "description": "A folder containing CSV values for Heat Sensation Percent (HSP). HSP is the percentage of occupied time where thermal conditions are hotter than what is considered acceptable/comfortable.",
+        "name": "udi",
+        "description": "Useful daylight illuminance results.",
         "path": "",
         "required": true,
         "source": {
           "type": "ProjectFolder",
           "annotations": {},
-          "path": "metrics/HSP"
+          "path": "metrics/udi"
         }
       },
       {
         "type": "StepFolderOutput",
         "annotations": {},
-        "name": "tcp",
-        "description": "A folder containing CSV values for Thermal Comfort Percent (TCP). TCP is the percentage of occupied time where thermal conditions are acceptable/comfortable. Note that outdoor sensors are considered always occupied.",
+        "name": "udi-lower",
+        "description": "Results for the percent of time that is below the lower threshold of useful daylight illuminance.",
         "path": "",
         "required": true,
         "source": {
           "type": "ProjectFolder",
           "annotations": {},
-          "path": "metrics/TCP"
+          "path": "metrics/udi_lower"
         }
       },
       {
         "type": "StepFolderOutput",
         "annotations": {},
-        "name": "utci",
-        "description": "A folder containing CSV maps of Universal Thermal Climate Index (UTCI) temperatures for each sensor grid. Values are in Celsius.",
+        "name": "udi-upper",
+        "description": "Results for the percent of time that is above the upper threshold of useful daylight illuminance.",
         "path": "",
         "required": true,
         "source": {
           "type": "ProjectFolder",
           "annotations": {},
-          "path": "results/temperature"
+          "path": "metrics/udi_upper"
         }
       }
     ],
     "message": null,
-    "started_at": "2023-08-29T23:41:53+00:00",
+    "started_at": "2023-08-30T01:03:24+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "6ee6f3d8-d006-454c-9435-9535d90325db_00",
-    "job_id": "6ee6f3d8-d006-454c-9435-9535d90325db",
+    "id": "9f20fde6-a0e5-4c64-9b1d-227f46352c4e_00",
+    "job_id": "9f20fde6-a0e5-4c64-9b1d-227f46352c4e",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}
@@ -1299,5 +1284,5 @@
       "total": 0
     }
   },
-  "name": "utci-comfort-map"
+  "name": "annual-daylight-enhanced"
 }

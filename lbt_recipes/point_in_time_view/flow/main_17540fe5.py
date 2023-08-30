@@ -1,5 +1,5 @@
 """
-This file is auto-generated from point-in-time-view:0.4.0.
+This file is auto-generated from point-in-time-view:0.4.1.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,8 +17,8 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.point_in_time_view_ray_tracing import _PointInTimeViewRayTracing_2514a5fcOrchestrator as PointInTimeViewRayTracing_2514a5fcWorkerbee
-from .dependencies.point_in_time_view_prepare_folder import _PointInTimeViewPrepareFolder_2514a5fcOrchestrator as PointInTimeViewPrepareFolder_2514a5fcWorkerbee
+from .dependencies.point_in_time_view_ray_tracing import _PointInTimeViewRayTracing_17540fe5Orchestrator as PointInTimeViewRayTracing_17540fe5Workerbee
+from .dependencies.point_in_time_view_prepare_folder import _PointInTimeViewPrepareFolder_17540fe5Orchestrator as PointInTimeViewPrepareFolder_17540fe5Workerbee
 
 
 _default_inputs = {   'cpu_count': 12,
@@ -104,7 +104,7 @@ class PrepareFolderPointInTimeView(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [PointInTimeViewPrepareFolder_2514a5fcWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [PointInTimeViewPrepareFolder_17540fe5Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -191,6 +191,14 @@ class ComputeViewSplitCount(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'compute_view_split_count.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
     def command(self):
         return 'honeybee-radiance view split-count view_info.json {cpu_count} --output-file view-split-count.txt'.format(cpu_count=self.cpu_count)
 
@@ -211,12 +219,17 @@ class ComputeViewSplitCount(QueenbeeTask):
             {'name': 'views_file', 'to': 'view_info.json', 'from': self.views_file, 'optional': False}]
 
     @property
+    def input_parameters(self):
+        return {
+            'cpu_count': self.cpu_count}
+
+    @property
     def output_parameters(self):
         return [{'name': 'split-count', 'from': 'view-split-count.txt', 'to': pathlib.Path(self.params_folder, 'view-split-count.txt').resolve().as_posix()}]
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.140'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
 
     @property
     def image_workdir(self):
@@ -322,7 +335,7 @@ class PointInTimeViewRayTracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [PointInTimeViewRayTracing_2514a5fcWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [PointInTimeViewRayTracing_17540fe5Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'point_in_time_view_ray_tracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -382,7 +395,7 @@ class PointInTimeViewRayTracing(luigi.Task):
         }
 
 
-class _Main_2514a5fcOrchestrator(luigi.WrapperTask):
+class _Main_17540fe5Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

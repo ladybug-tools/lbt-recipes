@@ -1,5 +1,5 @@
 """
-This file is auto-generated from cumulative-radiation:0.3.8.
+This file is auto-generated from cumulative-radiation:0.3.9.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -23,7 +23,7 @@ from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 from luigi.execution_summary import LuigiStatusCode
 
-import flow.main_c4e2265a as cumulative_radiation_workerbee
+import flow.main_49ddb174 as cumulative_radiation_workerbee
 
 
 _recipe_default_inputs = {   'cpu_count': 50,
@@ -42,7 +42,7 @@ class LetCumulativeRadiationFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [cumulative_radiation_workerbee._Main_c4e2265aOrchestrator(_input_params=self._input_params)]
+        yield [cumulative_radiation_workerbee._Main_49ddb174Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -127,7 +127,16 @@ def start(project_folder, user_values, workers):
     )
 
     now = datetime.datetime.utcnow()
-    status = json.loads(status_file.read_text())
+    try:
+        status = json.loads(status_file.read_text())
+    except json.JSONDecodeError:
+        time.sleep(2)
+        try:
+            status = json.loads(status_file.read_text())
+        except json.JSONDecodeError:
+            # the status will be wrong
+            print('Failed to read the latest status.')
+            pass
     duration = now - datetime.datetime.strptime(
         status['status']['started_at'], '%Y-%m-%dT%H:%M:%SZ'
     )
@@ -140,6 +149,7 @@ def start(project_folder, user_values, workers):
     elif summary.status == LuigiStatusCode.SUCCESS:
         status['status']['status'] = 'Succeeded'
     status['meta']['progress']['running'] = 0
+    status['meta']['progress']['completed'] = status['meta']['progress']['total']
     status_file.write_text(json.dumps(status))
 
     cpu_usage = status['meta']['resources_duration']['cpu']

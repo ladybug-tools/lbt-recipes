@@ -5,8 +5,8 @@
   "metadata": {
     "type": "MetaData",
     "annotations": {},
-    "name": "annual-daylight",
-    "tag": "0.10.9",
+    "name": "annual-daylight-enhanced",
+    "tag": "0.0.2",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -29,7 +29,7 @@
         "email": "info@ladybug.tools"
       }
     ],
-    "home": "https://github.com/pollination/annual-daylight",
+    "home": "https://github.com/pollination/annual-daylight-enhanced",
     "sources": [
       "https://hub.docker.com/r/ladybugtools/honeybee-radiance"
     ],

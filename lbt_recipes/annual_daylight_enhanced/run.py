@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight:0.10.9.
+This file is auto-generated from annual-daylight-enhanced:0.0.2.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -23,7 +23,7 @@ from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 from luigi.execution_summary import LuigiStatusCode
 
-import flow.main_025c6c2f as annual_daylight_workerbee
+import flow.main_2643b0fa as annual_daylight_enhanced_workerbee
 
 
 _recipe_default_inputs = {   'cpu_count': 50,
@@ -38,12 +38,12 @@ _recipe_default_inputs = {   'cpu_count': 50,
     'wea': None}
 
 
-class LetAnnualDaylightFly(luigi.WrapperTask):
+class LetAnnualDaylightEnhancedFly(luigi.WrapperTask):
     # global parameters
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [annual_daylight_workerbee._Main_025c6c2fOrchestrator(_input_params=self._input_params)]
+        yield [annual_daylight_enhanced_workerbee._Main_2643b0faOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -53,7 +53,7 @@ def start(project_folder, user_values, workers):
 
     if 'simulation_folder' not in input_params or not input_params['simulation_folder']:
         if 'simulation_id' not in input_params or not input_params['simulation_id']:
-            simulation_id = 'annual_daylight_%d' % int(round(time.time(), 2) * 100)
+            simulation_id = 'annual_daylight_enhanced_%d' % int(round(time.time(), 2) * 100)
         else:
             simulation_id = input_params['simulation_id']
 
@@ -120,7 +120,7 @@ def start(project_folder, user_values, workers):
     status_file.write_text(json.dumps(status))
 
     summary = luigi.build(
-        [LetAnnualDaylightFly(_input_params=input_params)],
+        [LetAnnualDaylightEnhancedFly(_input_params=input_params)],
         local_scheduler=local_scheduler(),
         workers=workers,
         detailed_summary=True,

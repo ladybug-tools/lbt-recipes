@@ -1,20 +1,20 @@
 {
-  "id": "46b8c17a-4f7f-4bb7-960f-35694f366f5d",
+  "id": "3c10c157-c2d5-4851-90f9-a46e6d6f921e",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
     "name": "ladybugbot",
     "display_name": "info@ladybug.tools",
     "description": "Your favorite bot!",
-    "picture_url": "https://avatars1.githubusercontent.com/u/38131342"
+    "picture_url": "https://avatars.githubusercontent.com/u/46136343"
   },
   "owner": {
-    "id": "1da45dba-a1a1-4449-9e41-b5df2f28e3bd",
+    "id": "8c2991d1-a6e4-4275-8789-4e9405b43508",
     "account_type": "org",
-    "name": "ladybug-tools",
-    "display_name": "Ladybug Tools",
+    "name": "pollination",
+    "display_name": "Pollination",
     "description": "...",
-    "picture_url": "https://avatars1.githubusercontent.com/u/38131342"
+    "picture_url": "https://avatars.githubusercontent.com/u/46136343"
   },
   "recipe": {
     "type": "RecipeInterface",
@@ -24,7 +24,7 @@
       "type": "MetaData",
       "annotations": {},
       "name": "annual-irradiance",
-      "tag": "0.4.2",
+      "tag": "0.4.3",
       "app_version": null,
       "keywords": [
         "honeybee",
@@ -154,7 +154,8 @@
             "name": "model",
             "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
             "platform": [
-              "grasshopper"
+              "grasshopper",
+              "rhino"
             ],
             "handler": [
               {
@@ -179,20 +180,20 @@
             "spec": null
           },
           {
-            "type": "DAGLinkedInputAlias",
+            "type": "DAGGenericInputAlias",
             "annotations": {},
             "name": "model",
-            "description": "This input links the model to Rhino model.",
+            "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
             "platform": [
-              "rhino"
+              "revit"
             ],
             "handler": [
               {
                 "type": "IOAliasHandler",
                 "annotations": {},
-                "language": "csharp",
-                "module": "Pollination.RhinoHandlers",
-                "function": "RhinoHBModelToJSON",
+                "language": "python",
+                "module": "pollination_handlers.inputs.model",
+                "function": "model_to_json_grid_check",
                 "index": 0
               }
             ],
@@ -338,7 +339,9 @@
             "name": "wea",
             "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
             "platform": [
-              "grasshopper"
+              "grasshopper",
+              "rhino",
+              "revit"
             ],
             "handler": [
               {
@@ -629,7 +632,8 @@
             "name": "model",
             "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
             "platform": [
-              "grasshopper"
+              "grasshopper",
+              "rhino"
             ],
             "handler": [
               {
@@ -654,20 +658,20 @@
             "spec": null
           },
           {
-            "type": "DAGLinkedInputAlias",
+            "type": "DAGGenericInputAlias",
             "annotations": {},
             "name": "model",
-            "description": "This input links the model to Rhino model.",
+            "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
             "platform": [
-              "rhino"
+              "revit"
             ],
             "handler": [
               {
                 "type": "IOAliasHandler",
                 "annotations": {},
-                "language": "csharp",
-                "module": "Pollination.RhinoHandlers",
-                "function": "RhinoHBModelToJSON",
+                "language": "python",
+                "module": "pollination_handlers.inputs.model",
+                "function": "model_to_json_grid_check",
                 "index": 0
               }
             ],
@@ -823,7 +827,9 @@
             "name": "wea",
             "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
             "platform": [
-              "grasshopper"
+              "grasshopper",
+              "rhino",
+              "revit"
             ],
             "handler": [
               {
@@ -921,12 +927,12 @@
       }
     ],
     "message": null,
-    "started_at": "2023-03-14T19:53:00+00:00",
+    "started_at": "2023-08-30T01:33:18+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "46b8c17a-4f7f-4bb7-960f-35694f366f5d_00",
-    "job_id": "46b8c17a-4f7f-4bb7-960f-35694f366f5d",
+    "id": "3c10c157-c2d5-4851-90f9-a46e6d6f921e_00",
+    "job_id": "3c10c157-c2d5-4851-90f9-a46e6d6f921e",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}

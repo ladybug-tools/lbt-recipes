@@ -1,5 +1,5 @@
 """
-This file is auto-generated from imageless-annual-glare:0.1.6.
+This file is auto-generated from annual-daylight:0.10.9.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -19,7 +19,7 @@ from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
 
 
-_default_inputs = {   'cpu_count': 50,
+_default_inputs = {   'cpu_count': None,
     'grid_filter': '*',
     'min_sensor_count': 500,
     'model': None,
@@ -77,7 +77,7 @@ class CreateRadFolder(QueenbeeTask):
             ),
             
             'sensor_grids_file': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'resources/grids_info.json').resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix()
             )
         }
 
@@ -98,7 +98,7 @@ class CreateRadFolder(QueenbeeTask):
                 
             {
                 'name': 'sensor-grids-file', 'from': 'model/grid/_info.json',
-                'to': pathlib.Path(self.execution_folder, 'resources/grids_info.json').resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -234,7 +234,7 @@ class CreateTotalSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(sky_type=self.sky_type, cumulative=self.cumulative, sun_up_hours=self.sun_up_hours, sky_density=self.sky_density, output_type=self.output_type, north=self.north, output_format=self.output_format)
+        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(sky_density=self.sky_density, sun_up_hours=self.sun_up_hours, output_format=self.output_format, output_type=self.output_type, sky_type=self.sky_type, north=self.north, cumulative=self.cumulative)
 
     def output(self):
         return {
@@ -482,7 +482,7 @@ class ParseSunUpHours(QueenbeeTask):
     def output(self):
         return {
             'sun_up_hours': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'resources/sun-up-hours.txt').resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'results/sun-up-hours.txt').resolve().as_posix()
             )
         }
 
@@ -496,7 +496,7 @@ class ParseSunUpHours(QueenbeeTask):
         return [
             {
                 'name': 'sun-up-hours', 'from': 'sun-up-hours.txt',
-                'to': pathlib.Path(self.execution_folder, 'resources/sun-up-hours.txt').resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'results/sun-up-hours.txt').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -567,7 +567,7 @@ class SplitGridFolder(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(min_sensor_count=self.min_sensor_count, cpus_per_grid=self.cpus_per_grid, cpu_count=self.cpu_count)
+        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(cpu_count=self.cpu_count, cpus_per_grid=self.cpus_per_grid, min_sensor_count=self.min_sensor_count)
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
@@ -579,7 +579,11 @@ class SplitGridFolder(QueenbeeTask):
             ),
             
             'dist_info': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'initial_results/dgp/_redist_info.json').resolve().as_posix()
+                pathlib.Path(self.execution_folder, 'resources/grid/_redist_info.json').resolve().as_posix()
+            ),
+            
+            'sensor_grids_file': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'resources/grid/_info.json').resolve().as_posix()
             )
         }
 
@@ -600,7 +604,14 @@ class SplitGridFolder(QueenbeeTask):
                 
             {
                 'name': 'dist-info', 'from': 'output_folder/_redist_info.json',
-                'to': pathlib.Path(self.execution_folder, 'initial_results/dgp/_redist_info.json').resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, 'resources/grid/_redist_info.json').resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
+            },
+                
+            {
+                'name': 'sensor-grids-file', 'from': 'output_folder/_info.json',
+                'to': pathlib.Path(self.execution_folder, 'resources/grid/_info.json').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
             }]
@@ -621,7 +632,7 @@ class SplitGridFolder(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _ImagelessAnnualGlarePrepareFolder_25082223Orchestrator(luigi.WrapperTask):
+class _AnnualDaylightPrepareFolder_025c6c2fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

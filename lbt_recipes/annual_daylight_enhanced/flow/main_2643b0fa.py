@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight:0.9.10.
+This file is auto-generated from annual-daylight-enhanced:0.0.2.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,11 +17,13 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.main_acc750a6 import _Main_acc750a6Orchestrator as Main_acc750a6Workerbee
+from .dependencies.annual_daylight_post_process import _AnnualDaylightPostProcess_2643b0faOrchestrator as AnnualDaylightPostProcess_2643b0faWorkerbee
+from .dependencies.main_33a9e3b7 import _Main_33a9e3b7Orchestrator as Main_33a9e3b7Workerbee
 
 
 _default_inputs = {   'cpu_count': 50,
     'grid_filter': '*',
+    'grid_metrics': None,
     'min_sensor_count': 500,
     'model': None,
     'north': 0.0,
@@ -107,7 +109,7 @@ class RunTwoPhaseDaylightCoefficient(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [Main_acc750a6Workerbee(_input_params=self.map_dag_inputs)]
+        yield [Main_33a9e3b7Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -119,8 +121,8 @@ class RunTwoPhaseDaylightCoefficient(QueenbeeTask):
         }
 
 
-class CalculateAnnualMetrics(QueenbeeTask):
-    """Calculate annual daylight metrics for annual daylight simulation."""
+class AnnualMetricsPostprocess(QueenbeeTask):
+    """No description is provided."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
@@ -132,8 +134,20 @@ class CalculateAnnualMetrics(QueenbeeTask):
         return self._input_params['thresholds']
 
     @property
-    def folder(self):
+    def model(self):
+        value = pathlib.Path(self._input_params['model'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def results(self):
         value = pathlib.Path('results')
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def grids_info(self):
+        value = pathlib.Path('results/grids_info.json')
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -149,6 +163,17 @@ class CalculateAnnualMetrics(QueenbeeTask):
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
+    def grid_metrics(self):
+        try:
+            pathlib.Path(self._input_params['grid_metrics'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['grid_metrics'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
     def execution_folder(self):
         return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
@@ -160,45 +185,67 @@ class CalculateAnnualMetrics(QueenbeeTask):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
-    def command(self):
-        return 'honeybee-radiance-postprocess post-process annual-daylight raw_results --schedule schedule.txt {thresholds} --sub-folder metrics'.format(thresholds=self.thresholds)
+    @property
+    def map_dag_inputs(self):
+        """Map task inputs to DAG inputs."""
+        inputs = {
+            'simulation_folder': self.execution_folder,
+            'model': self.model,
+            'results': self.results,
+            'grids_info': self.grids_info,
+            'schedule': self.schedule,
+            'thresholds': self.thresholds,
+            'grid_metrics': self.grid_metrics
+        }
+        try:
+            inputs['__debug__'] = self._input_params['__debug__']
+        except KeyError:
+            # not debug mode
+            pass
+
+        return inputs
+
+    def run(self):
+        yield [AnnualDaylightPostProcess_2643b0faWorkerbee(_input_params=self.map_dag_inputs)]
+        pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
+        self._copy_output_artifacts(self.execution_folder)
+        self._copy_output_parameters(self.execution_folder)
+        pathlib.Path(self.execution_folder, 'annual_metrics_postprocess.done').write_text('done!')
 
     def requires(self):
         return {'RunTwoPhaseDaylightCoefficient': RunTwoPhaseDaylightCoefficient(_input_params=self._input_params)}
 
     def output(self):
         return {
-            'annual_metrics': luigi.LocalTarget(
+            'metrics': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix()
-            )
+            ),
+            
+            'grid_summary': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'grid_summary.csv').resolve().as_posix()
+            ),
+            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'annual_metrics_postprocess.done').resolve().as_posix())
         }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'folder', 'to': 'raw_results', 'from': self.folder, 'optional': False},
-            {'name': 'schedule', 'to': 'schedule.txt', 'from': self.schedule, 'optional': True}]
 
     @property
     def output_artifacts(self):
         return [
             {
-                'name': 'annual-metrics', 'from': 'metrics',
+                'name': 'metrics', 'from': 'metrics',
                 'to': pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
+            },
+                
+            {
+                'name': 'grid-summary', 'from': 'grid_summary.csv',
+                'to': pathlib.Path(self.execution_folder, 'grid_summary.csv').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]
 
-    @property
-    def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.163'
 
-    @property
-    def image_workdir(self):
-        return '/home/ladybugbot/run'
-
-
-class _Main_47d8887dOrchestrator(luigi.WrapperTask):
+class _Main_2643b0faOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -210,4 +257,4 @@ class _Main_47d8887dOrchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [CalculateAnnualMetrics(_input_params=self.input_values)]
+        yield [AnnualMetricsPostprocess(_input_params=self.input_values)]
