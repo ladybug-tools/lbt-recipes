@@ -17,7 +17,7 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.radiance_contrib_entry_point import _RadianceContribEntryPoint_147cac13Orchestrator as RadianceContribEntryPoint_147cac13Workerbee
+from .dependencies.radiance_contrib_entry_point import _RadianceContribEntryPoint_b3d2dfdeOrchestrator as RadianceContribEntryPoint_b3d2dfdeWorkerbee
 
 
 _default_inputs = {   'group_name': None,
@@ -243,7 +243,7 @@ class RunRadianceWindowContribLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [RadianceContribEntryPoint_147cac13Workerbee(_input_params=self.map_dag_inputs)]
+        yield [RadianceContribEntryPoint_b3d2dfdeWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_window_contrib.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -303,7 +303,7 @@ class RunRadianceWindowContrib(luigi.Task):
         }
 
 
-class _DynamicContributionEntryPoint_147cac13Orchestrator(luigi.WrapperTask):
+class _DynamicContributionEntryPoint_b3d2dfdeOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -23,7 +23,7 @@ from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 from luigi.execution_summary import LuigiStatusCode
 
-import flow.main_147cac13 as adaptive_comfort_map_workerbee
+import flow.main_b3d2dfde as adaptive_comfort_map_workerbee
 
 
 _recipe_default_inputs = {   'additional_idf': None,
@@ -46,7 +46,7 @@ class LetAdaptiveComfortMapFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [adaptive_comfort_map_workerbee._Main_147cac13Orchestrator(_input_params=self._input_params)]
+        yield [adaptive_comfort_map_workerbee._Main_b3d2dfdeOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

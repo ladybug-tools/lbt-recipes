@@ -142,7 +142,7 @@ class CreateAirSpeedJson(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
+        return 'docker.io/ladybugtools/ladybug-comfort:0.16.47'
 
     @property
     def image_workdir(self):
@@ -213,7 +213,7 @@ class CreateAirTemperatureMap(QueenbeeTask):
         return False
 
     def command(self):
-        return 'ladybug-comfort map air result.sql enclosure_info.json weather.epw --run-period "{run_period}" --{metric} --output-file air.csv'.format(metric=self.metric, run_period=self.run_period)
+        return 'ladybug-comfort map air result.sql enclosure_info.json weather.epw --run-period "{run_period}" --{metric} --output-file air.csv'.format(run_period=self.run_period, metric=self.metric)
 
     def output(self):
         return {
@@ -248,7 +248,7 @@ class CreateAirTemperatureMap(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
+        return 'docker.io/ladybugtools/ladybug-comfort:0.16.47'
 
     @property
     def image_workdir(self):
@@ -363,7 +363,7 @@ class CreateLongwaveMrtMap(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
+        return 'docker.io/ladybugtools/ladybug-comfort:0.16.47'
 
     @property
     def image_workdir(self):
@@ -434,7 +434,7 @@ class CreateRelHumidityMap(QueenbeeTask):
         return False
 
     def command(self):
-        return 'ladybug-comfort map air result.sql enclosure_info.json weather.epw --run-period "{run_period}" --{metric} --output-file air.csv'.format(metric=self.metric, run_period=self.run_period)
+        return 'ladybug-comfort map air result.sql enclosure_info.json weather.epw --run-period "{run_period}" --{metric} --output-file air.csv'.format(run_period=self.run_period, metric=self.metric)
 
     def output(self):
         return {
@@ -469,7 +469,7 @@ class CreateRelHumidityMap(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
+        return 'docker.io/ladybugtools/ladybug-comfort:0.16.47'
 
     @property
     def image_workdir(self):
@@ -571,7 +571,7 @@ class CreateShortwaveMrtMap(QueenbeeTask):
         return False
 
     def command(self):
-        return 'ladybug-comfort map shortwave-mrt weather.epw indirect.ill direct.ill ref.ill sun-up-hours.txt --contributions dynamic --transmittance-contribs dyn_shade --trans-schedule-json trans_schedules.json --solarcal-par "{solarcal_par}" --run-period "{run_period}" --{indirect_is_total} --output-file shortwave.csv'.format(indirect_is_total=self.indirect_is_total, solarcal_par=self.solarcal_par, run_period=self.run_period)
+        return 'ladybug-comfort map shortwave-mrt weather.epw indirect.ill direct.ill ref.ill sun-up-hours.txt --contributions dynamic --transmittance-contribs dyn_shade --trans-schedule-json trans_schedules.json --solarcal-par "{solarcal_par}" --run-period "{run_period}" --{indirect_is_total} --output-file shortwave.csv'.format(indirect_is_total=self.indirect_is_total, run_period=self.run_period, solarcal_par=self.solarcal_par)
 
     def output(self):
         return {
@@ -611,7 +611,7 @@ class CreateShortwaveMrtMap(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
+        return 'docker.io/ladybugtools/ladybug-comfort:0.16.47'
 
     @property
     def image_workdir(self):
@@ -758,7 +758,7 @@ class ProcessUtciMatrix(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
+        return 'docker.io/ladybugtools/ladybug-comfort:0.16.47'
 
     @property
     def image_workdir(self):
@@ -886,14 +886,14 @@ class ComputeTcp(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/ladybug-comfort:0.16.5'
+        return 'docker.io/ladybugtools/ladybug-comfort:0.16.47'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _ComfortMappingEntryPoint_35d8ba4bOrchestrator(luigi.WrapperTask):
+class _ComfortMappingEntryPoint_29999f5eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
