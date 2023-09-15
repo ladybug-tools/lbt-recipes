@@ -23,7 +23,7 @@ from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 from luigi.execution_summary import LuigiStatusCode
 
-import flow.main_35d8ba4b as utci_comfort_map_workerbee
+import flow.main_29999f5e as utci_comfort_map_workerbee
 
 
 _recipe_default_inputs = {   'air_speed_matrices': None,
@@ -47,7 +47,7 @@ class LetUtciComfortMapFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [utci_comfort_map_workerbee._Main_35d8ba4bOrchestrator(_input_params=self._input_params)]
+        yield [utci_comfort_map_workerbee._Main_29999f5eOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
