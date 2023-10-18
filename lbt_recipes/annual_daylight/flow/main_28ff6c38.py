@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight:0.10.9.
+This file is auto-generated from annual-daylight:0.10.11.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,9 +17,9 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_025c6c2fOrchestrator as AnnualDaylightRayTracing_025c6c2fWorkerbee
-from .dependencies.annual_daylight_post_process import _AnnualDaylightPostProcess_025c6c2fOrchestrator as AnnualDaylightPostProcess_025c6c2fWorkerbee
-from .dependencies.annual_daylight_prepare_folder import _AnnualDaylightPrepareFolder_025c6c2fOrchestrator as AnnualDaylightPrepareFolder_025c6c2fWorkerbee
+from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_28ff6c38Orchestrator as AnnualDaylightRayTracing_28ff6c38Workerbee
+from .dependencies.annual_daylight_post_process import _AnnualDaylightPostProcess_28ff6c38Orchestrator as AnnualDaylightPostProcess_28ff6c38Workerbee
+from .dependencies.annual_daylight_prepare_folder import _AnnualDaylightPrepareFolder_28ff6c38Orchestrator as AnnualDaylightPrepareFolder_28ff6c38Workerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -105,7 +105,7 @@ class PrepareFolderAnnualDaylight(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightPrepareFolder_025c6c2fWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightPrepareFolder_28ff6c38Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -282,7 +282,7 @@ class AnnualDaylightRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightRayTracing_025c6c2fWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightRayTracing_28ff6c38Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_daylight_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -417,7 +417,7 @@ class PostProcessAnnualDaylight(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightPostProcess_025c6c2fWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightPostProcess_28ff6c38Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -431,6 +431,10 @@ class PostProcessAnnualDaylight(QueenbeeTask):
             'metrics': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix()
             ),
+            
+            'grid_summary': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'grid_summary.csv').resolve().as_posix()
+            ),
             'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'post_process_annual_daylight.done').resolve().as_posix())
         }
 
@@ -440,6 +444,13 @@ class PostProcessAnnualDaylight(QueenbeeTask):
             {
                 'name': 'metrics', 'from': 'metrics',
                 'to': pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
+            },
+                
+            {
+                'name': 'grid-summary', 'from': 'grid_summary.csv',
+                'to': pathlib.Path(self.execution_folder, 'grid_summary.csv').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]
@@ -530,14 +541,14 @@ class RestructureResults(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.231'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.279'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _Main_025c6c2fOrchestrator(luigi.WrapperTask):
+class _Main_28ff6c38Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
