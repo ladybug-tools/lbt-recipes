@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight:0.10.9.
+This file is auto-generated from annual-daylight:0.10.11.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -23,7 +23,7 @@ from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 from luigi.execution_summary import LuigiStatusCode
 
-import flow.main_025c6c2f as annual_daylight_workerbee
+import flow.main_28ff6c38 as annual_daylight_workerbee
 
 
 _recipe_default_inputs = {   'cpu_count': 50,
@@ -43,7 +43,7 @@ class LetAnnualDaylightFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [annual_daylight_workerbee._Main_025c6c2fOrchestrator(_input_params=self._input_params)]
+        yield [annual_daylight_workerbee._Main_28ff6c38Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
