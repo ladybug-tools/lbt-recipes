@@ -19,7 +19,7 @@ jobs:
         VERSION: ${{ github.event.client_payload.version }}
       run: |
         export CLEAN_VERSION=$(echo $VERSION | sed 's/v//g')
-        sed -i --regexp-extended 's/(queenbee-local==).*/queenbee-local=='"$CLEAN_VERSION"'/' requirements.txt
+        sed -i --regexp-extended 's/(queenbee-local==).*;python_version>="3.8"/queenbee-local=='"$CLEAN_VERSION"';python_version>="3.8"/' requirements.txt
     - name: "Commit and Push Changes"
       id: push
       env:
