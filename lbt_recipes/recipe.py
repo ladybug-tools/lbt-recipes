@@ -310,14 +310,18 @@ class Recipe(object):
 
         # execute command
         shell = False if os.name == 'nt' and not silent else True
+        custom_env = os.environ.copy()
+        custom_env['PYTHONHOME'] = ''
         if settings.report_out:
             process = subprocess.Popen(
-                command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell)
+                command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                shell=shell, env=custom_env
+            )
             result = process.communicate()
             print(result[0])
             print(result[1])
         else:
-            process = subprocess.Popen(command, shell=shell)
+            process = subprocess.Popen(command, shell=shell, env=custom_env)
             result = process.communicate()  # freeze the canvas while running
         return folder
 
