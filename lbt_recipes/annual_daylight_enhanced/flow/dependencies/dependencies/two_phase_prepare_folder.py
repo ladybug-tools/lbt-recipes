@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight-enhanced:0.0.2.
+This file is auto-generated from annual-daylight-enhanced:0.0.6.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -84,7 +84,7 @@ class CreateDirectSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(cumulative=self.cumulative, sun_up_hours=self.sun_up_hours, sky_type=self.sky_type, sky_density=self.sky_density, north=self.north, output_format=self.output_format, output_type=self.output_type)
+        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(cumulative=self.cumulative, sky_density=self.sky_density, output_type=self.output_type, sun_up_hours=self.sun_up_hours, north=self.north, sky_type=self.sky_type, output_format=self.output_format)
 
     def output(self):
         return {
@@ -121,7 +121,7 @@ class CreateDirectSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
 
     @property
     def image_workdir(self):
@@ -209,7 +209,7 @@ class CreateRadFolder(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
 
     @property
     def image_workdir(self):
@@ -273,7 +273,7 @@ class CreateSkyDome(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
 
     @property
     def image_workdir(self):
@@ -333,7 +333,7 @@ class CreateTotalSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(cumulative=self.cumulative, sun_up_hours=self.sun_up_hours, sky_type=self.sky_type, sky_density=self.sky_density, north=self.north, output_format=self.output_format, output_type=self.output_type)
+        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(cumulative=self.cumulative, sky_density=self.sky_density, output_type=self.output_type, sun_up_hours=self.sun_up_hours, north=self.north, sky_type=self.sky_type, output_format=self.output_format)
 
     def output(self):
         return {
@@ -370,7 +370,7 @@ class CreateTotalSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
 
     @property
     def image_workdir(self):
@@ -418,7 +418,7 @@ class GenerateSunpath(QueenbeeTask):
         return False
 
     def command(self):
-        return 'gendaymtx -n -D sunpath.mtx -M suns.mod -O{output_type} -r {north} -v sky.wea'.format(north=self.north, output_type=self.output_type)
+        return 'gendaymtx -n -D sunpath.mtx -M suns.mod -O{output_type} -r {north} -v sky.wea'.format(output_type=self.output_type, north=self.north)
 
     def output(self):
         return {
@@ -461,7 +461,7 @@ class GenerateSunpath(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
 
     @property
     def image_workdir(self):
@@ -537,7 +537,7 @@ class ParseSunUpHours(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
 
     @property
     def image_workdir(self):
@@ -615,7 +615,7 @@ class PrepareMultiphase(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance multi-phase prepare-multiphase model {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count} --sun-path sun.path --phase {phase} --octree-folder octree --grid-folder grid --{static}-static --{default_states}-states'.format(phase=self.phase, cpu_count=self.cpu_count, default_states=self.default_states, cpus_per_grid=self.cpus_per_grid, static=self.static, min_sensor_count=self.min_sensor_count)
+        return 'honeybee-radiance multi-phase prepare-multiphase model {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count} --sun-path sun.path --phase {phase} --octree-folder octree --grid-folder grid --{static}-static --{default_states}-states'.format(min_sensor_count=self.min_sensor_count, default_states=self.default_states, phase=self.phase, cpu_count=self.cpu_count, static=self.static, cpus_per_grid=self.cpus_per_grid)
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params), 'GenerateSunpath': GenerateSunpath(_input_params=self._input_params)}
@@ -688,14 +688,14 @@ class PrepareMultiphase(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.64.184'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _TwoPhasePrepareFolder_33a9e3b7Orchestrator(luigi.WrapperTask):
+class _TwoPhasePrepareFolder_ae79e661Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
