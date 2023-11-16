@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-irradiance:0.4.3.
+This file is auto-generated from irradiance:0.0.5.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -23,7 +23,7 @@ from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 from luigi.execution_summary import LuigiStatusCode
 
-import flow.main_f419d936 as annual_irradiance_workerbee
+import flow.main_5a14d535 as irradiance_workerbee
 
 
 _recipe_default_inputs = {   'cpu_count': 50,
@@ -37,12 +37,12 @@ _recipe_default_inputs = {   'cpu_count': 50,
     'wea': None}
 
 
-class LetAnnualIrradianceFly(luigi.WrapperTask):
+class LetIrradianceFly(luigi.WrapperTask):
     # global parameters
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [annual_irradiance_workerbee._Main_f419d936Orchestrator(_input_params=self._input_params)]
+        yield [irradiance_workerbee._Main_5a14d535Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
@@ -52,7 +52,7 @@ def start(project_folder, user_values, workers):
 
     if 'simulation_folder' not in input_params or not input_params['simulation_folder']:
         if 'simulation_id' not in input_params or not input_params['simulation_id']:
-            simulation_id = 'annual_irradiance_%d' % int(round(time.time(), 2) * 100)
+            simulation_id = 'irradiance_%d' % int(round(time.time(), 2) * 100)
         else:
             simulation_id = input_params['simulation_id']
 
@@ -119,7 +119,7 @@ def start(project_folder, user_values, workers):
     status_file.write_text(json.dumps(status))
 
     summary = luigi.build(
-        [LetAnnualIrradianceFly(_input_params=input_params)],
+        [LetIrradianceFly(_input_params=input_params)],
         local_scheduler=local_scheduler(),
         workers=workers,
         detailed_summary=True,

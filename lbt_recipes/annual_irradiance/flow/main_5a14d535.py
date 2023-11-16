@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-irradiance:0.4.3.
+This file is auto-generated from irradiance:0.0.5.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,9 +17,9 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.annual_irradiance_ray_tracing import _AnnualIrradianceRayTracing_f419d936Orchestrator as AnnualIrradianceRayTracing_f419d936Workerbee
-from .dependencies.annual_irradiance_postprocess import _AnnualIrradiancePostprocess_f419d936Orchestrator as AnnualIrradiancePostprocess_f419d936Workerbee
-from .dependencies.annual_irradiance_prepare_folder import _AnnualIrradiancePrepareFolder_f419d936Orchestrator as AnnualIrradiancePrepareFolder_f419d936Workerbee
+from .dependencies.annual_irradiance_ray_tracing import _AnnualIrradianceRayTracing_5a14d535Orchestrator as AnnualIrradianceRayTracing_5a14d535Workerbee
+from .dependencies.annual_irradiance_postprocess import _AnnualIrradiancePostprocess_5a14d535Orchestrator as AnnualIrradiancePostprocess_5a14d535Workerbee
+from .dependencies.annual_irradiance_prepare_folder import _AnnualIrradiancePrepareFolder_5a14d535Orchestrator as AnnualIrradiancePrepareFolder_5a14d535Workerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -114,7 +114,7 @@ class PrepareFolderAnnualIrradiance(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [AnnualIrradiancePrepareFolder_f419d936Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualIrradiancePrepareFolder_5a14d535Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -288,7 +288,7 @@ class AnnualIrradianceRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualIrradianceRayTracing_f419d936Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualIrradianceRayTracing_5a14d535Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_irradiance_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -356,7 +356,9 @@ class PostprocessAnnualIrradiance(QueenbeeTask):
     _status_lock = _queenbee_status_lock_
 
     # Task inputs
-    timestep = luigi.Parameter(default='1')
+    @property
+    def timestep(self):
+        return self._input_params['timestep']
 
     @property
     def input_folder(self):
@@ -402,6 +404,7 @@ class PostprocessAnnualIrradiance(QueenbeeTask):
             'input_folder': self.input_folder,
             'grids_info': self.grids_info,
             'sun_up_hours': self.sun_up_hours,
+            'timestep': self.timestep,
             'wea': self.wea
         }
         try:
@@ -413,7 +416,7 @@ class PostprocessAnnualIrradiance(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [AnnualIrradiancePostprocess_f419d936Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualIrradiancePostprocess_5a14d535Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -452,7 +455,7 @@ class PostprocessAnnualIrradiance(QueenbeeTask):
             }]
 
 
-class _Main_f419d936Orchestrator(luigi.WrapperTask):
+class _Main_5a14d535Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

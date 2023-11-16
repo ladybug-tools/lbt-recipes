@@ -5,8 +5,8 @@
   "metadata": {
     "type": "MetaData",
     "annotations": {},
-    "name": "annual-irradiance",
-    "tag": "0.4.3",
+    "name": "irradiance",
+    "tag": "0.0.5",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -29,7 +29,7 @@
         "email": "info@ladybug.tools"
       }
     ],
-    "home": "https://github.com/pollination/annual-irradiance",
+    "home": "https://github.com/pollination/irradiance",
     "sources": [
       "https://hub.docker.com/r/ladybugtools/honeybee-radiance"
     ],
