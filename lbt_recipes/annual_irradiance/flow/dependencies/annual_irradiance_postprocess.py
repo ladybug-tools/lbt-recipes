@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-irradiance:0.4.3.
+This file is auto-generated from irradiance:0.0.5.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -269,7 +269,7 @@ class RestructureDirectResults(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
 
     @property
     def image_workdir(self):
@@ -349,7 +349,7 @@ class RestructureTotalResults(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
 
     @property
     def image_workdir(self):
@@ -447,7 +447,7 @@ class CalculateMetrics(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
 
     @property
     def image_workdir(self):
@@ -530,7 +530,7 @@ class CopyTimestepFile(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _AnnualIrradiancePostprocess_f419d936Orchestrator(luigi.WrapperTask):
+class _AnnualIrradiancePostprocess_5a14d535Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
