@@ -1,5 +1,5 @@
 {
-  "id": "50247d49-934e-4558-9fbe-4975ecd2fb40",
+  "id": "dc6c8c90-091e-4a01-9384-81e1c3471c69",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
@@ -24,7 +24,7 @@
       "type": "MetaData",
       "annotations": {},
       "name": "adaptive-comfort-map",
-      "tag": "0.9.1",
+      "tag": "0.9.2",
       "app_version": null,
       "keywords": [
         "honeybee",
@@ -352,6 +352,28 @@
                 "language": "python",
                 "module": "pollination_handlers.inputs.north",
                 "function": "north_vector_to_angle",
+                "index": 0
+              }
+            ],
+            "default": "0",
+            "required": false,
+            "spec": null
+          },
+          {
+            "type": "DAGLinkedInputAlias",
+            "annotations": {},
+            "name": "north",
+            "description": "A number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees. This can also be Vector for the direction to North. (Default: 0).",
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "RhinoModelProjectInfoNorth",
                 "index": 0
               }
             ],
@@ -1063,6 +1085,28 @@
             "default": "0",
             "required": false,
             "spec": null
+          },
+          {
+            "type": "DAGLinkedInputAlias",
+            "annotations": {},
+            "name": "north",
+            "description": "A number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees. This can also be Vector for the direction to North. (Default: 0).",
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "RhinoModelProjectInfoNorth",
+                "index": 0
+              }
+            ],
+            "default": "0",
+            "required": false,
+            "spec": null
           }
         ],
         "required": false,
@@ -1252,12 +1296,12 @@
       }
     ],
     "message": null,
-    "started_at": "2023-09-15T00:13:47+00:00",
+    "started_at": "2024-08-25T21:02:07+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "50247d49-934e-4558-9fbe-4975ecd2fb40_00",
-    "job_id": "50247d49-934e-4558-9fbe-4975ecd2fb40",
+    "id": "dc6c8c90-091e-4a01-9384-81e1c3471c69_00",
+    "job_id": "dc6c8c90-091e-4a01-9384-81e1c3471c69",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}
