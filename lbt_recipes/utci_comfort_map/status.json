@@ -1,5 +1,5 @@
 {
-  "id": "b94606b7-ae80-4e91-a648-1013819b8775",
+  "id": "af30ff36-3211-4edf-872a-075e16199e6a",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
@@ -24,7 +24,7 @@
       "type": "MetaData",
       "annotations": {},
       "name": "utci-comfort-map",
-      "tag": "0.9.11",
+      "tag": "0.9.12",
       "app_version": null,
       "keywords": [
         "honeybee",
@@ -211,8 +211,7 @@
             "name": "model",
             "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
             "platform": [
-              "grasshopper",
-              "rhino"
+              "grasshopper"
             ],
             "handler": [
               {
@@ -229,6 +228,28 @@
                 "language": "csharp",
                 "module": "Pollination.RhinoHandlers",
                 "function": "HBModelToJSON",
+                "index": 0
+              }
+            ],
+            "default": null,
+            "required": true,
+            "spec": null
+          },
+          {
+            "type": "DAGLinkedInputAlias",
+            "annotations": {},
+            "name": "model",
+            "description": "This input links the model to Rhino model.",
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "RhinoHBModelToJSON",
                 "index": 0
               }
             ],
@@ -288,6 +309,28 @@
                 "language": "python",
                 "module": "pollination_handlers.inputs.north",
                 "function": "north_vector_to_angle",
+                "index": 0
+              }
+            ],
+            "default": "0",
+            "required": false,
+            "spec": null
+          },
+          {
+            "type": "DAGLinkedInputAlias",
+            "annotations": {},
+            "name": "north",
+            "description": "A number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees. This can also be Vector for the direction to North. (Default: 0).",
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "RhinoModelProjectInfoNorth",
                 "index": 0
               }
             ],
@@ -914,8 +957,7 @@
             "name": "model",
             "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
             "platform": [
-              "grasshopper",
-              "rhino"
+              "grasshopper"
             ],
             "handler": [
               {
@@ -932,6 +974,28 @@
                 "language": "csharp",
                 "module": "Pollination.RhinoHandlers",
                 "function": "HBModelToJSON",
+                "index": 0
+              }
+            ],
+            "default": null,
+            "required": true,
+            "spec": null
+          },
+          {
+            "type": "DAGLinkedInputAlias",
+            "annotations": {},
+            "name": "model",
+            "description": "This input links the model to Rhino model.",
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "RhinoHBModelToJSON",
                 "index": 0
               }
             ],
@@ -997,6 +1061,28 @@
                 "language": "python",
                 "module": "pollination_handlers.inputs.north",
                 "function": "north_vector_to_angle",
+                "index": 0
+              }
+            ],
+            "default": "0",
+            "required": false,
+            "spec": null
+          },
+          {
+            "type": "DAGLinkedInputAlias",
+            "annotations": {},
+            "name": "north",
+            "description": "A number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees. This can also be Vector for the direction to North. (Default: 0).",
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "RhinoModelProjectInfoNorth",
                 "index": 0
               }
             ],
@@ -1278,12 +1364,12 @@
       }
     ],
     "message": null,
-    "started_at": "2023-09-15T00:03:21+00:00",
+    "started_at": "2024-08-25T20:59:26+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "b94606b7-ae80-4e91-a648-1013819b8775_00",
-    "job_id": "b94606b7-ae80-4e91-a648-1013819b8775",
+    "id": "af30ff36-3211-4edf-872a-075e16199e6a_00",
+    "job_id": "af30ff36-3211-4edf-872a-075e16199e6a",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}

@@ -1,5 +1,5 @@
 """
-This file is auto-generated from utci-comfort-map:0.9.11.
+This file is auto-generated from utci-comfort-map:0.9.12.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,7 +17,7 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.shade_contrib_entry_point import _ShadeContribEntryPoint_29999f5eOrchestrator as ShadeContribEntryPoint_29999f5eWorkerbee
+from .dependencies.shade_contrib_entry_point import _ShadeContribEntryPoint_cbe7c10eOrchestrator as ShadeContribEntryPoint_cbe7c10eWorkerbee
 
 
 _default_inputs = {   'group_name': None,
@@ -26,81 +26,13 @@ _default_inputs = {   'group_name': None,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05',
     'sensor_grid_folder': None,
-    'sensor_grids': None,
+    'sensor_grids': [],
     'simulation_folder': '.',
     'sky_dome': None,
     'sky_matrix': None,
     'sky_matrix_direct': None,
     'sun_modifiers': None,
     'sun_up_hours': None}
-
-
-class ReadGridsForShade(QueenbeeTask):
-    """Read the content of a JSON file as a list."""
-
-    # DAG Input parameters
-    _input_params = luigi.DictParameter()
-    _status_lock = _queenbee_status_lock_
-
-    # Task inputs
-    @property
-    def src(self):
-        value = pathlib.Path(self._input_params['sensor_grids'])
-        return value.as_posix() if value.is_absolute() \
-            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
-
-    @property
-    def execution_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def initiation_folder(self):
-        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
-
-    @property
-    def params_folder(self):
-        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
-
-    @property
-    def __script__(self):
-        return pathlib.Path(__file__).parent.joinpath('scripts', 'read_grids_for_shade.py').resolve()
-
-    @property
-    def is_script(self):
-        return False
-
-    def command(self):
-        return 'echo parsing JSON information to a list...'
-
-    def output(self):
-        return {'data': luigi.LocalTarget(
-                pathlib.Path(
-                    self.params_folder,
-                    'input_path').resolve().as_posix()
-                )
-        }
-
-    @property
-    def input_artifacts(self):
-        return [
-            {'name': 'src', 'to': 'input_path', 'from': self.src, 'optional': False}]
-
-    @property
-    def input_parameters(self):
-        return {
-}
-
-    @property
-    def output_parameters(self):
-        return [{'name': 'data', 'from': 'input_path', 'to': pathlib.Path(self.params_folder, 'input_path').resolve().as_posix()}]
-
-    @property
-    def task_image(self):
-        return 'docker.io/python:3.7-slim'
-
-    @property
-    def image_workdir(self):
-        return '/home/ladybugbot/run'
 
 
 class RunRadianceShadeContribLoop(luigi.Task):
@@ -227,18 +159,25 @@ class RunRadianceShadeContribLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [ShadeContribEntryPoint_29999f5eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [ShadeContribEntryPoint_cbe7c10eWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_shade_contrib.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
-
-    def requires(self):
-        return {'ReadGridsForShade': ReadGridsForShade(_input_params=self._input_params)}
 
     def output(self):
         return {
             'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'run_radiance_shade_contrib.done').resolve().as_posix())
         }
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'shd-trans', 'from': 'shd_trans/final',
+                'to': pathlib.Path(self.execution_folder, 'radiance/shortwave/shd_trans/final').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
+            }]
 
 
 class RunRadianceShadeContrib(luigi.Task):
@@ -246,8 +185,8 @@ class RunRadianceShadeContrib(luigi.Task):
     # global parameters
     _input_params = luigi.DictParameter()
     @property
-    def data(self):
-        value = pathlib.Path(self.input()['ReadGridsForShade']['data'].path)
+    def sensor_grids(self):
+        value = pathlib.Path(self._input_params['sensor_grids'])
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -255,10 +194,10 @@ class RunRadianceShadeContrib(luigi.Task):
     def items(self):
         try:
             # assume the input is a file
-            return qb_load_input_param(self.data)
+            return qb_load_input_param(self.sensor_grids)
         except:
             # it is a parameter
-            return self.input()['ReadGridsForShade']['data'].path
+            return self._input_params['sensor_grids']
 
     def run(self):
         yield [RunRadianceShadeContribLoop(item=item, _input_params=self._input_params) for item in self.items]
@@ -278,8 +217,6 @@ class RunRadianceShadeContrib(luigi.Task):
     def params_folder(self):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
-    def requires(self):
-        return {'ReadGridsForShade': ReadGridsForShade(_input_params=self._input_params)}
 
     def output(self):
         return {
@@ -287,7 +224,7 @@ class RunRadianceShadeContrib(luigi.Task):
         }
 
 
-class _DynamicShadeContribEntryPoint_29999f5eOrchestrator(luigi.WrapperTask):
+class _DynamicShadeContribEntryPoint_cbe7c10eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
