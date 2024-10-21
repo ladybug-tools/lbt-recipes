@@ -1,5 +1,5 @@
 """
-This file is auto-generated from utci-comfort-map:0.9.12.
+This file is auto-generated from utci-comfort-map:0.9.15.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -86,7 +86,7 @@ class CreateSimPar(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-energy settings comfort-sim-par input.ddy --run-period "{run_period}" --north {north} --{filter_des_days} --output-file sim_par.json'.format(filter_des_days=self.filter_des_days, north=self.north, run_period=self.run_period)
+        return 'honeybee-energy settings comfort-sim-par input.ddy --run-period "{run_period}" --north {north} --{filter_des_days} --output-file sim_par.json'.format(north=self.north, run_period=self.run_period, filter_des_days=self.filter_des_days)
 
     def output(self):
         return {
@@ -242,7 +242,7 @@ class RunEnergySimulation(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _EnergySimulation_cbe7c10eOrchestrator(luigi.WrapperTask):
+class _EnergySimulation_1f915e33Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

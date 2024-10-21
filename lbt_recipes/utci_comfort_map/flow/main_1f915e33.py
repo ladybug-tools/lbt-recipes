@@ -1,5 +1,5 @@
 """
-This file is auto-generated from utci-comfort-map:0.9.12.
+This file is auto-generated from utci-comfort-map:0.9.15.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,12 +17,12 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.energy_simulation import _EnergySimulation_cbe7c10eOrchestrator as EnergySimulation_cbe7c10eWorkerbee
-from .dependencies.prepare_folder import _PrepareFolder_cbe7c10eOrchestrator as PrepareFolder_cbe7c10eWorkerbee
-from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_cbe7c10eOrchestrator as ComfortMappingEntryPoint_cbe7c10eWorkerbee
-from .dependencies.dynamic_shade_contrib_entry_point import _DynamicShadeContribEntryPoint_cbe7c10eOrchestrator as DynamicShadeContribEntryPoint_cbe7c10eWorkerbee
-from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_cbe7c10eOrchestrator as RadianceMappingEntryPoint_cbe7c10eWorkerbee
-from .dependencies.spherical_view_factor_entry_point import _SphericalViewFactorEntryPoint_cbe7c10eOrchestrator as SphericalViewFactorEntryPoint_cbe7c10eWorkerbee
+from .dependencies.energy_simulation import _EnergySimulation_1f915e33Orchestrator as EnergySimulation_1f915e33Workerbee
+from .dependencies.prepare_folder import _PrepareFolder_1f915e33Orchestrator as PrepareFolder_1f915e33Workerbee
+from .dependencies.comfort_mapping_entry_point import _ComfortMappingEntryPoint_1f915e33Orchestrator as ComfortMappingEntryPoint_1f915e33Workerbee
+from .dependencies.dynamic_shade_contrib_entry_point import _DynamicShadeContribEntryPoint_1f915e33Orchestrator as DynamicShadeContribEntryPoint_1f915e33Workerbee
+from .dependencies.radiance_mapping_entry_point import _RadianceMappingEntryPoint_1f915e33Orchestrator as RadianceMappingEntryPoint_1f915e33Workerbee
+from .dependencies.spherical_view_factor_entry_point import _SphericalViewFactorEntryPoint_1f915e33Orchestrator as SphericalViewFactorEntryPoint_1f915e33Workerbee
 
 
 _default_inputs = {   'air_speed_matrices': None,
@@ -82,7 +82,7 @@ class CreateResultInfo(QueenbeeTask):
         return False
 
     def command(self):
-        return 'ladybug-comfort map map-result-info {comfort_model} --run-period "{run_period}" --qualifier "{qualifier}" --folder output --log-file results_info.json'.format(comfort_model=self.comfort_model, qualifier=self.qualifier, run_period=self.run_period)
+        return 'ladybug-comfort map map-result-info {comfort_model} --run-period "{run_period}" --qualifier "{qualifier}" --folder output --log-file results_info.json'.format(run_period=self.run_period, qualifier=self.qualifier, comfort_model=self.comfort_model)
 
     def output(self):
         return {
@@ -165,7 +165,7 @@ class CreateResultInfo(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/ladybug-comfort:0.18.42'
+        return 'docker.io/ladybugtools/ladybug-comfort:0.18.46'
 
     @property
     def image_workdir(self):
@@ -243,7 +243,7 @@ class EnergySimulation(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [EnergySimulation_cbe7c10eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [EnergySimulation_1f915e33Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -349,7 +349,7 @@ class PrepareFolder(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [PrepareFolder_cbe7c10eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [PrepareFolder_1f915e33Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -637,7 +637,7 @@ class RunRadianceDynamicShadeContributionLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [DynamicShadeContribEntryPoint_cbe7c10eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [DynamicShadeContribEntryPoint_1f915e33Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_dynamic_shade_contribution.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -809,7 +809,7 @@ class RunRadianceSimulationLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [RadianceMappingEntryPoint_cbe7c10eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [RadianceMappingEntryPoint_1f915e33Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_radiance_simulation.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -998,7 +998,7 @@ class RunSphericalViewFactorSimulationLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [SphericalViewFactorEntryPoint_cbe7c10eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [SphericalViewFactorEntryPoint_1f915e33Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_spherical_view_factor_simulation.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -1191,11 +1191,11 @@ class RunComfortMapLoop(luigi.Task):
     @property
     def air_speed_mtx(self):
         try:
-            pathlib.Path(self.input()['PrepareFolder']['initial_results'].path, 'conditions/{item_full_id}.csv'.format(item_full_id=self.item['full_id']))
+            pathlib.Path(self.input()['PrepareFolder']['initial_results'].path, 'conditions/air_speeds/{item_full_id}.csv'.format(item_full_id=self.item['full_id']))
         except TypeError:
             # optional artifact
             return None
-        value = pathlib.Path(self.input()['PrepareFolder']['initial_results'].path, 'conditions/{item_full_id}.csv'.format(item_full_id=self.item['full_id']))
+        value = pathlib.Path(self.input()['PrepareFolder']['initial_results'].path, 'conditions/air_speeds/{item_full_id}.csv'.format(item_full_id=self.item['full_id']))
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -1251,7 +1251,7 @@ class RunComfortMapLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [ComfortMappingEntryPoint_cbe7c10eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [ComfortMappingEntryPoint_1f915e33Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'run_comfort_map.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -1382,7 +1382,7 @@ class RestructureConditionIntensityResults(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance-postprocess grid merge-folder ./input_folder ./output_folder {extension} --dist-info dist_info.json --output-extension {output_extension} --as-text {as_text} --fmt {fmt} --delimiter {delimiter}'.format(as_text=self.as_text, output_extension=self.output_extension, fmt=self.fmt, extension=self.extension, delimiter=self.delimiter)
+        return 'honeybee-radiance-postprocess grid merge-folder ./input_folder ./output_folder {extension} --dist-info dist_info.json --output-extension {output_extension} --as-text {as_text} --fmt {fmt} --delimiter {delimiter}'.format(fmt=self.fmt, as_text=self.as_text, extension=self.extension, delimiter=self.delimiter, output_extension=self.output_extension)
 
     def requires(self):
         return {'RunComfortMap': RunComfortMap(_input_params=self._input_params)}
@@ -1420,7 +1420,7 @@ class RestructureConditionIntensityResults(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.431'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.443'
 
     @property
     def image_workdir(self):
@@ -1474,7 +1474,7 @@ class RestructureConditionResults(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance-postprocess grid merge-folder ./input_folder ./output_folder {extension} --dist-info dist_info.json --output-extension {output_extension} --as-text {as_text} --fmt {fmt} --delimiter {delimiter}'.format(as_text=self.as_text, output_extension=self.output_extension, fmt=self.fmt, extension=self.extension, delimiter=self.delimiter)
+        return 'honeybee-radiance-postprocess grid merge-folder ./input_folder ./output_folder {extension} --dist-info dist_info.json --output-extension {output_extension} --as-text {as_text} --fmt {fmt} --delimiter {delimiter}'.format(fmt=self.fmt, as_text=self.as_text, extension=self.extension, delimiter=self.delimiter, output_extension=self.output_extension)
 
     def requires(self):
         return {'RunComfortMap': RunComfortMap(_input_params=self._input_params)}
@@ -1512,7 +1512,7 @@ class RestructureConditionResults(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.431'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.443'
 
     @property
     def image_workdir(self):
@@ -1592,7 +1592,7 @@ class RestructureCspResults(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.103'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.106'
 
     @property
     def image_workdir(self):
@@ -1672,7 +1672,7 @@ class RestructureHspResults(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.103'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.106'
 
     @property
     def image_workdir(self):
@@ -1752,7 +1752,7 @@ class RestructureTcpResults(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.103'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.106'
 
     @property
     def image_workdir(self):
@@ -1806,7 +1806,7 @@ class RestructureTemperatureResults(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance-postprocess grid merge-folder ./input_folder ./output_folder {extension} --dist-info dist_info.json --output-extension {output_extension} --as-text {as_text} --fmt {fmt} --delimiter {delimiter}'.format(as_text=self.as_text, output_extension=self.output_extension, fmt=self.fmt, extension=self.extension, delimiter=self.delimiter)
+        return 'honeybee-radiance-postprocess grid merge-folder ./input_folder ./output_folder {extension} --dist-info dist_info.json --output-extension {output_extension} --as-text {as_text} --fmt {fmt} --delimiter {delimiter}'.format(fmt=self.fmt, as_text=self.as_text, extension=self.extension, delimiter=self.delimiter, output_extension=self.output_extension)
 
     def requires(self):
         return {'RunComfortMap': RunComfortMap(_input_params=self._input_params)}
@@ -1844,14 +1844,14 @@ class RestructureTemperatureResults(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.431'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.443'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _Main_cbe7c10eOrchestrator(luigi.WrapperTask):
+class _Main_1f915e33Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
