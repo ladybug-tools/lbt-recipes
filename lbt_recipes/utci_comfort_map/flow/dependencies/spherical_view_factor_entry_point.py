@@ -1,5 +1,5 @@
 """
-This file is auto-generated from utci-comfort-map:0.9.12.
+This file is auto-generated from utci-comfort-map:0.9.15.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,7 +17,7 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.spherical_view_factor import _SphericalViewFactor_cbe7c10eOrchestrator as SphericalViewFactor_cbe7c10eWorkerbee
+from .dependencies.spherical_view_factor import _SphericalViewFactor_1f915e33Orchestrator as SphericalViewFactor_1f915e33Workerbee
 
 
 _default_inputs = {   'grid_name': None,
@@ -90,7 +90,7 @@ class SplitModifiers(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance modifier split-modifiers scene.mod ./output_folder --sensor-count {sensor_count} --grid-file grid.pts --max-value {max_value} --sensor-multiplier {sensor_multiplier}'.format(sensor_multiplier=self.sensor_multiplier, sensor_count=self.sensor_count, max_value=self.max_value)
+        return 'honeybee-radiance modifier split-modifiers scene.mod ./output_folder --sensor-count {sensor_count} --grid-file grid.pts --max-value {max_value} --sensor-multiplier {sensor_multiplier}'.format(max_value=self.max_value, sensor_multiplier=self.sensor_multiplier, sensor_count=self.sensor_count)
 
     def output(self):
         return {
@@ -134,7 +134,7 @@ class SplitModifiers(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.103'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.106'
 
     @property
     def image_workdir(self):
@@ -213,7 +213,7 @@ class CalculateSphericalViewFactorsLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [SphericalViewFactor_cbe7c10eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [SphericalViewFactor_1f915e33Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'calculate_spherical_view_factors.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -337,7 +337,7 @@ class RestructureViewFactor(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance-postprocess merge merge-files ./input_folder {extension} --output-file output --dist-info dist_info.json --merge-axis "{merge_axis}" --as-text {as_text} --fmt {fmt} --delimiter {delimiter}'.format(as_text=self.as_text, merge_axis=self.merge_axis, fmt=self.fmt, extension=self.extension, delimiter=self.delimiter)
+        return 'honeybee-radiance-postprocess merge merge-files ./input_folder {extension} --output-file output --dist-info dist_info.json --merge-axis "{merge_axis}" --as-text {as_text} --fmt {fmt} --delimiter {delimiter}'.format(fmt=self.fmt, as_text=self.as_text, extension=self.extension, delimiter=self.delimiter, merge_axis=self.merge_axis)
 
     def requires(self):
         return {'CalculateSphericalViewFactors': CalculateSphericalViewFactors(_input_params=self._input_params), 'SplitModifiers': SplitModifiers(_input_params=self._input_params)}
@@ -377,14 +377,14 @@ class RestructureViewFactor(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.431'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.443'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _SphericalViewFactorEntryPoint_cbe7c10eOrchestrator(luigi.WrapperTask):
+class _SphericalViewFactorEntryPoint_1f915e33Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

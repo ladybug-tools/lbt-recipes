@@ -1,5 +1,5 @@
 """
-This file is auto-generated from utci-comfort-map:0.9.12.
+This file is auto-generated from utci-comfort-map:0.9.15.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -89,7 +89,7 @@ class ComputeSphericalViewFactors(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance-postprocess view-factor contrib scene.oct grid.pts scene.mod --ray-count {ray_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --name view_factor'.format(radiance_parameters=self.radiance_parameters, ray_count=self.ray_count, fixed_radiance_parameters=self.fixed_radiance_parameters)
+        return 'honeybee-radiance-postprocess view-factor contrib scene.oct grid.pts scene.mod --ray-count {ray_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --name view_factor'.format(fixed_radiance_parameters=self.fixed_radiance_parameters, radiance_parameters=self.radiance_parameters, ray_count=self.ray_count)
 
     def output(self):
         return {
@@ -125,14 +125,14 @@ class ComputeSphericalViewFactors(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.431'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.443'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _SphericalViewFactor_cbe7c10eOrchestrator(luigi.WrapperTask):
+class _SphericalViewFactor_1f915e33Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
