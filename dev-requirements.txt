@@ -1,4 +1,4 @@
-lbt-honeybee==0.8.514
+lbt-honeybee==0.8.515
 pytest==8.3.2
 Sphinx==8.0.2
 sphinx-bootstrap-theme==0.8.1
