@@ -1,4 +1,4 @@
-queenbee-local==0.6.7;python_version>="3.8"
+queenbee-local==0.6.9;python_version>="3.8"
 queenbee-local==0.6.2;python_version<"3.8"
 pollination-handlers==0.10.12
 click==7.1.2;python_version<'3.8'
