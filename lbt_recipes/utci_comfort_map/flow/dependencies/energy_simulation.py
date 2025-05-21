@@ -188,7 +188,7 @@ class RunEnergySimulation(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-energy simulate model model.hbjson weather.epw --sim-par-json sim-par.json --measures measures --additional-string "{additional_string}" --additional-idf additional.idf --check-model --skip-no-rooms --folder output'.format(additional_string=self.additional_string)
+        return 'honeybee-energy simulate model model.hbjson weather.epw --sim-par-json sim-par.json --measures measures --additional-string "{additional_string}" --additional-idf additional.idf --skip-no-rooms --folder output'.format(additional_string=self.additional_string)
 
     def requires(self):
         return {'CreateSimPar': CreateSimPar(_input_params=self._input_params)}
