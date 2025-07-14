@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight:0.10.11.
+This file is auto-generated from annual-daylight:0.10.20.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -30,6 +30,7 @@ _default_inputs = {   'bsdfs': None,
     'simulation_folder': '.',
     'sky_dome': None,
     'sky_matrix': None,
+    'study_info': None,
     'sun_up_hours': None,
     'thresholds': '-t 300 -lt 100 -ut 3000'}
 
@@ -124,7 +125,7 @@ class TotalSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(order_by=self.order_by, sensor_count=self.sensor_count, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, conversion=self.conversion, header=self.header, radiance_parameters=self.radiance_parameters)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, order_by=self.order_by, output_format=self.output_format, fixed_radiance_parameters=self.fixed_radiance_parameters, header=self.header, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count)
 
     def output(self):
         return {
@@ -166,7 +167,7 @@ class TotalSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.39'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -213,6 +214,17 @@ class AnnualMetricsFile(QueenbeeTask):
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
+    def study_info(self):
+        try:
+            pathlib.Path(self._input_params['study_info'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['study_info'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
     def execution_folder(self):
         return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
@@ -233,7 +245,7 @@ class AnnualMetricsFile(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance-postprocess post-process annual-daylight-file illuminance.ill sun-up-hours.txt --schedule schedule.txt {thresholds} --grid-name "{grid_name}" --sub-folder metrics'.format(grid_name=self.grid_name, thresholds=self.thresholds)
+        return 'honeybee-radiance-postprocess post-process annual-daylight-file illuminance.ill sun-up-hours.txt --schedule schedule.txt {thresholds} --grid-name "{grid_name}" --study-info study_info.json --sub-folder metrics'.format(grid_name=self.grid_name, thresholds=self.thresholds)
 
     def requires(self):
         return {'TotalSky': TotalSky(_input_params=self._input_params)}
@@ -250,7 +262,8 @@ class AnnualMetricsFile(QueenbeeTask):
         return [
             {'name': 'file', 'to': 'illuminance.ill', 'from': self.file, 'optional': False},
             {'name': 'sun_up_hours', 'to': 'sun-up-hours.txt', 'from': self.sun_up_hours, 'optional': False},
-            {'name': 'schedule', 'to': 'schedule.txt', 'from': self.schedule, 'optional': True}]
+            {'name': 'schedule', 'to': 'schedule.txt', 'from': self.schedule, 'optional': True},
+            {'name': 'study_info', 'to': 'study_info.json', 'from': self.study_info, 'optional': True}]
 
     @property
     def output_artifacts(self):
@@ -270,14 +283,14 @@ class AnnualMetricsFile(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.279'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _AnnualDaylightRayTracing_28ff6c38Orchestrator(luigi.WrapperTask):
+class _AnnualDaylightRayTracing_e6056798Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
