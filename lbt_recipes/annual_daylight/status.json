@@ -1,5 +1,5 @@
 {
-  "id": "0c0bdc48-02d3-468b-84a3-56883c990c42",
+  "id": "8d0a50ce-b315-4816-bf26-82499dead5d4",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
@@ -24,7 +24,7 @@
       "type": "MetaData",
       "annotations": {},
       "name": "annual-daylight",
-      "tag": "0.10.11",
+      "tag": "0.10.20",
       "app_version": null,
       "keywords": [
         "honeybee",
@@ -154,25 +154,13 @@
       },
       {
         "type": "DAGIntegerInput",
-        "annotations": {},
+        "annotations": {
+          "__default_local__": 500
+        },
         "name": "min-sensor-count",
-        "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids. The default value is set to 1, which means that the cpu_count is always respected.",
-        "default": 500,
-        "alias": [
-          {
-            "type": "DAGIntegerInputAlias",
-            "annotations": {},
-            "name": "min_sen_count",
-            "description": "Positive integer for the minimum number of sensors in each grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids that increase overhead. (Default: 200).",
-            "platform": [
-              "grasshopper"
-            ],
-            "handler": [],
-            "default": 200,
-            "required": false,
-            "spec": null
-          }
-        ],
+        "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids.",
+        "default": 1000,
+        "alias": [],
         "required": false,
         "spec": {
           "type": "integer",
@@ -192,8 +180,7 @@
             "name": "model",
             "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
             "platform": [
-              "grasshopper",
-              "rhino"
+              "grasshopper"
             ],
             "handler": [
               {
@@ -210,6 +197,28 @@
                 "language": "csharp",
                 "module": "Pollination.RhinoHandlers",
                 "function": "HBModelToJSON",
+                "index": 0
+              }
+            ],
+            "default": null,
+            "required": true,
+            "spec": null
+          },
+          {
+            "type": "DAGLinkedInputAlias",
+            "annotations": {},
+            "name": "model",
+            "description": "This input links the model to Rhino model.",
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "RhinoHBModelToJSON",
                 "index": 0
               }
             ],
@@ -254,7 +263,7 @@
         "type": "DAGNumberInput",
         "annotations": {},
         "name": "north",
-        "description": "A number for rotation from north.",
+        "description": "A number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees. This can also be a Vector for the direction to North. (Default: 0).",
         "default": 0.0,
         "alias": [
           {
@@ -278,12 +287,34 @@
             "default": "0",
             "required": false,
             "spec": null
+          },
+          {
+            "type": "DAGLinkedInputAlias",
+            "annotations": {},
+            "name": "north",
+            "description": "A number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees. This can also be Vector for the direction to North. (Default: 0).",
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "RhinoModelProjectInfoNorth",
+                "index": 0
+              }
+            ],
+            "default": "0",
+            "required": false,
+            "spec": null
           }
         ],
         "required": false,
         "spec": {
           "type": "number",
-          "minimum": 0,
+          "minimum": -360,
           "maximum": 360
         }
       },
@@ -302,7 +333,16 @@
             "platform": [
               "grasshopper"
             ],
-            "handler": [],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.inputs.radiancepar",
+                "function": "validate_rfluxmtx_params",
+                "index": 0
+              }
+            ],
             "default": "-ab 2 -ad 5000 -lw 2e-05 -dr 0",
             "required": false,
             "spec": null
@@ -373,6 +413,20 @@
         "spec": null
       },
       {
+        "type": "DAGIntegerInput",
+        "annotations": {},
+        "name": "timestep",
+        "description": "Input wea timestep.",
+        "default": 1,
+        "alias": [],
+        "required": false,
+        "spec": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60
+        }
+      },
+      {
         "type": "DAGFileInput",
         "annotations": {},
         "name": "wea",
@@ -386,7 +440,6 @@
             "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
             "platform": [
               "grasshopper",
-              "rhino",
               "revit"
             ],
             "handler": [
@@ -395,7 +448,29 @@
                 "annotations": {},
                 "language": "python",
                 "module": "pollination_handlers.inputs.wea",
-                "function": "wea_handler_timestep_check",
+                "function": "wea_handler",
+                "index": 0
+              }
+            ],
+            "default": null,
+            "required": true,
+            "spec": null
+          },
+          {
+            "type": "DAGLinkedInputAlias",
+            "annotations": {},
+            "name": "wea",
+            "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "RhinoModelProjectInfoWeather",
                 "index": 0
               }
             ],
@@ -407,7 +482,8 @@
         "required": true,
         "spec": null,
         "extensions": [
-          "wea"
+          "wea",
+          "epw"
         ]
       }
     ],
@@ -877,31 +953,19 @@
       },
       {
         "type": "StepIntegerInput",
-        "annotations": {},
+        "annotations": {
+          "__default_local__": 500
+        },
         "name": "min-sensor-count",
-        "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids. The default value is set to 1, which means that the cpu_count is always respected.",
-        "default": 500,
-        "alias": [
-          {
-            "type": "DAGIntegerInputAlias",
-            "annotations": {},
-            "name": "min_sen_count",
-            "description": "Positive integer for the minimum number of sensors in each grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids that increase overhead. (Default: 200).",
-            "platform": [
-              "grasshopper"
-            ],
-            "handler": [],
-            "default": 200,
-            "required": false,
-            "spec": null
-          }
-        ],
+        "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids.",
+        "default": 1000,
+        "alias": [],
         "required": false,
         "spec": {
           "type": "integer",
           "minimum": 1
         },
-        "value": 500
+        "value": 1000
       },
       {
         "type": "StepFileInput",
@@ -916,8 +980,7 @@
             "name": "model",
             "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
             "platform": [
-              "grasshopper",
-              "rhino"
+              "grasshopper"
             ],
             "handler": [
               {
@@ -934,6 +997,28 @@
                 "language": "csharp",
                 "module": "Pollination.RhinoHandlers",
                 "function": "HBModelToJSON",
+                "index": 0
+              }
+            ],
+            "default": null,
+            "required": true,
+            "spec": null
+          },
+          {
+            "type": "DAGLinkedInputAlias",
+            "annotations": {},
+            "name": "model",
+            "description": "This input links the model to Rhino model.",
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "RhinoHBModelToJSON",
                 "index": 0
               }
             ],
@@ -984,7 +1069,7 @@
         "type": "StepNumberInput",
         "annotations": {},
         "name": "north",
-        "description": "A number for rotation from north.",
+        "description": "A number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees. This can also be a Vector for the direction to North. (Default: 0).",
         "default": 0.0,
         "alias": [
           {
@@ -1008,12 +1093,34 @@
             "default": "0",
             "required": false,
             "spec": null
+          },
+          {
+            "type": "DAGLinkedInputAlias",
+            "annotations": {},
+            "name": "north",
+            "description": "A number between -360 and 360 for the counterclockwise difference between the North and the positive Y-axis in degrees. This can also be Vector for the direction to North. (Default: 0).",
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "RhinoModelProjectInfoNorth",
+                "index": 0
+              }
+            ],
+            "default": "0",
+            "required": false,
+            "spec": null
           }
         ],
         "required": false,
         "spec": {
           "type": "number",
-          "minimum": 0,
+          "minimum": -360,
           "maximum": 360
         },
         "value": 0.0
@@ -1033,7 +1140,16 @@
             "platform": [
               "grasshopper"
             ],
-            "handler": [],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.inputs.radiancepar",
+                "function": "validate_rfluxmtx_params",
+                "index": 0
+              }
+            ],
             "default": "-ab 2 -ad 5000 -lw 2e-05 -dr 0",
             "required": false,
             "spec": null
@@ -1112,6 +1228,21 @@
         "value": "-t 300 -lt 100 -ut 3000"
       },
       {
+        "type": "StepIntegerInput",
+        "annotations": {},
+        "name": "timestep",
+        "description": "Input wea timestep.",
+        "default": 1,
+        "alias": [],
+        "required": false,
+        "spec": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60
+        },
+        "value": 1
+      },
+      {
         "type": "StepFileInput",
         "annotations": {},
         "name": "wea",
@@ -1125,7 +1256,6 @@
             "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
             "platform": [
               "grasshopper",
-              "rhino",
               "revit"
             ],
             "handler": [
@@ -1134,7 +1264,29 @@
                 "annotations": {},
                 "language": "python",
                 "module": "pollination_handlers.inputs.wea",
-                "function": "wea_handler_timestep_check",
+                "function": "wea_handler",
+                "index": 0
+              }
+            ],
+            "default": null,
+            "required": true,
+            "spec": null
+          },
+          {
+            "type": "DAGLinkedInputAlias",
+            "annotations": {},
+            "name": "wea",
+            "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "RhinoModelProjectInfoWeather",
                 "index": 0
               }
             ],
@@ -1147,7 +1299,8 @@
         "spec": null,
         "path": null,
         "extensions": [
-          "wea"
+          "wea",
+          "epw"
         ],
         "source": {
           "type": "ProjectFolder",
@@ -1263,12 +1416,12 @@
       }
     ],
     "message": null,
-    "started_at": "2023-10-18T19:15:38+00:00",
+    "started_at": "2025-07-14T19:52:37+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "0c0bdc48-02d3-468b-84a3-56883c990c42_00",
-    "job_id": "0c0bdc48-02d3-468b-84a3-56883c990c42",
+    "id": "8d0a50ce-b315-4816-bf26-82499dead5d4_00",
+    "job_id": "8d0a50ce-b315-4816-bf26-82499dead5d4",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}
