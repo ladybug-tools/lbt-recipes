@@ -1,5 +1,5 @@
 {
-  "id": "bd4bea58-cbf7-464c-a397-e83be307c983",
+  "id": "416e3f21-7517-4f19-9952-f19c53cdd7f9",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
@@ -24,7 +24,7 @@
       "type": "MetaData",
       "annotations": {},
       "name": "point-in-time-grid",
-      "tag": "0.3.10",
+      "tag": "0.4.0",
       "app_version": null,
       "keywords": [
         "honeybee",
@@ -158,25 +158,13 @@
       },
       {
         "type": "DAGIntegerInput",
-        "annotations": {},
+        "annotations": {
+          "__default_local__": 500
+        },
         "name": "min-sensor-count",
-        "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids. The default value is set to 1, which means that the cpu_count is always respected.",
-        "default": 500,
-        "alias": [
-          {
-            "type": "DAGIntegerInputAlias",
-            "annotations": {},
-            "name": "min_sen_count",
-            "description": "Positive integer for the minimum number of sensors in each grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids that increase overhead. (Default: 200).",
-            "platform": [
-              "grasshopper"
-            ],
-            "handler": [],
-            "default": 200,
-            "required": false,
-            "spec": null
-          }
-        ],
+        "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids.",
+        "default": 1000,
+        "alias": [],
         "required": false,
         "spec": {
           "type": "integer",
@@ -196,8 +184,7 @@
             "name": "model",
             "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
             "platform": [
-              "grasshopper",
-              "rhino"
+              "grasshopper"
             ],
             "handler": [
               {
@@ -214,6 +201,28 @@
                 "language": "csharp",
                 "module": "Pollination.RhinoHandlers",
                 "function": "HBModelToJSON",
+                "index": 0
+              }
+            ],
+            "default": null,
+            "required": true,
+            "spec": null
+          },
+          {
+            "type": "DAGLinkedInputAlias",
+            "annotations": {},
+            "name": "model",
+            "description": "This input links the model to Rhino model.",
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "RhinoHBModelToJSON",
                 "index": 0
               }
             ],
@@ -269,7 +278,16 @@
             "platform": [
               "grasshopper"
             ],
-            "handler": [],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.inputs.radiancepar",
+                "function": "validate_rtrace_params",
+                "index": 0
+              }
+            ],
             "default": "-ab 2 -aa 0.1 -ad 2048 -ar 64",
             "required": false,
             "spec": null
@@ -427,31 +445,19 @@
       },
       {
         "type": "StepIntegerInput",
-        "annotations": {},
+        "annotations": {
+          "__default_local__": 500
+        },
         "name": "min-sensor-count",
-        "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids. The default value is set to 1, which means that the cpu_count is always respected.",
-        "default": 500,
-        "alias": [
-          {
-            "type": "DAGIntegerInputAlias",
-            "annotations": {},
-            "name": "min_sen_count",
-            "description": "Positive integer for the minimum number of sensors in each grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids that increase overhead. (Default: 200).",
-            "platform": [
-              "grasshopper"
-            ],
-            "handler": [],
-            "default": 200,
-            "required": false,
-            "spec": null
-          }
-        ],
+        "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids.",
+        "default": 1000,
+        "alias": [],
         "required": false,
         "spec": {
           "type": "integer",
           "minimum": 1
         },
-        "value": 500
+        "value": 1000
       },
       {
         "type": "StepFileInput",
@@ -466,8 +472,7 @@
             "name": "model",
             "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
             "platform": [
-              "grasshopper",
-              "rhino"
+              "grasshopper"
             ],
             "handler": [
               {
@@ -484,6 +489,28 @@
                 "language": "csharp",
                 "module": "Pollination.RhinoHandlers",
                 "function": "HBModelToJSON",
+                "index": 0
+              }
+            ],
+            "default": null,
+            "required": true,
+            "spec": null
+          },
+          {
+            "type": "DAGLinkedInputAlias",
+            "annotations": {},
+            "name": "model",
+            "description": "This input links the model to Rhino model.",
+            "platform": [
+              "rhino"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "csharp",
+                "module": "Pollination.RhinoHandlers",
+                "function": "RhinoHBModelToJSON",
                 "index": 0
               }
             ],
@@ -545,7 +572,16 @@
             "platform": [
               "grasshopper"
             ],
-            "handler": [],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.inputs.radiancepar",
+                "function": "validate_rtrace_params",
+                "index": 0
+              }
+            ],
             "default": "-ab 2 -aa 0.1 -ad 2048 -ar 64",
             "required": false,
             "spec": null
@@ -583,12 +619,12 @@
       }
     ],
     "message": null,
-    "started_at": "2023-08-29T21:00:12+00:00",
+    "started_at": "2026-01-17T20:08:19+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "bd4bea58-cbf7-464c-a397-e83be307c983_00",
-    "job_id": "bd4bea58-cbf7-464c-a397-e83be307c983",
+    "id": "416e3f21-7517-4f19-9952-f19c53cdd7f9_00",
+    "job_id": "416e3f21-7517-4f19-9952-f19c53cdd7f9",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}

@@ -1,5 +1,5 @@
 """
-This file is auto-generated from point-in-time-view:0.4.1.
+This file is auto-generated from point-in-time-view:0.5.0.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -20,6 +20,7 @@ from . import _queenbee_status_lock_
 
 
 _default_inputs = {   'bsdfs': None,
+    'ies': None,
     'metric': 'luminance',
     'octree_file': None,
     'params_folder': '__params',
@@ -85,6 +86,17 @@ class SplitView(QueenbeeTask):
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
     @property
+    def ies_folder(self):
+        try:
+            pathlib.Path(self._input_params['ies'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['ies'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
     def execution_folder(self):
         return pathlib.Path(self._input_params['simulation_folder']).as_posix()
 
@@ -105,7 +117,7 @@ class SplitView(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance view split view.vf {view_count} --resolution {resolution} --{overture} --octree scene.oct --rad-params "{radiance_parameters}" --folder output --log-file output/views_info.json'.format(view_count=self.view_count, overture=self.overture, resolution=self.resolution, radiance_parameters=self.radiance_parameters)
+        return 'honeybee-radiance view split view.vf {view_count} --resolution {resolution} --{overture} --octree scene.oct --rad-params "{radiance_parameters}" --folder output --log-file output/views_info.json'.format(overture=self.overture, resolution=self.resolution, radiance_parameters=self.radiance_parameters, view_count=self.view_count)
 
     def output(self):
         return {
@@ -129,7 +141,8 @@ class SplitView(QueenbeeTask):
         return [
             {'name': 'input_view', 'to': 'view.vf', 'from': self.input_view, 'optional': False},
             {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': True},
-            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': True}]
+            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': True},
+            {'name': 'ies_folder', 'to': 'model/ies', 'from': self.ies_folder, 'optional': True}]
 
     @property
     def output_artifacts(self):
@@ -162,7 +175,7 @@ class SplitView(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -227,6 +240,17 @@ class RayTracingLoop(QueenbeeTask):
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
+    @property
+    def ies_folder(self):
+        try:
+            pathlib.Path(self._input_params['ies'])
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self._input_params['ies'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
     # get item for loop
     try:
         item = luigi.DictParameter()
@@ -254,7 +278,7 @@ class RayTracingLoop(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance rpict rpict scene.oct view.vf --rad-params "{radiance_parameters}" --metric {metric} --resolution {resolution} --scale-factor {scale_factor} --output view.HDR'.format(scale_factor=self.scale_factor, metric=self.metric, resolution=self.resolution, radiance_parameters=self.radiance_parameters)
+        return 'honeybee-radiance rpict rpict scene.oct view.vf --rad-params "{radiance_parameters}" --metric {metric} --resolution {resolution} --scale-factor {scale_factor} --output view.HDR'.format(resolution=self.resolution, metric=self.metric, scale_factor=self.scale_factor, radiance_parameters=self.radiance_parameters)
 
     def requires(self):
         return {'SplitView': SplitView(_input_params=self._input_params)}
@@ -272,7 +296,8 @@ class RayTracingLoop(QueenbeeTask):
             {'name': 'ambient_cache', 'to': 'view.amb', 'from': self.ambient_cache, 'optional': True},
             {'name': 'view', 'to': 'view.vf', 'from': self.view, 'optional': False},
             {'name': 'scene_file', 'to': 'scene.oct', 'from': self.scene_file, 'optional': False},
-            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': True}]
+            {'name': 'bsdf_folder', 'to': 'model/bsdf', 'from': self.bsdf_folder, 'optional': True},
+            {'name': 'ies_folder', 'to': 'model/ies', 'from': self.ies_folder, 'optional': True}]
 
     @property
     def output_artifacts(self):
@@ -294,7 +319,7 @@ class RayTracingLoop(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -348,7 +373,7 @@ class RayTracing(luigi.Task):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -413,7 +438,7 @@ class MergeResults(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance view merge input_folder view {extension} --scale-factor {scale_factor} --name {name} --view original-view.vf'.format(extension=self.extension, name=self.name, scale_factor=self.scale_factor)
+        return 'honeybee-radiance view merge input_folder view {extension} --scale-factor {scale_factor} --name {name} --view original-view.vf'.format(name=self.name, extension=self.extension, scale_factor=self.scale_factor)
 
     def requires(self):
         return {'RayTracing': RayTracing(_input_params=self._input_params)}
@@ -450,14 +475,14 @@ class MergeResults(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _PointInTimeViewRayTracing_17540fe5Orchestrator(luigi.WrapperTask):
+class _PointInTimeViewRayTracing_8480f42eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
