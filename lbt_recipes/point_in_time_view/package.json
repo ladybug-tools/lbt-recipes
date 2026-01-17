@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "point-in-time-view",
-    "tag": "0.4.1",
+    "tag": "0.5.0",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -200,7 +200,16 @@
           "platform": [
             "grasshopper"
           ],
-          "handler": [],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.radiancepar",
+              "function": "validate_rpict_params",
+              "index": 0
+            }
+          ],
           "default": "-ab 2 -aa 0.1 -ad 2048 -ar 64",
           "required": false,
           "spec": null

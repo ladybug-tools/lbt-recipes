@@ -1,5 +1,5 @@
 """
-This file is auto-generated from point-in-time-grid:0.3.10.
+This file is auto-generated from point-in-time-grid:0.4.0.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -69,7 +69,7 @@ class CreateRadFolder(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid " {grid_filter} " --grid-check'.format(grid_filter=self.grid_filter)
+        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid " {grid_filter} " --grid-check --create-grids'.format(grid_filter=self.grid_filter)
 
     def output(self):
         return {
@@ -122,7 +122,7 @@ class CreateRadFolder(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.31'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -188,7 +188,7 @@ class GenerateSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.31'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -198,7 +198,7 @@ class GenerateSky(QueenbeeTask):
 class AdjustSky(QueenbeeTask):
     """Adjust a sky file to ensure it is suitable for a given metric.
 
-    Specifcally, this ensures that skies being created with gendaylit have a -O
+    Specifically, this ensures that skies being created with gendaylit have a -O
     option that aligns with visible vs. solar energy."""
 
     # DAG Input parameters
@@ -271,7 +271,7 @@ class AdjustSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.31'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -330,7 +330,7 @@ class SplitGridFolder(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(min_sensor_count=self.min_sensor_count, cpus_per_grid=self.cpus_per_grid, cpu_count=self.cpu_count)
+        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(cpu_count=self.cpu_count, cpus_per_grid=self.cpus_per_grid, min_sensor_count=self.min_sensor_count)
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
@@ -377,7 +377,7 @@ class SplitGridFolder(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.31'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -429,7 +429,7 @@ class CreateOctree(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out} --add-before sky.sky'.format(include_aperture=self.include_aperture, black_out=self.black_out)
+        return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out} --add-before sky.sky'.format(black_out=self.black_out, include_aperture=self.include_aperture)
 
     def requires(self):
         return {'AdjustSky': AdjustSky(_input_params=self._input_params), 'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
@@ -465,14 +465,14 @@ class CreateOctree(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.31'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _PointInTimeGridPrepareFolder_266428f6Orchestrator(luigi.WrapperTask):
+class _PointInTimeGridPrepareFolder_a9ddd14fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

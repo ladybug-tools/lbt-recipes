@@ -1,5 +1,5 @@
 """
-This file is auto-generated from point-in-time-view:0.4.1.
+This file is auto-generated from point-in-time-view:0.5.0.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,8 +17,8 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.point_in_time_view_ray_tracing import _PointInTimeViewRayTracing_17540fe5Orchestrator as PointInTimeViewRayTracing_17540fe5Workerbee
-from .dependencies.point_in_time_view_prepare_folder import _PointInTimeViewPrepareFolder_17540fe5Orchestrator as PointInTimeViewPrepareFolder_17540fe5Workerbee
+from .dependencies.point_in_time_view_ray_tracing import _PointInTimeViewRayTracing_8480f42eOrchestrator as PointInTimeViewRayTracing_8480f42eWorkerbee
+from .dependencies.point_in_time_view_prepare_folder import _PointInTimeViewPrepareFolder_8480f42eOrchestrator as PointInTimeViewPrepareFolder_8480f42eWorkerbee
 
 
 _default_inputs = {   'cpu_count': 12,
@@ -104,7 +104,7 @@ class PrepareFolderPointInTimeView(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [PointInTimeViewPrepareFolder_17540fe5Workerbee(_input_params=self.map_dag_inputs)]
+        yield [PointInTimeViewPrepareFolder_8480f42eWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -229,7 +229,7 @@ class ComputeViewSplitCount(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -293,6 +293,17 @@ class PointInTimeViewRayTracingLoop(luigi.Task):
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
+    @property
+    def ies(self):
+        try:
+            pathlib.Path(self.input()['PrepareFolderPointInTimeView']['model_folder'].path, 'ies')
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self.input()['PrepareFolderPointInTimeView']['model_folder'].path, 'ies')
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
     # get item for loop
     try:
         item = luigi.DictParameter()
@@ -324,7 +335,8 @@ class PointInTimeViewRayTracingLoop(luigi.Task):
             'octree_file': self.octree_file,
             'view_name': self.view_name,
             'view': self.view,
-            'bsdfs': self.bsdfs
+            'bsdfs': self.bsdfs,
+            'ies': self.ies
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -335,7 +347,7 @@ class PointInTimeViewRayTracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [PointInTimeViewRayTracing_17540fe5Workerbee(_input_params=self.map_dag_inputs)]
+        yield [PointInTimeViewRayTracing_8480f42eWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'point_in_time_view_ray_tracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -395,7 +407,7 @@ class PointInTimeViewRayTracing(luigi.Task):
         }
 
 
-class _Main_17540fe5Orchestrator(luigi.WrapperTask):
+class _Main_8480f42eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

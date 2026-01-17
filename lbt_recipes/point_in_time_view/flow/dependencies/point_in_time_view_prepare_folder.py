@@ -1,5 +1,5 @@
 """
-This file is auto-generated from point-in-time-view:0.4.1.
+This file is auto-generated from point-in-time-view:0.5.0.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -123,7 +123,7 @@ class CreateRadFolder(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -189,7 +189,7 @@ class GenerateSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -199,7 +199,7 @@ class GenerateSky(QueenbeeTask):
 class AdjustSky(QueenbeeTask):
     """Adjust a sky file to ensure it is suitable for a given metric.
 
-    Specifcally, this ensures that skies being created with gendaylit have a -O
+    Specifically, this ensures that skies being created with gendaylit have a -O
     option that aligns with visible vs. solar energy."""
 
     # DAG Input parameters
@@ -272,7 +272,7 @@ class AdjustSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -324,7 +324,7 @@ class CreateOctree(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out} --add-before sky.sky'.format(include_aperture=self.include_aperture, black_out=self.black_out)
+        return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out} --add-before sky.sky'.format(black_out=self.black_out, include_aperture=self.include_aperture)
 
     def requires(self):
         return {'AdjustSky': AdjustSky(_input_params=self._input_params), 'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
@@ -360,14 +360,14 @@ class CreateOctree(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.32'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _PointInTimeViewPrepareFolder_17540fe5Orchestrator(luigi.WrapperTask):
+class _PointInTimeViewPrepareFolder_8480f42eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -1,5 +1,5 @@
 """
-This file is auto-generated from point-in-time-grid:0.3.10.
+This file is auto-generated from point-in-time-grid:0.4.0.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -95,7 +95,7 @@ class RestructureResults(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.31'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -178,7 +178,7 @@ class CopyGridInfo(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _PointInTimeGridPostProcess_266428f6Orchestrator(luigi.WrapperTask):
+class _PointInTimeGridPostProcess_a9ddd14fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

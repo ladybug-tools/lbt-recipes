@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "point-in-time-grid",
-    "tag": "0.3.10",
+    "tag": "0.4.0",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -140,25 +140,13 @@
     },
     {
       "type": "DAGIntegerInput",
-      "annotations": {},
+      "annotations": {
+        "__default_local__": 500
+      },
       "name": "min-sensor-count",
-      "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids. The default value is set to 1, which means that the cpu_count is always respected.",
-      "default": 500,
-      "alias": [
-        {
-          "type": "DAGIntegerInputAlias",
-          "annotations": {},
-          "name": "min_sen_count",
-          "description": "Positive integer for the minimum number of sensors in each grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids that increase overhead. (Default: 200).",
-          "platform": [
-            "grasshopper"
-          ],
-          "handler": [],
-          "default": 200,
-          "required": false,
-          "spec": null
-        }
-      ],
+      "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids.",
+      "default": 1000,
+      "alias": [],
       "required": false,
       "spec": {
         "type": "integer",
@@ -178,8 +166,7 @@
           "name": "model",
           "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
           "platform": [
-            "grasshopper",
-            "rhino"
+            "grasshopper"
           ],
           "handler": [
             {
@@ -196,6 +183,28 @@
               "language": "csharp",
               "module": "Pollination.RhinoHandlers",
               "function": "HBModelToJSON",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        },
+        {
+          "type": "DAGLinkedInputAlias",
+          "annotations": {},
+          "name": "model",
+          "description": "This input links the model to Rhino model.",
+          "platform": [
+            "rhino"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "csharp",
+              "module": "Pollination.RhinoHandlers",
+              "function": "RhinoHBModelToJSON",
               "index": 0
             }
           ],
@@ -251,7 +260,16 @@
           "platform": [
             "grasshopper"
           ],
-          "handler": [],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.radiancepar",
+              "function": "validate_rtrace_params",
+              "index": 0
+            }
+          ],
           "default": "-ab 2 -aa 0.1 -ad 2048 -ar 64",
           "required": false,
           "spec": null

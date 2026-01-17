@@ -1,5 +1,5 @@
 """
-This file is auto-generated from point-in-time-view:0.4.1.
+This file is auto-generated from point-in-time-view:0.5.0.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -23,7 +23,7 @@ from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 from luigi.execution_summary import LuigiStatusCode
 
-import flow.main_17540fe5 as point_in_time_view_workerbee
+import flow.main_8480f42e as point_in_time_view_workerbee
 
 
 _recipe_default_inputs = {   'cpu_count': 12,
@@ -41,7 +41,7 @@ class LetPointInTimeViewFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [point_in_time_view_workerbee._Main_17540fe5Orchestrator(_input_params=self._input_params)]
+        yield [point_in_time_view_workerbee._Main_8480f42eOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

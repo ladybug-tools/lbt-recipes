@@ -1,5 +1,5 @@
 {
-  "id": "10ef7387-3205-419e-bc50-b2e23a0aad1d",
+  "id": "ec34ef04-3009-4389-a92f-447dddb1fe43",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
@@ -24,7 +24,7 @@
       "type": "MetaData",
       "annotations": {},
       "name": "point-in-time-view",
-      "tag": "0.4.1",
+      "tag": "0.5.0",
       "app_version": null,
       "keywords": [
         "honeybee",
@@ -218,7 +218,16 @@
             "platform": [
               "grasshopper"
             ],
-            "handler": [],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.inputs.radiancepar",
+                "function": "validate_rpict_params",
+                "index": 0
+              }
+            ],
             "default": "-ab 2 -aa 0.1 -ad 2048 -ar 64",
             "required": false,
             "spec": null
@@ -503,7 +512,16 @@
             "platform": [
               "grasshopper"
             ],
-            "handler": [],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.inputs.radiancepar",
+                "function": "validate_rpict_params",
+                "index": 0
+              }
+            ],
             "default": "-ab 2 -aa 0.1 -ad 2048 -ar 64",
             "required": false,
             "spec": null
@@ -606,12 +624,12 @@
       }
     ],
     "message": null,
-    "started_at": "2023-08-29T23:21:42+00:00",
+    "started_at": "2026-01-17T20:08:05+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "10ef7387-3205-419e-bc50-b2e23a0aad1d_00",
-    "job_id": "10ef7387-3205-419e-bc50-b2e23a0aad1d",
+    "id": "ec34ef04-3009-4389-a92f-447dddb1fe43_00",
+    "job_id": "ec34ef04-3009-4389-a92f-447dddb1fe43",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}
