@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lbt_recipes.settings &#8212; lbt-recipes  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=0bf093e7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b493dabd" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          lbt-recipes</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">CLI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../cli/index.html#commands">Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../cli/main.html">main</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cli/main.html#lbt-recipes">lbt-recipes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../cli/main.html#lbt-recipes-run">run</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../cli/main.html#lbt-recipes-viz">viz</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">lbt_recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../lbt_recipes.html">lbt_recipes package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../lbt_recipes.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../lbt_recipes.cli.html">lbt_recipes.cli package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.cli.html#module-lbt_recipes.cli">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../lbt_recipes.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../lbt_recipes.recipe.html">lbt_recipes.recipe module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe"><code class="docutils literal notranslate"><span class="pre">Recipe</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.ToString"><code class="docutils literal notranslate"><span class="pre">ToString()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.error_summary"><code class="docutils literal notranslate"><span class="pre">error_summary()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.failure_message"><code class="docutils literal notranslate"><span class="pre">failure_message()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.handle_inputs"><code class="docutils literal notranslate"><span class="pre">handle_inputs()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.input_value_by_name"><code class="docutils literal notranslate"><span class="pre">input_value_by_name()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.luigi_execution_summary"><code class="docutils literal notranslate"><span class="pre">luigi_execution_summary()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.output_value_by_name"><code class="docutils literal notranslate"><span class="pre">output_value_by_name()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.write_inputs_json"><code class="docutils literal notranslate"><span class="pre">write_inputs_json()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.MODEL_EXTENSIONS"><code class="docutils literal notranslate"><span class="pre">MODEL_EXTENSIONS</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.default_project_folder"><code class="docutils literal notranslate"><span class="pre">default_project_folder</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.input_names"><code class="docutils literal notranslate"><span class="pre">input_names</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.inputs"><code class="docutils literal notranslate"><span class="pre">inputs</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.name"><code class="docutils literal notranslate"><span class="pre">name</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.output_names"><code class="docutils literal notranslate"><span class="pre">output_names</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.outputs"><code class="docutils literal notranslate"><span class="pre">outputs</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.path"><code class="docutils literal notranslate"><span class="pre">path</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.simulation_id"><code class="docutils literal notranslate"><span class="pre">simulation_id</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.tag"><code class="docutils literal notranslate"><span class="pre">tag</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput"><code class="docutils literal notranslate"><span class="pre">RecipeInput</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.handle_value"><code class="docutils literal notranslate"><span class="pre">handle_value()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.INPUT_TYPES"><code class="docutils literal notranslate"><span class="pre">INPUT_TYPES</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.PATH_TYPES"><code class="docutils literal notranslate"><span class="pre">PATH_TYPES</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.default_value"><code class="docutils literal notranslate"><span class="pre">default_value</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.description"><code class="docutils literal notranslate"><span class="pre">description</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.handlers"><code class="docutils literal notranslate"><span class="pre">handlers</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.is_handled"><code class="docutils literal notranslate"><span class="pre">is_handled</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.is_path"><code class="docutils literal notranslate"><span class="pre">is_path</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.is_required"><code class="docutils literal notranslate"><span class="pre">is_required</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.name"><code class="docutils literal notranslate"><span class="pre">name</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.value"><code class="docutils literal notranslate"><span class="pre">value</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput"><code class="docutils literal notranslate"><span class="pre">RecipeOutput</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput.value"><code class="docutils literal notranslate"><span class="pre">value()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput.description"><code class="docutils literal notranslate"><span class="pre">description</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput.handlers"><code class="docutils literal notranslate"><span class="pre">handlers</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput.name"><code class="docutils literal notranslate"><span class="pre">name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../lbt_recipes.settings.html">lbt_recipes.settings module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings"><code class="docutils literal notranslate"><span class="pre">RecipeSettings</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.ToString"><code class="docutils literal notranslate"><span class="pre">ToString()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.duplicate"><code class="docutils literal notranslate"><span class="pre">duplicate()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.from_string"><code class="docutils literal notranslate"><span class="pre">from_string()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.debug_folder"><code class="docutils literal notranslate"><span class="pre">debug_folder</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.folder"><code class="docutils literal notranslate"><span class="pre">folder</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.reload_old"><code class="docutils literal notranslate"><span class="pre">reload_old</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.report_out"><code class="docutils literal notranslate"><span class="pre">report_out</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.workers"><code class="docutils literal notranslate"><span class="pre">workers</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../lbt_recipes.version.html">lbt_recipes.version module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.version.html#lbt_recipes.version.check_energyplus_version"><code class="docutils literal notranslate"><span class="pre">check_energyplus_version()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.version.html#lbt_recipes.version.check_openstudio_version"><code class="docutils literal notranslate"><span class="pre">check_openstudio_version()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.version.html#lbt_recipes.version.check_radiance_date"><code class="docutils literal notranslate"><span class="pre">check_radiance_date()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../lbt_recipes.html#module-lbt_recipes">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">CLI</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">lbt_recipes</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">CLI</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">lbt_recipes</a></li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <h1>Source code for lbt_recipes.settings</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot;Class to handle settings for running recipes locally.&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">division</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shlex</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">honeybee.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">int_in_range</span>
+
+
+<div class="viewcode-block" id="RecipeSettings">
+<a class="viewcode-back" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RecipeSettings</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parameters specifying how to run recipes locally.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        folder: Path to a project folder in which the recipe will be executed.</span>
+<span class="sd">            If None, the default project folder for the Recipe will be</span>
+<span class="sd">            used. (Default: None).</span>
+<span class="sd">        workers: An integer to set the number of CPUs used in the execution of the</span>
+<span class="sd">            recipe. This number should not exceed the number of CPUs on the</span>
+<span class="sd">            machine running the simulation and should be lower if other tasks</span>
+<span class="sd">            are running while the simulation is running. If set to None, it</span>
+<span class="sd">            should automatically default to one less than the number of CPUs</span>
+<span class="sd">            currently available on the machine. (Default: None).</span>
+<span class="sd">        reload_old: A boolean to indicate whether existing results for a given project</span>
+<span class="sd">            and simulation ID should be reloaded if they are found instead of</span>
+<span class="sd">            re-running the entire recipe from the beginning. If False, any existing</span>
+<span class="sd">            results will be overwritten by the new simulation. (Default: False).</span>
+<span class="sd">        report_out: A boolean to indicate whether the recipe progress should be</span>
+<span class="sd">            displayed in the cmd window (False) or printed (True). Printing can</span>
+<span class="sd">            be useful for debugging and capturing what&#39;s happening in the process</span>
+<span class="sd">            but recipe reports can often be very long and so it can slow</span>
+<span class="sd">            Grasshopper slightly. (Default: False).</span>
+<span class="sd">        debug_folder: An optional path to a debug folder. If debug folder is</span>
+<span class="sd">            provided all the steps of the simulation will be executed inside</span>
+<span class="sd">            the debug folder which can be used for further inspection.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        * folder</span>
+<span class="sd">        * workers</span>
+<span class="sd">        * reload_old</span>
+<span class="sd">        * report_out</span>
+<span class="sd">        * debug_folder</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_folder&#39;</span><span class="p">,</span> <span class="s1">&#39;_workers&#39;</span><span class="p">,</span> <span class="s1">&#39;_reload_old&#39;</span><span class="p">,</span> <span class="s1">&#39;_report_out&#39;</span><span class="p">,</span> <span class="s1">&#39;_debug_folder&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">workers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reload_old</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">report_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">debug_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize RecipeSettings.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">=</span> <span class="n">folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workers</span> <span class="o">=</span> <span class="n">workers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reload_old</span> <span class="o">=</span> <span class="n">reload_old</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">report_out</span> <span class="o">=</span> <span class="n">report_out</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug_folder</span> <span class="o">=</span> <span class="n">debug_folder</span>
+
+<div class="viewcode-block" id="RecipeSettings.from_string">
+<a class="viewcode-back" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.from_string">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">settings_string</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an RecipeSettings object from a RecipeSettings string.&quot;&quot;&quot;</span>
+        <span class="c1"># parse the string representation</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--folder&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;folder&quot;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--workers&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;workers&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--reload-old&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--report-out&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--debug-folder&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;debug_folder&quot;</span><span class="p">)</span>
+        <span class="n">argument_list</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">settings_string</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argument_list</span><span class="p">)</span>
+
+        <span class="c1"># assign the properties</span>
+        <span class="n">folder</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">folder</span> <span class="k">if</span> <span class="s1">&#39;folder&#39;</span> <span class="ow">in</span> <span class="n">args</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">workers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">workers</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;workers&#39;</span> <span class="ow">in</span> <span class="n">args</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">debug_folder</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">debug_folder</span> <span class="k">if</span> <span class="s1">&#39;debug_folder&#39;</span> <span class="ow">in</span> <span class="n">args</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">workers</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">reload_old</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">report_out</span><span class="p">,</span> <span class="n">debug_folder</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get or set the path to a project folder in which the recipe will be executed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_folder</span>
+
+    <span class="nd">@folder</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">folder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_folder</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">workers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get or set a integer the number of CPUs used in the execution of the recipe.</span>
+
+<span class="sd">        If set to None, this should be equal to one less than the number of processors</span>
+<span class="sd">        currently available on the machine.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workers</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> \
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recommended_processor_count</span><span class="p">()</span>
+
+    <span class="nd">@workers</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">workers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">int_in_range</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">mi</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">input_name</span><span class="o">=</span><span class="s1">&#39;recipe workers&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_workers</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reload_old</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get or set a boolean for whether existing results should be reloaded.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reload_old</span>
+
+    <span class="nd">@reload_old</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reload_old</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reload_old</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">report_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get or set a boolean for whether to print the recipe progress.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_report_out</span>
+
+    <span class="nd">@report_out</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">report_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_report_out</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get or set the path to a folder in which the simulation steps are executed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug_folder</span>
+
+    <span class="nd">@debug_folder</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_debug_folder</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="RecipeSettings.ToString">
+<a class="viewcode-back" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.ToString">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ToString</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Overwrite .NET ToString.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="RecipeSettings.duplicate">
+<a class="viewcode-back" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.duplicate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">duplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a copy of this object.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__copy__</span><span class="p">()</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_recommended_processor_count</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an integer for one minus the number of processors on this machine.</span>
+
+<span class="sd">        This method should work on all of the major operating systems and in</span>
+<span class="sd">        both IronPython and cPython. If, for whatever reason, the number of</span>
+<span class="sd">        processors could not be sensed, a value of 1 will be returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>  <span class="c1"># assume that we are in cPython</span>
+            <span class="n">cpu_count</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c1"># we are probably in IronPython</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">System.Environment</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProcessorCount</span>
+                <span class="n">cpu_count</span> <span class="o">=</span> <span class="n">ProcessorCount</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># no idea what Python this is; let&#39;s play it safe</span>
+                <span class="n">cpu_count</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">cpu_count</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">cpu_count</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">cpu_count</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">RecipeSettings</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">workers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reload_old</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">report_out</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug_folder</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A tuple based on the object properties, useful for hashing.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">workers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reload_old</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">report_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug_folder</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__key</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">RecipeSettings</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__key</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__key</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;RecipeSettings representation.&quot;&quot;&quot;</span>
+        <span class="n">rep_str</span> <span class="o">=</span> <span class="s1">&#39;--folder &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">rep_str</span> <span class="o">+=</span> <span class="s1">&#39; --workers </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reload_old</span><span class="p">:</span>
+            <span class="n">rep_str</span> <span class="o">+=</span> <span class="s1">&#39; --reload-old&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">report_out</span><span class="p">:</span>
+            <span class="n">rep_str</span> <span class="o">+=</span> <span class="s1">&#39; --report-out&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug_folder</span><span class="p">:</span>
+            <span class="n">rep_str</span> <span class="o">+=</span> <span class="s1">&#39;--debug-folder &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">debug_folder</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rep_str</span></div>
+
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2026, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.0.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
