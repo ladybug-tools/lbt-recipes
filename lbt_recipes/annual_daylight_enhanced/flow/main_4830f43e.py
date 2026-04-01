@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight-enhanced:0.0.6.
+This file is auto-generated from annual-daylight-enhanced:0.0.13.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,8 +17,8 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.annual_daylight_post_process import _AnnualDaylightPostProcess_7efbbeb4Orchestrator as AnnualDaylightPostProcess_7efbbeb4Workerbee
-from .dependencies.main_ae79e661 import _Main_ae79e661Orchestrator as Main_ae79e661Workerbee
+from .dependencies.annual_daylight_post_process import _AnnualDaylightPostProcess_4830f43eOrchestrator as AnnualDaylightPostProcess_4830f43eWorkerbee
+from .dependencies.main_c6087cf6 import _Main_c6087cf6Orchestrator as Main_c6087cf6Workerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -32,6 +32,7 @@ _default_inputs = {   'cpu_count': 50,
     'schedule': None,
     'simulation_folder': '.',
     'thresholds': '-t 300 -lt 100 -ut 3000',
+    'timestep': 1,
     'wea': None}
 
 
@@ -62,6 +63,12 @@ class RunTwoPhaseDaylightCoefficient(QueenbeeTask):
     @property
     def grid_filter(self):
         return self._input_params['grid_filter']
+
+    @property
+    def timestep(self):
+        return self._input_params['timestep']
+
+    dtype = luigi.Parameter(default='float32')
 
     @property
     def model(self):
@@ -98,7 +105,8 @@ class RunTwoPhaseDaylightCoefficient(QueenbeeTask):
             'radiance_parameters': self.radiance_parameters,
             'grid_filter': self.grid_filter,
             'model': self.model,
-            'wea': self.wea
+            'wea': self.wea,
+            'timestep': self.timestep
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -109,7 +117,7 @@ class RunTwoPhaseDaylightCoefficient(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [Main_ae79e661Workerbee(_input_params=self.map_dag_inputs)]
+        yield [Main_c6087cf6Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -206,7 +214,7 @@ class AnnualMetricsPostprocess(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightPostProcess_7efbbeb4Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightPostProcess_4830f43eWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -224,6 +232,7 @@ class AnnualMetricsPostprocess(QueenbeeTask):
             'grid_summary': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'grid_summary.csv').resolve().as_posix()
             ),
+            
             'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'annual_metrics_postprocess.done').resolve().as_posix())
         }
 
@@ -245,7 +254,7 @@ class AnnualMetricsPostprocess(QueenbeeTask):
             }]
 
 
-class _Main_7efbbeb4Orchestrator(luigi.WrapperTask):
+class _Main_4830f43eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

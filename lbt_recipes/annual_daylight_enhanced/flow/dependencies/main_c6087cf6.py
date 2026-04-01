@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight-enhanced:0.0.6.
+This file is auto-generated from annual-daylight-enhanced:0.0.13.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,11 +17,12 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.two_phase_simulation import _TwoPhaseSimulation_ae79e661Orchestrator as TwoPhaseSimulation_ae79e661Workerbee
-from .dependencies.two_phase_prepare_folder import _TwoPhasePrepareFolder_ae79e661Orchestrator as TwoPhasePrepareFolder_ae79e661Workerbee
+from .dependencies.two_phase_simulation import _TwoPhaseSimulation_c6087cf6Orchestrator as TwoPhaseSimulation_c6087cf6Workerbee
+from .dependencies.two_phase_prepare_folder import _TwoPhasePrepareFolder_c6087cf6Orchestrator as TwoPhasePrepareFolder_c6087cf6Workerbee
 
 
 _default_inputs = {   'cpu_count': 50,
+    'dtype': 'float32',
     'grid_filter': '*',
     'min_sensor_count': 500,
     'model': None,
@@ -29,6 +30,7 @@ _default_inputs = {   'cpu_count': 50,
     'params_folder': '__params',
     'radiance_parameters': '-ab 2 -ad 5000 -lw 2e-05 -dr 0',
     'simulation_folder': '.',
+    'timestep': 1,
     'wea': None}
 
 
@@ -55,6 +57,10 @@ class PrepareFolderAnnualDaylight(QueenbeeTask):
     @property
     def grid_filter(self):
         return self._input_params['grid_filter']
+
+    @property
+    def timestep(self):
+        return self._input_params['timestep']
 
     @property
     def model(self):
@@ -90,7 +96,8 @@ class PrepareFolderAnnualDaylight(QueenbeeTask):
             'min_sensor_count': self.min_sensor_count,
             'grid_filter': self.grid_filter,
             'model': self.model,
-            'wea': self.wea
+            'wea': self.wea,
+            'timestep': self.timestep
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -101,7 +108,7 @@ class PrepareFolderAnnualDaylight(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [TwoPhasePrepareFolder_ae79e661Workerbee(_input_params=self.map_dag_inputs)]
+        yield [TwoPhasePrepareFolder_c6087cf6Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -112,6 +119,10 @@ class PrepareFolderAnnualDaylight(QueenbeeTask):
             
             'model_folder': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'model').resolve().as_posix()
+            ),
+            
+            'output_model': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'output_model.hbjson').resolve().as_posix()
             ),
             
             'resources': luigi.LocalTarget(
@@ -135,6 +146,13 @@ class PrepareFolderAnnualDaylight(QueenbeeTask):
             {
                 'name': 'model-folder', 'from': 'model',
                 'to': pathlib.Path(self.execution_folder, 'model').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
+            },
+                
+            {
+                'name': 'output-model', 'from': 'output_model.hbjson',
+                'to': pathlib.Path(self.execution_folder, 'output_model.hbjson').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             },
@@ -185,6 +203,10 @@ class CalculateTwoPhaseMatrixLoop(luigi.Task):
     @property
     def results_folder(self):
         return '../../../results'
+
+    @property
+    def dtype(self):
+        return self._input_params['dtype']
 
     @property
     def sensor_grids_folder(self):
@@ -281,7 +303,8 @@ class CalculateTwoPhaseMatrixLoop(luigi.Task):
             'direct_sky': self.direct_sky,
             'sun_modifiers': self.sun_modifiers,
             'bsdf_folder': self.bsdf_folder,
-            'results_folder': self.results_folder
+            'results_folder': self.results_folder,
+            'dtype': self.dtype
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -292,7 +315,7 @@ class CalculateTwoPhaseMatrixLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [TwoPhaseSimulation_ae79e661Workerbee(_input_params=self.map_dag_inputs)]
+        yield [TwoPhaseSimulation_c6087cf6Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'calculate_two_phase_matrix.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -352,7 +375,7 @@ class CalculateTwoPhaseMatrix(luigi.Task):
         }
 
 
-class _Main_ae79e661Orchestrator(luigi.WrapperTask):
+class _Main_c6087cf6Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight-enhanced:0.0.6.
+This file is auto-generated from annual-daylight-enhanced:0.0.13.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -111,7 +111,7 @@ class CalculateAnnualMetrics(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.290'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess'
 
     @property
     def image_workdir(self):
@@ -227,14 +227,14 @@ class GridSummaryMetrics(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.290'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _AnnualDaylightPostProcess_7efbbeb4Orchestrator(luigi.WrapperTask):
+class _AnnualDaylightPostProcess_4830f43eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

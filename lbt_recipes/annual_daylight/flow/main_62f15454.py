@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight:0.10.11.
+This file is auto-generated from annual-daylight:0.10.20.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,9 +17,9 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_28ff6c38Orchestrator as AnnualDaylightRayTracing_28ff6c38Workerbee
-from .dependencies.annual_daylight_post_process import _AnnualDaylightPostProcess_28ff6c38Orchestrator as AnnualDaylightPostProcess_28ff6c38Workerbee
-from .dependencies.annual_daylight_prepare_folder import _AnnualDaylightPrepareFolder_28ff6c38Orchestrator as AnnualDaylightPrepareFolder_28ff6c38Workerbee
+from .dependencies.annual_daylight_ray_tracing import _AnnualDaylightRayTracing_62f15454Orchestrator as AnnualDaylightRayTracing_62f15454Workerbee
+from .dependencies.annual_daylight_post_process import _AnnualDaylightPostProcess_62f15454Orchestrator as AnnualDaylightPostProcess_62f15454Workerbee
+from .dependencies.annual_daylight_prepare_folder import _AnnualDaylightPrepareFolder_62f15454Orchestrator as AnnualDaylightPrepareFolder_62f15454Workerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -33,6 +33,7 @@ _default_inputs = {   'cpu_count': 50,
     'schedule': None,
     'simulation_folder': '.',
     'thresholds': '-t 300 -lt 100 -ut 3000',
+    'timestep': 1,
     'wea': None}
 
 
@@ -59,6 +60,10 @@ class PrepareFolderAnnualDaylight(QueenbeeTask):
     @property
     def grid_filter(self):
         return self._input_params['grid_filter']
+
+    @property
+    def timestep(self):
+        return self._input_params['timestep']
 
     @property
     def model(self):
@@ -94,7 +99,8 @@ class PrepareFolderAnnualDaylight(QueenbeeTask):
             'min_sensor_count': self.min_sensor_count,
             'grid_filter': self.grid_filter,
             'model': self.model,
-            'wea': self.wea
+            'wea': self.wea,
+            'timestep': self.timestep
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -105,7 +111,7 @@ class PrepareFolderAnnualDaylight(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightPrepareFolder_28ff6c38Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightPrepareFolder_62f15454Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -238,6 +244,17 @@ class AnnualDaylightRaytracingLoop(luigi.Task):
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
+    @property
+    def study_info(self):
+        try:
+            pathlib.Path(self.input()['PrepareFolderAnnualDaylight']['results'].path, 'study_info.json')
+        except TypeError:
+            # optional artifact
+            return None
+        value = pathlib.Path(self.input()['PrepareFolderAnnualDaylight']['results'].path, 'study_info.json')
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
     # get item for loop
     try:
         item = luigi.DictParameter()
@@ -271,7 +288,8 @@ class AnnualDaylightRaytracingLoop(luigi.Task):
             'bsdfs': self.bsdfs,
             'sun_up_hours': self.sun_up_hours,
             'schedule': self.schedule,
-            'thresholds': self.thresholds
+            'thresholds': self.thresholds,
+            'study_info': self.study_info
         }
         try:
             inputs['__debug__'] = self._input_params['__debug__']
@@ -282,7 +300,7 @@ class AnnualDaylightRaytracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightRayTracing_28ff6c38Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightRayTracing_62f15454Workerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'annual_daylight_raytracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -417,7 +435,7 @@ class PostProcessAnnualDaylight(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightPostProcess_28ff6c38Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightPostProcess_62f15454Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -431,10 +449,7 @@ class PostProcessAnnualDaylight(QueenbeeTask):
             'metrics': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix()
             ),
-            
-            'grid_summary': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'grid_summary.csv').resolve().as_posix()
-            ),
+
             'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'post_process_annual_daylight.done').resolve().as_posix())
         }
 
@@ -444,13 +459,6 @@ class PostProcessAnnualDaylight(QueenbeeTask):
             {
                 'name': 'metrics', 'from': 'metrics',
                 'to': pathlib.Path(self.execution_folder, 'metrics').resolve().as_posix(),
-                'optional': False,
-                'type': 'folder'
-            },
-                
-            {
-                'name': 'grid-summary', 'from': 'grid_summary.csv',
-                'to': pathlib.Path(self.execution_folder, 'grid_summary.csv').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]
@@ -467,6 +475,14 @@ class RestructureResults(QueenbeeTask):
     @property
     def extension(self):
         return 'ill'
+
+    as_text = luigi.Parameter(default='False')
+
+    delimiter = luigi.Parameter(default='tab')
+
+    fmt = luigi.Parameter(default='%.2f')
+
+    output_extension = luigi.Parameter(default='ill')
 
     @property
     def input_folder(self):
@@ -506,7 +522,7 @@ class RestructureResults(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance-postprocess grid merge-folder ./input_folder ./output_folder {extension} --dist-info dist_info.json'.format(extension=self.extension)
+        return 'honeybee-radiance-postprocess grid merge-folder ./input_folder ./output_folder {extension} --dist-info dist_info.json --output-extension {output_extension} --as-text {as_text} --fmt {fmt} --delimiter {delimiter}'.format(as_text=self.as_text, extension=self.extension, fmt=self.fmt, delimiter=self.delimiter, output_extension=self.output_extension)
 
     def requires(self):
         return {'PrepareFolderAnnualDaylight': PrepareFolderAnnualDaylight(_input_params=self._input_params), 'AnnualDaylightRaytracing': AnnualDaylightRaytracing(_input_params=self._input_params)}
@@ -537,18 +553,22 @@ class RestructureResults(QueenbeeTask):
     @property
     def input_parameters(self):
         return {
-            'extension': self.extension}
+            'extension': self.extension,
+            'as_text': self.as_text,
+            'delimiter': self.delimiter,
+            'fmt': self.fmt,
+            'output_extension': self.output_extension}
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.279'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _Main_28ff6c38Orchestrator(luigi.WrapperTask):
+class _Main_62f15454Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

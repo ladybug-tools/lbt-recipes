@@ -1,5 +1,5 @@
 {
-  "id": "8d0a50ce-b315-4816-bf26-82499dead5d4",
+  "id": "c46f9aad-e335-4650-ba26-e3207abb469a",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
@@ -159,7 +159,7 @@
         },
         "name": "min-sensor-count",
         "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids.",
-        "default": 1000,
+        "default": 500,
         "alias": [],
         "required": false,
         "spec": {
@@ -958,14 +958,14 @@
         },
         "name": "min-sensor-count",
         "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids.",
-        "default": 1000,
+        "default": 500,
         "alias": [],
         "required": false,
         "spec": {
           "type": "integer",
           "minimum": 1
         },
-        "value": 1000
+        "value": 500
       },
       {
         "type": "StepFileInput",
@@ -1416,12 +1416,12 @@
       }
     ],
     "message": null,
-    "started_at": "2025-07-14T19:52:37+00:00",
+    "started_at": "2026-04-01T13:15:28+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "8d0a50ce-b315-4816-bf26-82499dead5d4_00",
-    "job_id": "8d0a50ce-b315-4816-bf26-82499dead5d4",
+    "id": "c46f9aad-e335-4650-ba26-e3207abb469a_00",
+    "job_id": "c46f9aad-e335-4650-ba26-e3207abb469a",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}

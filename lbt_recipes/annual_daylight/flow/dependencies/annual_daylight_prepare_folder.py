@@ -197,6 +197,8 @@ class CreateStudyInfo(QueenbeeTask):
     def timestep(self):
         return self._input_params['timestep']
 
+    study_type = luigi.Parameter(default='annual-daylight')
+
     @property
     def wea(self):
         value = pathlib.Path(self._input_params['wea'])
@@ -224,7 +226,7 @@ class CreateStudyInfo(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance study study-info sky.epw {timestep} --name study_info'.format(timestep=self.timestep)
+        return 'honeybee-radiance study study-info sky.epw {timestep} --study-type {study_type} --name study_info'.format(study_type=self.study_type, timestep=self.timestep)
 
     def output(self):
         return {
@@ -251,7 +253,8 @@ class CreateStudyInfo(QueenbeeTask):
     @property
     def input_parameters(self):
         return {
-            'timestep': self.timestep}
+            'timestep': self.timestep,
+            'study_type': self.study_type}
 
     @property
     def task_image(self):
@@ -315,7 +318,7 @@ class CreateTotalSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance sky mtx sky.epw --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(sky_density=self.sky_density, sun_up_hours=self.sun_up_hours, sky_type=self.sky_type, output_format=self.output_format, cumulative=self.cumulative, output_type=self.output_type, north=self.north)
+        return 'honeybee-radiance sky mtx sky.epw --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(output_type=self.output_type, north=self.north, cumulative=self.cumulative, sky_type=self.sky_type, sky_density=self.sky_density, output_format=self.output_format, sun_up_hours=self.sun_up_hours)
 
     def output(self):
         return {
@@ -643,7 +646,7 @@ class SplitGridFolder(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(min_sensor_count=self.min_sensor_count, cpu_count=self.cpu_count, cpus_per_grid=self.cpus_per_grid)
+        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(min_sensor_count=self.min_sensor_count, cpus_per_grid=self.cpus_per_grid, cpu_count=self.cpu_count)
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
@@ -708,7 +711,7 @@ class SplitGridFolder(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _AnnualDaylightPrepareFolder_e6056798Orchestrator(luigi.WrapperTask):
+class _AnnualDaylightPrepareFolder_62f15454Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
