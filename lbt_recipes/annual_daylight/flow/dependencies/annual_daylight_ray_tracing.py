@@ -125,7 +125,7 @@ class TotalSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, order_by=self.order_by, output_format=self.output_format, fixed_radiance_parameters=self.fixed_radiance_parameters, header=self.header, radiance_parameters=self.radiance_parameters, sensor_count=self.sensor_count)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(conversion=self.conversion, header=self.header, sensor_count=self.sensor_count, fixed_radiance_parameters=self.fixed_radiance_parameters, output_format=self.output_format, order_by=self.order_by, radiance_parameters=self.radiance_parameters)
 
     def output(self):
         return {
@@ -290,7 +290,7 @@ class AnnualMetricsFile(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _AnnualDaylightRayTracing_e6056798Orchestrator(luigi.WrapperTask):
+class _AnnualDaylightRayTracing_62f15454Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -23,7 +23,7 @@ from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 from luigi.execution_summary import LuigiStatusCode
 
-import flow.main_e6056798 as annual_daylight_workerbee
+import flow.main_62f15454 as annual_daylight_workerbee
 
 
 _recipe_default_inputs = {   'cpu_count': 50,
@@ -44,7 +44,7 @@ class LetAnnualDaylightFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [annual_daylight_workerbee._Main_e6056798Orchestrator(_input_params=self._input_params)]
+        yield [annual_daylight_workerbee._Main_62f15454Orchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

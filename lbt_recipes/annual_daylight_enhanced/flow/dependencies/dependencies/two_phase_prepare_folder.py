@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight-enhanced:0.0.6.
+This file is auto-generated from annual-daylight-enhanced:0.0.13.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -26,6 +26,7 @@ _default_inputs = {   'cpu_count': None,
     'north': 0.0,
     'params_folder': '__params',
     'simulation_folder': '.',
+    'timestep': 1,
     'wea': None}
 
 
@@ -84,7 +85,7 @@ class CreateDirectSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(cumulative=self.cumulative, sky_density=self.sky_density, output_type=self.output_type, sun_up_hours=self.sun_up_hours, north=self.north, sky_type=self.sky_type, output_format=self.output_format)
+        return 'honeybee-radiance sky mtx sky.epw --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(output_type=self.output_type, north=self.north, cumulative=self.cumulative, sky_type=self.sky_type, sky_density=self.sky_density, output_format=self.output_format, sun_up_hours=self.sun_up_hours)
 
     def output(self):
         return {
@@ -96,7 +97,7 @@ class CreateDirectSky(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'wea', 'to': 'sky.wea', 'from': self.wea, 'optional': False}]
+            {'name': 'wea', 'to': 'sky.epw', 'from': self.wea, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -121,7 +122,7 @@ class CreateDirectSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -167,7 +168,7 @@ class CreateRadFolder(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid " {grid_filter} " --grid-check'.format(grid_filter=self.grid_filter)
+        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid " {grid_filter} " --grid-check --create-grids'.format(grid_filter=self.grid_filter)
 
     def output(self):
         return {
@@ -177,6 +178,10 @@ class CreateRadFolder(QueenbeeTask):
             
             'sensor_grids_file': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix()
+            ),
+            
+            'output_model': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'output_model.hbjson').resolve().as_posix()
             )
         }
 
@@ -200,6 +205,13 @@ class CreateRadFolder(QueenbeeTask):
                 'to': pathlib.Path(self.execution_folder, 'results/grids_info.json').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
+            },
+                
+            {
+                'name': 'output-model', 'from': 'output_model.hbjson',
+                'to': pathlib.Path(self.execution_folder, 'output_model.hbjson').resolve().as_posix(),
+                'optional': True,
+                'type': 'file'
             }]
 
     @property
@@ -209,7 +221,7 @@ class CreateRadFolder(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -273,7 +285,90 @@ class CreateSkyDome(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
+        return 'docker.io/ladybugtools/honeybee-radiance'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
+
+
+class CreateStudyInfo(QueenbeeTask):
+    """Create a study info file.
+    
+    This function generates study info file with the timestep and the hoys of
+    the wea."""
+
+    # DAG Input parameters
+    _input_params = luigi.DictParameter()
+    _status_lock = _queenbee_status_lock_
+
+    # Task inputs
+    @property
+    def timestep(self):
+        return self._input_params['timestep']
+
+    study_type = luigi.Parameter(default='annual-daylight')
+
+    @property
+    def wea(self):
+        value = pathlib.Path(self._input_params['wea'])
+        return value.as_posix() if value.is_absolute() \
+            else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
+
+    @property
+    def execution_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def initiation_folder(self):
+        return pathlib.Path(self._input_params['simulation_folder']).as_posix()
+
+    @property
+    def params_folder(self):
+        return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
+
+    @property
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_study_info.py').resolve()
+
+    @property
+    def is_script(self):
+        return False
+
+    def command(self):
+        return 'honeybee-radiance study study-info sky.epw {timestep} --study-type {study_type} --name study_info'.format(study_type=self.study_type, timestep=self.timestep)
+
+    def output(self):
+        return {
+            'study_info': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'results/study_info.json').resolve().as_posix()
+            )
+        }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'wea', 'to': 'sky.epw', 'from': self.wea, 'optional': False}]
+
+    @property
+    def output_artifacts(self):
+        return [
+            {
+                'name': 'study-info', 'from': 'study_info.json',
+                'to': pathlib.Path(self.execution_folder, 'results/study_info.json').resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
+            }]
+
+    @property
+    def input_parameters(self):
+        return {
+            'timestep': self.timestep,
+            'study_type': self.study_type}
+
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -333,7 +428,7 @@ class CreateTotalSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance sky mtx sky.wea --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(cumulative=self.cumulative, sky_density=self.sky_density, output_type=self.output_type, sun_up_hours=self.sun_up_hours, north=self.north, sky_type=self.sky_type, output_format=self.output_format)
+        return 'honeybee-radiance sky mtx sky.epw --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(output_type=self.output_type, north=self.north, cumulative=self.cumulative, sky_type=self.sky_type, sky_density=self.sky_density, output_format=self.output_format, sun_up_hours=self.sun_up_hours)
 
     def output(self):
         return {
@@ -345,7 +440,7 @@ class CreateTotalSky(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'wea', 'to': 'sky.wea', 'from': self.wea, 'optional': False}]
+            {'name': 'wea', 'to': 'sky.epw', 'from': self.wea, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -370,7 +465,7 @@ class CreateTotalSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -378,7 +473,7 @@ class CreateTotalSky(QueenbeeTask):
 
 
 class GenerateSunpath(QueenbeeTask):
-    """Generate a Radiance sun matrix (AKA sun-path)."""
+    """Generate a Radiance sun matrix using honeybee-radiance methods."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
@@ -389,7 +484,7 @@ class GenerateSunpath(QueenbeeTask):
     def north(self):
         return self._input_params['north']
 
-    output_type = luigi.Parameter(default='0')
+    output_type = luigi.Parameter(default='visible')
 
     @property
     def wea(self):
@@ -418,7 +513,7 @@ class GenerateSunpath(QueenbeeTask):
         return False
 
     def command(self):
-        return 'gendaymtx -n -D sunpath.mtx -M suns.mod -O{output_type} -r {north} -v sky.wea'.format(output_type=self.output_type, north=self.north)
+        return 'honeybee-radiance sunpath radiance sky.epw --name sunpath --{output_type} --north {north}'.format(output_type=self.output_type, north=self.north)
 
     def output(self):
         return {
@@ -434,7 +529,7 @@ class GenerateSunpath(QueenbeeTask):
     @property
     def input_artifacts(self):
         return [
-            {'name': 'wea', 'to': 'sky.wea', 'from': self.wea, 'optional': False}]
+            {'name': 'wea', 'to': 'sky.epw', 'from': self.wea, 'optional': False}]
 
     @property
     def output_artifacts(self):
@@ -447,7 +542,7 @@ class GenerateSunpath(QueenbeeTask):
             },
                 
             {
-                'name': 'sun-modifiers', 'from': 'suns.mod',
+                'name': 'sun-modifiers', 'from': 'sunpath.mod',
                 'to': pathlib.Path(self.execution_folder, 'resources/suns.mod').resolve().as_posix(),
                 'optional': False,
                 'type': 'file'
@@ -461,7 +556,7 @@ class GenerateSunpath(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -537,7 +632,7 @@ class ParseSunUpHours(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
@@ -615,7 +710,7 @@ class PrepareMultiphase(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance multi-phase prepare-multiphase model {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count} --sun-path sun.path --phase {phase} --octree-folder octree --grid-folder grid --{static}-static --{default_states}-states'.format(min_sensor_count=self.min_sensor_count, default_states=self.default_states, phase=self.phase, cpu_count=self.cpu_count, static=self.static, cpus_per_grid=self.cpus_per_grid)
+        return 'honeybee-radiance multi-phase prepare-multiphase model {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count} --sun-path sun.path --phase {phase} --octree-folder octree --grid-folder grid --{static}-static --{default_states}-states'.format(phase=self.phase, min_sensor_count=self.min_sensor_count, static=self.static, default_states=self.default_states, cpu_count=self.cpu_count, cpus_per_grid=self.cpus_per_grid)
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params), 'GenerateSunpath': GenerateSunpath(_input_params=self._input_params)}
@@ -688,14 +783,14 @@ class PrepareMultiphase(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.65.47'
+        return 'docker.io/ladybugtools/honeybee-radiance'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _TwoPhasePrepareFolder_ae79e661Orchestrator(luigi.WrapperTask):
+class _TwoPhasePrepareFolder_c6087cf6Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
@@ -707,4 +802,4 @@ class _TwoPhasePrepareFolder_ae79e661Orchestrator(luigi.WrapperTask):
         return params
 
     def requires(self):
-        yield [CreateDirectSky(_input_params=self.input_values), CreateSkyDome(_input_params=self.input_values), CreateTotalSky(_input_params=self.input_values), ParseSunUpHours(_input_params=self.input_values), PrepareMultiphase(_input_params=self.input_values)]
+        yield [CreateDirectSky(_input_params=self.input_values), CreateSkyDome(_input_params=self.input_values), CreateStudyInfo(_input_params=self.input_values), CreateTotalSky(_input_params=self.input_values), ParseSunUpHours(_input_params=self.input_values), PrepareMultiphase(_input_params=self.input_values)]

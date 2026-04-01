@@ -241,7 +241,7 @@ class GridSummaryMetrics(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _AnnualDaylightPostProcess_e6056798Orchestrator(luigi.WrapperTask):
+class _AnnualDaylightPostProcess_62f15454Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
