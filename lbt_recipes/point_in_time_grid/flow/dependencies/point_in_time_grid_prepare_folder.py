@@ -1,5 +1,5 @@
 """
-This file is auto-generated from point-in-time-grid:0.4.0.
+This file is auto-generated from point-in-time-grid:0.4.1.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -330,7 +330,7 @@ class SplitGridFolder(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(cpu_count=self.cpu_count, cpus_per_grid=self.cpus_per_grid, min_sensor_count=self.min_sensor_count)
+        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(cpus_per_grid=self.cpus_per_grid, cpu_count=self.cpu_count, min_sensor_count=self.min_sensor_count)
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
@@ -385,16 +385,16 @@ class SplitGridFolder(QueenbeeTask):
 
 
 class CreateOctree(QueenbeeTask):
-    """Generate an octree from a Radiance folder and a sky!"""
+    """Generate an octree from a Radiance folder and a sky."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
     _status_lock = _queenbee_status_lock_
 
     # Task inputs
-    black_out = luigi.Parameter(default='default')
-
-    include_aperture = luigi.Parameter(default='include')
+    @property
+    def include_ies(self):
+        return 'include'
 
     @property
     def model(self):
@@ -429,7 +429,7 @@ class CreateOctree(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance octree from-folder model --output scene.oct --{include_aperture}-aperture --{black_out} --add-before sky.sky'.format(black_out=self.black_out, include_aperture=self.include_aperture)
+        return 'honeybee-radiance octree from-folder-static model --output scene.oct --{include_ies}-ies --add-before sky.sky'.format(include_ies=self.include_ies)
 
     def requires(self):
         return {'AdjustSky': AdjustSky(_input_params=self._input_params), 'CreateRadFolder': CreateRadFolder(_input_params=self._input_params)}
@@ -460,8 +460,7 @@ class CreateOctree(QueenbeeTask):
     @property
     def input_parameters(self):
         return {
-            'black_out': self.black_out,
-            'include_aperture': self.include_aperture}
+            'include_ies': self.include_ies}
 
     @property
     def task_image(self):
@@ -472,7 +471,7 @@ class CreateOctree(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _PointInTimeGridPrepareFolder_a9ddd14fOrchestrator(luigi.WrapperTask):
+class _PointInTimeGridPrepareFolder_b35d7754Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

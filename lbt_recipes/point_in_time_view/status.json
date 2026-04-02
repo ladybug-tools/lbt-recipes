@@ -1,5 +1,5 @@
 {
-  "id": "ec34ef04-3009-4389-a92f-447dddb1fe43",
+  "id": "838008f8-3ff8-470a-b882-8576e7cac024",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
@@ -24,7 +24,7 @@
       "type": "MetaData",
       "annotations": {},
       "name": "point-in-time-view",
-      "tag": "0.5.0",
+      "tag": "0.5.1",
       "app_version": null,
       "keywords": [
         "honeybee",
@@ -624,12 +624,12 @@
       }
     ],
     "message": null,
-    "started_at": "2026-01-17T20:08:05+00:00",
+    "started_at": "2026-04-02T14:31:31+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "ec34ef04-3009-4389-a92f-447dddb1fe43_00",
-    "job_id": "ec34ef04-3009-4389-a92f-447dddb1fe43",
+    "id": "838008f8-3ff8-470a-b882-8576e7cac024_00",
+    "job_id": "838008f8-3ff8-470a-b882-8576e7cac024",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}

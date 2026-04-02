@@ -1,5 +1,5 @@
 {
-  "id": "416e3f21-7517-4f19-9952-f19c53cdd7f9",
+  "id": "d493b8df-adf7-4358-8b66-f630f266faf0",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
@@ -24,7 +24,7 @@
       "type": "MetaData",
       "annotations": {},
       "name": "point-in-time-grid",
-      "tag": "0.4.0",
+      "tag": "0.4.1",
       "app_version": null,
       "keywords": [
         "honeybee",
@@ -163,7 +163,7 @@
         },
         "name": "min-sensor-count",
         "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids.",
-        "default": 1000,
+        "default": 500,
         "alias": [],
         "required": false,
         "spec": {
@@ -450,14 +450,14 @@
         },
         "name": "min-sensor-count",
         "description": "The minimum number of sensors in each sensor grid after redistributing the sensors based on cpu_count. This value takes precedence over the cpu_count and can be used to ensure that the parallelization does not result in generating unnecessarily small sensor grids.",
-        "default": 1000,
+        "default": 500,
         "alias": [],
         "required": false,
         "spec": {
           "type": "integer",
           "minimum": 1
         },
-        "value": 1000
+        "value": 500
       },
       {
         "type": "StepFileInput",
@@ -619,12 +619,12 @@
       }
     ],
     "message": null,
-    "started_at": "2026-01-17T20:08:19+00:00",
+    "started_at": "2026-04-02T14:32:42+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "416e3f21-7517-4f19-9952-f19c53cdd7f9_00",
-    "job_id": "416e3f21-7517-4f19-9952-f19c53cdd7f9",
+    "id": "d493b8df-adf7-4358-8b66-f630f266faf0_00",
+    "job_id": "d493b8df-adf7-4358-8b66-f630f266faf0",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}

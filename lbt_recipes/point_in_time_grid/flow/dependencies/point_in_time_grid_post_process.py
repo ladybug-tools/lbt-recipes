@@ -1,5 +1,5 @@
 """
-This file is auto-generated from point-in-time-grid:0.4.0.
+This file is auto-generated from point-in-time-grid:0.4.1.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -178,7 +178,7 @@ class CopyGridInfo(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _PointInTimeGridPostProcess_a9ddd14fOrchestrator(luigi.WrapperTask):
+class _PointInTimeGridPostProcess_b35d7754Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
