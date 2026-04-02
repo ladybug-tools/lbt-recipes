@@ -1,5 +1,5 @@
 """
-This file is auto-generated from point-in-time-view:0.5.0.
+This file is auto-generated from point-in-time-view:0.5.1.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -117,7 +117,7 @@ class SplitView(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance view split view.vf {view_count} --resolution {resolution} --{overture} --octree scene.oct --rad-params "{radiance_parameters}" --folder output --log-file output/views_info.json'.format(overture=self.overture, resolution=self.resolution, radiance_parameters=self.radiance_parameters, view_count=self.view_count)
+        return 'honeybee-radiance view split view.vf {view_count} --resolution {resolution} --{overture} --octree scene.oct --rad-params "{radiance_parameters}" --folder output --log-file output/views_info.json'.format(radiance_parameters=self.radiance_parameters, view_count=self.view_count, resolution=self.resolution, overture=self.overture)
 
     def output(self):
         return {
@@ -278,7 +278,7 @@ class RayTracingLoop(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance rpict rpict scene.oct view.vf --rad-params "{radiance_parameters}" --metric {metric} --resolution {resolution} --scale-factor {scale_factor} --output view.HDR'.format(resolution=self.resolution, metric=self.metric, scale_factor=self.scale_factor, radiance_parameters=self.radiance_parameters)
+        return 'honeybee-radiance rpict rpict scene.oct view.vf --rad-params "{radiance_parameters}" --metric {metric} --resolution {resolution} --scale-factor {scale_factor} --output view.HDR'.format(radiance_parameters=self.radiance_parameters, metric=self.metric, resolution=self.resolution, scale_factor=self.scale_factor)
 
     def requires(self):
         return {'SplitView': SplitView(_input_params=self._input_params)}
@@ -438,7 +438,7 @@ class MergeResults(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance view merge input_folder view {extension} --scale-factor {scale_factor} --name {name} --view original-view.vf'.format(name=self.name, extension=self.extension, scale_factor=self.scale_factor)
+        return 'honeybee-radiance view merge input_folder view {extension} --scale-factor {scale_factor} --name {name} --view original-view.vf'.format(scale_factor=self.scale_factor, extension=self.extension, name=self.name)
 
     def requires(self):
         return {'RayTracing': RayTracing(_input_params=self._input_params)}
@@ -482,7 +482,7 @@ class MergeResults(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _PointInTimeViewRayTracing_8480f42eOrchestrator(luigi.WrapperTask):
+class _PointInTimeViewRayTracing_7ccae81fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

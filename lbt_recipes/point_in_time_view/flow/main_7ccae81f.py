@@ -1,5 +1,5 @@
 """
-This file is auto-generated from point-in-time-view:0.5.0.
+This file is auto-generated from point-in-time-view:0.5.1.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,8 +17,8 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.point_in_time_view_ray_tracing import _PointInTimeViewRayTracing_8480f42eOrchestrator as PointInTimeViewRayTracing_8480f42eWorkerbee
-from .dependencies.point_in_time_view_prepare_folder import _PointInTimeViewPrepareFolder_8480f42eOrchestrator as PointInTimeViewPrepareFolder_8480f42eWorkerbee
+from .dependencies.point_in_time_view_ray_tracing import _PointInTimeViewRayTracing_7ccae81fOrchestrator as PointInTimeViewRayTracing_7ccae81fWorkerbee
+from .dependencies.point_in_time_view_prepare_folder import _PointInTimeViewPrepareFolder_7ccae81fOrchestrator as PointInTimeViewPrepareFolder_7ccae81fWorkerbee
 
 
 _default_inputs = {   'cpu_count': 12,
@@ -104,7 +104,7 @@ class PrepareFolderPointInTimeView(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [PointInTimeViewPrepareFolder_8480f42eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [PointInTimeViewPrepareFolder_7ccae81fWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -347,7 +347,7 @@ class PointInTimeViewRayTracingLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [PointInTimeViewRayTracing_8480f42eWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [PointInTimeViewRayTracing_7ccae81fWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'point_in_time_view_ray_tracing.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -407,7 +407,7 @@ class PointInTimeViewRayTracing(luigi.Task):
         }
 
 
-class _Main_8480f42eOrchestrator(luigi.WrapperTask):
+class _Main_7ccae81fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
