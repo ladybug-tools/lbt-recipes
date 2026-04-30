@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>lbt_recipes &#8212; lbt-recipes  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=0bf093e7" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=b493dabd" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="lbt_recipes package" href="lbt_recipes.html" />
+    <link rel="prev" title="main" href="cli/main.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          lbt-recipes</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="cli/index.html">CLI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli/index.html#commands">Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli/main.html">main</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli/main.html#lbt-recipes">lbt-recipes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="cli/main.html#lbt-recipes-run">run</a></li>
+<li class="toctree-l5"><a class="reference internal" href="cli/main.html#lbt-recipes-viz">viz</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">lbt_recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lbt_recipes.html">lbt_recipes package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lbt_recipes.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lbt_recipes.cli.html">lbt_recipes.cli package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="lbt_recipes.cli.html#module-lbt_recipes.cli">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lbt_recipes.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lbt_recipes.recipe.html">lbt_recipes.recipe module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe"><code class="docutils literal notranslate"><span class="pre">Recipe</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.ToString"><code class="docutils literal notranslate"><span class="pre">ToString()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.error_summary"><code class="docutils literal notranslate"><span class="pre">error_summary()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.failure_message"><code class="docutils literal notranslate"><span class="pre">failure_message()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.handle_inputs"><code class="docutils literal notranslate"><span class="pre">handle_inputs()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.input_value_by_name"><code class="docutils literal notranslate"><span class="pre">input_value_by_name()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.luigi_execution_summary"><code class="docutils literal notranslate"><span class="pre">luigi_execution_summary()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.output_value_by_name"><code class="docutils literal notranslate"><span class="pre">output_value_by_name()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.write_inputs_json"><code class="docutils literal notranslate"><span class="pre">write_inputs_json()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.MODEL_EXTENSIONS"><code class="docutils literal notranslate"><span class="pre">MODEL_EXTENSIONS</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.default_project_folder"><code class="docutils literal notranslate"><span class="pre">default_project_folder</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.input_names"><code class="docutils literal notranslate"><span class="pre">input_names</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.inputs"><code class="docutils literal notranslate"><span class="pre">inputs</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.name"><code class="docutils literal notranslate"><span class="pre">name</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.output_names"><code class="docutils literal notranslate"><span class="pre">output_names</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.outputs"><code class="docutils literal notranslate"><span class="pre">outputs</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.path"><code class="docutils literal notranslate"><span class="pre">path</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.simulation_id"><code class="docutils literal notranslate"><span class="pre">simulation_id</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.tag"><code class="docutils literal notranslate"><span class="pre">tag</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput"><code class="docutils literal notranslate"><span class="pre">RecipeInput</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.handle_value"><code class="docutils literal notranslate"><span class="pre">handle_value()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.INPUT_TYPES"><code class="docutils literal notranslate"><span class="pre">INPUT_TYPES</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.PATH_TYPES"><code class="docutils literal notranslate"><span class="pre">PATH_TYPES</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.default_value"><code class="docutils literal notranslate"><span class="pre">default_value</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.description"><code class="docutils literal notranslate"><span class="pre">description</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.handlers"><code class="docutils literal notranslate"><span class="pre">handlers</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.is_handled"><code class="docutils literal notranslate"><span class="pre">is_handled</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.is_path"><code class="docutils literal notranslate"><span class="pre">is_path</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.is_required"><code class="docutils literal notranslate"><span class="pre">is_required</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.name"><code class="docutils literal notranslate"><span class="pre">name</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.value"><code class="docutils literal notranslate"><span class="pre">value</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput"><code class="docutils literal notranslate"><span class="pre">RecipeOutput</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput.value"><code class="docutils literal notranslate"><span class="pre">value()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput.description"><code class="docutils literal notranslate"><span class="pre">description</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput.handlers"><code class="docutils literal notranslate"><span class="pre">handlers</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput.name"><code class="docutils literal notranslate"><span class="pre">name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="lbt_recipes.settings.html">lbt_recipes.settings module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings"><code class="docutils literal notranslate"><span class="pre">RecipeSettings</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.ToString"><code class="docutils literal notranslate"><span class="pre">ToString()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.duplicate"><code class="docutils literal notranslate"><span class="pre">duplicate()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.from_string"><code class="docutils literal notranslate"><span class="pre">from_string()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.debug_folder"><code class="docutils literal notranslate"><span class="pre">debug_folder</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.folder"><code class="docutils literal notranslate"><span class="pre">folder</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.reload_old"><code class="docutils literal notranslate"><span class="pre">reload_old</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.report_out"><code class="docutils literal notranslate"><span class="pre">report_out</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.workers"><code class="docutils literal notranslate"><span class="pre">workers</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="lbt_recipes.version.html">lbt_recipes.version module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="lbt_recipes.version.html#lbt_recipes.version.check_energyplus_version"><code class="docutils literal notranslate"><span class="pre">check_energyplus_version()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="lbt_recipes.version.html#lbt_recipes.version.check_openstudio_version"><code class="docutils literal notranslate"><span class="pre">check_openstudio_version()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="lbt_recipes.version.html#lbt_recipes.version.check_radiance_date"><code class="docutils literal notranslate"><span class="pre">check_radiance_date()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lbt_recipes.html#module-lbt_recipes">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="cli/index.html">CLI</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">lbt_recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lbt_recipes.html">lbt_recipes package</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="cli/main.html" title="Previous Chapter: main"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; main</span>
+    </a>
+  </li>
+  <li>
+    <a href="lbt_recipes.html" title="Next Chapter: lbt_recipes package"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">lbt_recipes package &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/modules.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li class="toctree-l1"><a class="reference internal" href="cli/index.html">CLI</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">lbt_recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lbt_recipes.html">lbt_recipes package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <section id="lbt-recipes">
+<h1>lbt_recipes<a class="headerlink" href="#lbt-recipes" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lbt_recipes.html">lbt_recipes package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lbt_recipes.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lbt_recipes.cli.html">lbt_recipes.cli package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lbt_recipes.cli.html#module-lbt_recipes.cli">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lbt_recipes.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lbt_recipes.recipe.html">lbt_recipes.recipe module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe"><code class="docutils literal notranslate"><span class="pre">Recipe</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput"><code class="docutils literal notranslate"><span class="pre">RecipeInput</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput"><code class="docutils literal notranslate"><span class="pre">RecipeOutput</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lbt_recipes.settings.html">lbt_recipes.settings module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings"><code class="docutils literal notranslate"><span class="pre">RecipeSettings</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lbt_recipes.version.html">lbt_recipes.version module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lbt_recipes.version.html#lbt_recipes.version.check_energyplus_version"><code class="docutils literal notranslate"><span class="pre">check_energyplus_version()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lbt_recipes.version.html#lbt_recipes.version.check_openstudio_version"><code class="docutils literal notranslate"><span class="pre">check_openstudio_version()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lbt_recipes.version.html#lbt_recipes.version.check_radiance_date"><code class="docutils literal notranslate"><span class="pre">check_radiance_date()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lbt_recipes.html#module-lbt_recipes">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2026, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.0.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
