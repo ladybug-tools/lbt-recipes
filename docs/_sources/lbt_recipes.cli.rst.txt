@@ -1,0 +1,10 @@
+lbt\_recipes.cli package
+========================
+
+Module contents
+---------------
+
+.. automodule:: lbt_recipes.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:
