@@ -1,5 +1,5 @@
 """
-This file is auto-generated from breeam-daylight-4b:1.0.9.
+This file is auto-generated from breeam-daylight-4b:1.0.10.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -155,7 +155,7 @@ class CreateVisMetadata(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.583'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.637'
 
     @property
     def image_workdir(self):
@@ -237,7 +237,7 @@ class CreateVsf(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-display model-to-vis model.hbjson --color-by {color_by} --{color_visibility}-color-by --{wireframe} --{attr_format}-attr --room-attr "{room_attr}" --face-attr "{face_attr}" --grid-display-mode {grid_display_mode} --{grid_visibility}-grid --grid-data input_data --grid-data-display-mode {grid_data_display_mode} --active-grid-data "{active_grid_data}" --output-format {output_format} --output-file model_vis.{output_format}'.format(wireframe=self.wireframe, room_attr=self.room_attr, grid_display_mode=self.grid_display_mode, face_attr=self.face_attr, active_grid_data=self.active_grid_data, color_by=self.color_by, output_format=self.output_format, grid_data_display_mode=self.grid_data_display_mode, grid_visibility=self.grid_visibility, color_visibility=self.color_visibility, attr_format=self.attr_format)
+        return 'honeybee-display model-to-vis model.hbjson --color-by {color_by} --{color_visibility}-color-by --{wireframe} --{attr_format}-attr --room-attr "{room_attr}" --face-attr "{face_attr}" --grid-display-mode {grid_display_mode} --{grid_visibility}-grid --grid-data input_data --grid-data-display-mode {grid_data_display_mode} --active-grid-data "{active_grid_data}" --output-format {output_format} --output-file model_vis.{output_format}'.format(face_attr=self.face_attr, grid_display_mode=self.grid_display_mode, active_grid_data=self.active_grid_data, wireframe=self.wireframe, grid_visibility=self.grid_visibility, output_format=self.output_format, attr_format=self.attr_format, grid_data_display_mode=self.grid_data_display_mode, color_visibility=self.color_visibility, color_by=self.color_by, room_attr=self.room_attr)
 
     def requires(self):
         return {'CopyPassFail': CopyPassFail(_input_params=self._input_params), 'CreateVisMetadata': CreateVisMetadata(_input_params=self._input_params)}
@@ -289,7 +289,7 @@ class CreateVsf(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _BreeamDaylight4bVisualization_d1bca667Orchestrator(luigi.WrapperTask):
+class _BreeamDaylight4bVisualization_0eec764cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

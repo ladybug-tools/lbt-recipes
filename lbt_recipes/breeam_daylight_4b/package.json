@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "breeam-daylight-4b",
-    "tag": "1.0.9",
+    "tag": "1.0.10",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -135,9 +135,10 @@
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "model",
-          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
+          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have Rooms assigned to it to be usable with this recipe.",
           "platform": [
-            "grasshopper"
+            "grasshopper",
+            "rhino"
           ],
           "handler": [
             {
@@ -145,7 +146,7 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.model",
-              "function": "model_to_json_grid_check",
+              "function": "model_to_json_room_check",
               "index": 0
             },
             {
@@ -162,32 +163,10 @@
           "spec": null
         },
         {
-          "type": "DAGLinkedInputAlias",
-          "annotations": {},
-          "name": "model",
-          "description": "This input links the model to Rhino model.",
-          "platform": [
-            "rhino"
-          ],
-          "handler": [
-            {
-              "type": "IOAliasHandler",
-              "annotations": {},
-              "language": "csharp",
-              "module": "Pollination.RhinoHandlers",
-              "function": "RhinoHBModelToJSON",
-              "index": 0
-            }
-          ],
-          "default": null,
-          "required": true,
-          "spec": null
-        },
-        {
           "type": "DAGGenericInputAlias",
           "annotations": {},
           "name": "model",
-          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have sensor grids assigned to it.",
+          "description": "A Honeybee Model to simulate or the path to a HBJSON file of a Model. This can also be the path to a HBpkl file, though this is only recommended for cases where the model is extremely large. Note that this model should have Rooms assigned to it to be usable with this recipe.",
           "platform": [
             "revit"
           ],
@@ -197,7 +176,7 @@
               "annotations": {},
               "language": "python",
               "module": "pollination_handlers.inputs.model",
-              "function": "model_to_json_grid_check",
+              "function": "model_to_json_room_check",
               "index": 0
             }
           ],

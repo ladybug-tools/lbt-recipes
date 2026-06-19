@@ -1,5 +1,5 @@
 """
-This file is auto-generated from well-daylight:0.0.21.
+This file is auto-generated from well-daylight:0.0.22.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,9 +17,8 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.well_daylight_visualization import _WellDaylightVisualization_1d5ef609Orchestrator as WellDaylightVisualization_1d5ef609Workerbee
-from .dependencies.main_b117d182 import _Main_b117d182Orchestrator as Main_b117d182Workerbee
-from .dependencies.well_daylight_process_e_p_w import _WellDaylightProcessEPW_1d5ef609Orchestrator as WellDaylightProcessEPW_1d5ef609Workerbee
+from .dependencies.well_daylight_visualization import _WellDaylightVisualization_f1842a5fOrchestrator as WellDaylightVisualization_f1842a5fWorkerbee
+from .dependencies.main_b46ec90c import _Main_b46ec90cOrchestrator as Main_b46ec90cWorkerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -87,7 +86,7 @@ class AddApertureGroupBlinds(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance multi-phase add-aperture-group-blinds model.hbjson --diffuse-transmission {diffuse_transmission} --specular-transmission {specular_transmission} --distance {distance} --scale {scale} --create-groups --output-model model_blinds.hbjson'.format(distance=self.distance, diffuse_transmission=self.diffuse_transmission, scale=self.scale, specular_transmission=self.specular_transmission)
+        return 'honeybee-radiance multi-phase add-aperture-group-blinds model.hbjson --diffuse-transmission {diffuse_transmission} --specular-transmission {specular_transmission} --distance {distance} --scale {scale} --create-groups --output-model model_blinds.hbjson'.format(distance=self.distance, scale=self.scale, diffuse_transmission=self.diffuse_transmission, specular_transmission=self.specular_transmission)
 
     def output(self):
         return {
@@ -121,15 +120,19 @@ class AddApertureGroupBlinds(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.246'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class WellDaylightProcessEpw(QueenbeeTask):
-    """No description is provided."""
+class CreateDaylightHours(QueenbeeTask):
+    """Convert EPW to EN 17037 schedule as a CSV file.
+    
+    This function generates a valid schedule for EN 17037, also known as daylight hours.
+    Rather than a typical occupancy schedule, the daylight hours is half the year with
+    the largest quantity of daylight."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
@@ -155,55 +158,72 @@ class WellDaylightProcessEpw(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     @property
-    def map_dag_inputs(self):
-        """Map task inputs to DAG inputs."""
-        inputs = {
-            'simulation_folder': self.execution_folder,
-            'epw': self.epw
-        }
-        try:
-            inputs['__debug__'] = self._input_params['__debug__']
-        except KeyError:
-            # not debug mode
-            pass
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_daylight_hours.py').resolve()
 
-        return inputs
+    @property
+    def is_script(self):
+        return False
 
-    def run(self):
-        yield [WellDaylightProcessEPW_1d5ef609Workerbee(_input_params=self.map_dag_inputs)]
-        pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
-        self._copy_output_artifacts(self.execution_folder)
-        self._copy_output_parameters(self.execution_folder)
-        pathlib.Path(self.execution_folder, 'well_daylight_process_epw.done').write_text('done!')
+    def command(self):
+        return 'honeybee-radiance schedule epw-to-daylight-hours weather.epw --name daylight_hours'
 
     def output(self):
         return {
-            'wea': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'wea.wea').resolve().as_posix()
-            ),
-            
-            'daylight_hours': luigi.LocalTarget(
+            'daylight_hours_csv': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'daylight_hours.csv').resolve().as_posix()
             ),
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'well_daylight_process_epw.done').resolve().as_posix())
+            
+            'daylight_hours_json': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'daylight_hours.json').resolve().as_posix()
+            ),
+            
+            'daylight_hours_wea': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'wea.wea').resolve().as_posix()
+            )
         }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'epw', 'to': 'weather.epw', 'from': self.epw, 'optional': False}]
 
     @property
     def output_artifacts(self):
         return [
             {
-                'name': 'wea', 'from': 'wea.wea',
-                'to': pathlib.Path(self.execution_folder, 'wea.wea').resolve().as_posix(),
+                'name': 'daylight-hours-csv', 'from': 'daylight_hours.csv',
+                'to': pathlib.Path(self.execution_folder, 'daylight_hours.csv').resolve().as_posix(),
                 'optional': False,
-                'type': 'folder'
+                'type': 'file'
             },
                 
             {
-                'name': 'daylight-hours', 'from': 'daylight_hours.csv',
-                'to': pathlib.Path(self.execution_folder, 'daylight_hours.csv').resolve().as_posix(),
+                'name': 'daylight-hours-json', 'from': 'daylight_hours.json',
+                'to': pathlib.Path(self.execution_folder, 'daylight_hours.json').resolve().as_posix(),
                 'optional': False,
-                'type': 'folder'
+                'type': 'file'
+            },
+                
+            {
+                'name': 'daylight-hours-wea', 'from': 'daylight_hours.wea',
+                'to': pathlib.Path(self.execution_folder, 'wea.wea').resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
             }]
+
+    @property
+    def input_parameters(self):
+        return {
+}
+
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
 
 
 class RunTwoPhaseDaylightCoefficient(QueenbeeTask):
@@ -248,7 +268,7 @@ class RunTwoPhaseDaylightCoefficient(QueenbeeTask):
 
     @property
     def wea(self):
-        value = pathlib.Path(self.input()['WellDaylightProcessEpw']['wea'].path)
+        value = pathlib.Path(self.input()['CreateDaylightHours']['daylight_hours_wea'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -287,14 +307,14 @@ class RunTwoPhaseDaylightCoefficient(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [Main_b117d182Workerbee(_input_params=self.map_dag_inputs)]
+        yield [Main_b46ec90cWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
         pathlib.Path(self.execution_folder, 'run_two_phase_daylight_coefficient.done').write_text('done!')
 
     def requires(self):
-        return {'WellDaylightProcessEpw': WellDaylightProcessEpw(_input_params=self._input_params), 'AddApertureGroupBlinds': AddApertureGroupBlinds(_input_params=self._input_params)}
+        return {'CreateDaylightHours': CreateDaylightHours(_input_params=self._input_params), 'AddApertureGroupBlinds': AddApertureGroupBlinds(_input_params=self._input_params)}
 
     def output(self):
         return {
@@ -331,7 +351,7 @@ class WellAnnualDaylight(QueenbeeTask):
 
     @property
     def daylight_hours(self):
-        value = pathlib.Path(self.input()['WellDaylightProcessEpw']['daylight_hours'].path)
+        value = pathlib.Path(self.input()['CreateDaylightHours']['daylight_hours_csv'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -359,7 +379,7 @@ class WellAnnualDaylight(QueenbeeTask):
         return 'honeybee-radiance-postprocess post-process well well-annual-daylight results daylight_hours.txt --grids-filter " {grid_filter} " --sub-folder well_summary'.format(grid_filter=self.grid_filter)
 
     def requires(self):
-        return {'WellDaylightProcessEpw': WellDaylightProcessEpw(_input_params=self._input_params), 'RunTwoPhaseDaylightCoefficient': RunTwoPhaseDaylightCoefficient(_input_params=self._input_params)}
+        return {'CreateDaylightHours': CreateDaylightHours(_input_params=self._input_params), 'RunTwoPhaseDaylightCoefficient': RunTwoPhaseDaylightCoefficient(_input_params=self._input_params)}
 
     def output(self):
         return {
@@ -392,7 +412,7 @@ class WellAnnualDaylight(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.635'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.637'
 
     @property
     def image_workdir(self):
@@ -455,7 +475,7 @@ class CreateVisualization(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [WellDaylightVisualization_1d5ef609Workerbee(_input_params=self.map_dag_inputs)]
+        yield [WellDaylightVisualization_f1842a5fWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -483,7 +503,7 @@ class CreateVisualization(QueenbeeTask):
             }]
 
 
-class _Main_1d5ef609Orchestrator(luigi.WrapperTask):
+class _Main_f1842a5fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

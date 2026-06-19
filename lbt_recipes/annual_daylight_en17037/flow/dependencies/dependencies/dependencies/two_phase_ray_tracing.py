@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight-en17037:0.1.22.
+This file is auto-generated from annual-daylight-en17037:0.1.23.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -163,7 +163,7 @@ class DirectSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.266'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -296,7 +296,7 @@ class DirectSunlight(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.266'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -430,7 +430,7 @@ class TotalSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.266'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -549,7 +549,7 @@ class OutputMatrixMath(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _TwoPhaseRayTracing_7fae6d11Orchestrator(luigi.WrapperTask):
+class _TwoPhaseRayTracing_b46ec90cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

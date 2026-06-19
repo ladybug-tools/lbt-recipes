@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight-en17037:0.1.22.
+This file is auto-generated from annual-daylight-en17037:0.1.23.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,9 +17,8 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.annual_daylight_e_n17037_post_process import _AnnualDaylightEN17037PostProcess_d9049334Orchestrator as AnnualDaylightEN17037PostProcess_d9049334Workerbee
-from .dependencies.annual_daylight_e_n17037_process_e_p_w import _AnnualDaylightEN17037ProcessEPW_d9049334Orchestrator as AnnualDaylightEN17037ProcessEPW_d9049334Workerbee
-from .dependencies.main_7fae6d11 import _Main_7fae6d11Orchestrator as Main_7fae6d11Workerbee
+from .dependencies.annual_daylight_e_n17037_post_process import _AnnualDaylightEN17037PostProcess_f30511cdOrchestrator as AnnualDaylightEN17037PostProcess_f30511cdWorkerbee
+from .dependencies.main_b46ec90c import _Main_b46ec90cOrchestrator as Main_b46ec90cWorkerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -35,8 +34,12 @@ _default_inputs = {   'cpu_count': 50,
     'thresholds': '-t 300 -lt 100 -ut 3000'}
 
 
-class AnnualMetricsEn17037ProcessEpw(QueenbeeTask):
-    """No description is provided."""
+class CreateDaylightHours(QueenbeeTask):
+    """Convert EPW to EN 17037 schedule as a CSV file.
+    
+    This function generates a valid schedule for EN 17037, also known as daylight hours.
+    Rather than a typical occupancy schedule, the daylight hours is half the year with
+    the largest quantity of daylight."""
 
     # DAG Input parameters
     _input_params = luigi.DictParameter()
@@ -62,33 +65,18 @@ class AnnualMetricsEn17037ProcessEpw(QueenbeeTask):
         return pathlib.Path(self.execution_folder, self._input_params['params_folder']).resolve().as_posix()
 
     @property
-    def map_dag_inputs(self):
-        """Map task inputs to DAG inputs."""
-        inputs = {
-            'simulation_folder': self.execution_folder,
-            'epw': self.epw
-        }
-        try:
-            inputs['__debug__'] = self._input_params['__debug__']
-        except KeyError:
-            # not debug mode
-            pass
+    def __script__(self):
+        return pathlib.Path(__file__).parent.joinpath('scripts', 'create_daylight_hours.py').resolve()
 
-        return inputs
+    @property
+    def is_script(self):
+        return False
 
-    def run(self):
-        yield [AnnualDaylightEN17037ProcessEPW_d9049334Workerbee(_input_params=self.map_dag_inputs)]
-        pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
-        self._copy_output_artifacts(self.execution_folder)
-        self._copy_output_parameters(self.execution_folder)
-        pathlib.Path(self.execution_folder, 'annual_metrics_en17037_process_epw.done').write_text('done!')
+    def command(self):
+        return 'honeybee-radiance schedule epw-to-daylight-hours weather.epw --name daylight_hours'
 
     def output(self):
         return {
-            'wea': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, 'wea.wea').resolve().as_posix()
-            ),
-            
             'daylight_hours_csv': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'daylight_hours.csv').resolve().as_posix()
             ),
@@ -96,32 +84,53 @@ class AnnualMetricsEn17037ProcessEpw(QueenbeeTask):
             'daylight_hours_json': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'daylight_hours.json').resolve().as_posix()
             ),
-            'is_done': luigi.LocalTarget(pathlib.Path(self.execution_folder, 'annual_metrics_en17037_process_epw.done').resolve().as_posix())
+            
+            'daylight_hours_wea': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'wea.wea').resolve().as_posix()
+            )
         }
+
+    @property
+    def input_artifacts(self):
+        return [
+            {'name': 'epw', 'to': 'weather.epw', 'from': self.epw, 'optional': False}]
 
     @property
     def output_artifacts(self):
         return [
             {
-                'name': 'wea', 'from': 'wea.wea',
-                'to': pathlib.Path(self.execution_folder, 'wea.wea').resolve().as_posix(),
-                'optional': False,
-                'type': 'folder'
-            },
-                
-            {
                 'name': 'daylight-hours-csv', 'from': 'daylight_hours.csv',
                 'to': pathlib.Path(self.execution_folder, 'daylight_hours.csv').resolve().as_posix(),
                 'optional': False,
-                'type': 'folder'
+                'type': 'file'
             },
                 
             {
                 'name': 'daylight-hours-json', 'from': 'daylight_hours.json',
                 'to': pathlib.Path(self.execution_folder, 'daylight_hours.json').resolve().as_posix(),
                 'optional': False,
-                'type': 'folder'
+                'type': 'file'
+            },
+                
+            {
+                'name': 'daylight-hours-wea', 'from': 'daylight_hours.wea',
+                'to': pathlib.Path(self.execution_folder, 'wea.wea').resolve().as_posix(),
+                'optional': False,
+                'type': 'file'
             }]
+
+    @property
+    def input_parameters(self):
+        return {
+}
+
+    @property
+    def task_image(self):
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
+
+    @property
+    def image_workdir(self):
+        return '/home/ladybugbot/run'
 
 
 class RunTwoPhaseDaylightCoefficient(QueenbeeTask):
@@ -164,7 +173,7 @@ class RunTwoPhaseDaylightCoefficient(QueenbeeTask):
 
     @property
     def wea(self):
-        value = pathlib.Path(self.input()['AnnualMetricsEn17037ProcessEpw']['wea'].path)
+        value = pathlib.Path(self.input()['CreateDaylightHours']['daylight_hours_wea'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -202,14 +211,14 @@ class RunTwoPhaseDaylightCoefficient(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [Main_7fae6d11Workerbee(_input_params=self.map_dag_inputs)]
+        yield [Main_b46ec90cWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
         pathlib.Path(self.execution_folder, 'run_two_phase_daylight_coefficient.done').write_text('done!')
 
     def requires(self):
-        return {'AnnualMetricsEn17037ProcessEpw': AnnualMetricsEn17037ProcessEpw(_input_params=self._input_params)}
+        return {'CreateDaylightHours': CreateDaylightHours(_input_params=self._input_params)}
 
     def output(self):
         return {
@@ -238,11 +247,11 @@ class AnnualMetricsEn17037Postprocess(QueenbeeTask):
     @property
     def schedule(self):
         try:
-            pathlib.Path(self.input()['AnnualMetricsEn17037ProcessEpw']['daylight_hours_csv'].path)
+            pathlib.Path(self.input()['CreateDaylightHours']['daylight_hours_csv'].path)
         except TypeError:
             # optional artifact
             return None
-        value = pathlib.Path(self.input()['AnnualMetricsEn17037ProcessEpw']['daylight_hours_csv'].path)
+        value = pathlib.Path(self.input()['CreateDaylightHours']['daylight_hours_csv'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -295,14 +304,14 @@ class AnnualMetricsEn17037Postprocess(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightEN17037PostProcess_d9049334Workerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightEN17037PostProcess_f30511cdWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
         pathlib.Path(self.execution_folder, 'annual_metrics_en17037_postprocess.done').write_text('done!')
 
     def requires(self):
-        return {'AnnualMetricsEn17037ProcessEpw': AnnualMetricsEn17037ProcessEpw(_input_params=self._input_params), 'RunTwoPhaseDaylightCoefficient': RunTwoPhaseDaylightCoefficient(_input_params=self._input_params)}
+        return {'CreateDaylightHours': CreateDaylightHours(_input_params=self._input_params), 'RunTwoPhaseDaylightCoefficient': RunTwoPhaseDaylightCoefficient(_input_params=self._input_params)}
 
     def output(self):
         return {
@@ -367,7 +376,7 @@ class AnnualMetricsEn17037Postprocess(QueenbeeTask):
             }]
 
 
-class _Main_d9049334Orchestrator(luigi.WrapperTask):
+class _Main_f30511cdOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

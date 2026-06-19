@@ -1,5 +1,5 @@
 """
-This file is auto-generated from leed-daylight-option-two:0.3.9.
+This file is auto-generated from leed-daylight-option-two:0.3.10.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,9 +17,9 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.leed_daylight_option_two_visualization import _LeedDaylightOptionTwoVisualization_0853cc1dOrchestrator as LeedDaylightOptionTwoVisualization_0853cc1dWorkerbee
-from .dependencies.point_in_time_grid_entry_point import _PointInTimeGridEntryPoint_0853cc1dOrchestrator as PointInTimeGridEntryPoint_0853cc1dWorkerbee
-from .dependencies.leed_daylight_option_two_prepare_folder import _LeedDaylightOptionTwoPrepareFolder_0853cc1dOrchestrator as LeedDaylightOptionTwoPrepareFolder_0853cc1dWorkerbee
+from .dependencies.leed_daylight_option_two_visualization import _LeedDaylightOptionTwoVisualization_0c3ede2fOrchestrator as LeedDaylightOptionTwoVisualization_0c3ede2fWorkerbee
+from .dependencies.point_in_time_grid_entry_point import _PointInTimeGridEntryPoint_0c3ede2fOrchestrator as PointInTimeGridEntryPoint_0c3ede2fWorkerbee
+from .dependencies.leed_daylight_option_two_prepare_folder import _LeedDaylightOptionTwoPrepareFolder_0c3ede2fOrchestrator as LeedDaylightOptionTwoPrepareFolder_0c3ede2fWorkerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -93,7 +93,7 @@ class PrepareFolder(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [LeedDaylightOptionTwoPrepareFolder_0853cc1dWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [LeedDaylightOptionTwoPrepareFolder_0c3ede2fWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -244,7 +244,7 @@ class IlluminanceSimulationLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [PointInTimeGridEntryPoint_0853cc1dWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [PointInTimeGridEntryPoint_0c3ede2fWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'illuminance_simulation.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -388,7 +388,7 @@ class EvaluateCredits(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.92'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -472,7 +472,7 @@ class CreateVisualization(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [LeedDaylightOptionTwoVisualization_0853cc1dWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [LeedDaylightOptionTwoVisualization_0c3ede2fWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -500,7 +500,7 @@ class CreateVisualization(QueenbeeTask):
             }]
 
 
-class _Main_0853cc1dOrchestrator(luigi.WrapperTask):
+class _Main_0c3ede2fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -1,5 +1,5 @@
 """
-This file is auto-generated from leed-daylight-option-two:0.3.9.
+This file is auto-generated from leed-daylight-option-two:0.3.10.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -139,7 +139,7 @@ class CreateRadFolder(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid " {grid_filter} " --grid-check'.format(grid_filter=self.grid_filter)
+        return 'honeybee-radiance translate model-to-rad-folder model.hbjson --grid " {grid_filter} " --grid-check --create-grids'.format(grid_filter=self.grid_filter)
 
     def output(self):
         return {
@@ -181,7 +181,7 @@ class CreateRadFolder(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.92'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -258,14 +258,14 @@ class CreateSkies(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.92'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _LeedDaylightOptionTwoPrepareFolder_0853cc1dOrchestrator(luigi.WrapperTask):
+class _LeedDaylightOptionTwoPrepareFolder_0c3ede2fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

@@ -1,5 +1,5 @@
 """
-This file is auto-generated from leed-daylight-option-two:0.3.9.
+This file is auto-generated from leed-daylight-option-two:0.3.10.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -111,6 +111,8 @@ class CreateOctree(QueenbeeTask):
     _status_lock = _queenbee_status_lock_
 
     # Task inputs
+    include_ies = luigi.Parameter(default='exclude')
+
     @property
     def model(self):
         value = pathlib.Path(self._input_params['model_folder'])
@@ -144,7 +146,7 @@ class CreateOctree(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance octree from-folder-static model --output scene.oct --add-before sky.sky'
+        return 'honeybee-radiance octree from-folder-static model --output scene.oct --{include_ies}-ies --add-before sky.sky'.format(include_ies=self.include_ies)
 
     def output(self):
         return {
@@ -172,11 +174,11 @@ class CreateOctree(QueenbeeTask):
     @property
     def input_parameters(self):
         return {
-}
+            'include_ies': self.include_ies}
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.92'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -235,7 +237,7 @@ class SplitGridFolder(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(cpu_count=self.cpu_count, cpus_per_grid=self.cpus_per_grid, min_sensor_count=self.min_sensor_count)
+        return 'honeybee-radiance grid split-folder ./input_folder ./output_folder {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count}'.format(cpu_count=self.cpu_count, min_sensor_count=self.min_sensor_count, cpus_per_grid=self.cpus_per_grid)
 
     def output(self):
         return {
@@ -289,7 +291,7 @@ class SplitGridFolder(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.92'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -402,7 +404,7 @@ class PointInTimeGridRayTracingLoop(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.92'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -456,7 +458,7 @@ class PointInTimeGridRayTracing(luigi.Task):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.92'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -536,14 +538,14 @@ class RestructureResults(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.92'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _PointInTimeGridEntryPoint_0853cc1dOrchestrator(luigi.WrapperTask):
+class _PointInTimeGridEntryPoint_0c3ede2fOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
