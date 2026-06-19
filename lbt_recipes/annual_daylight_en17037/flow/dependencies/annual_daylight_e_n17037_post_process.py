@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight-en17037:0.1.22.
+This file is auto-generated from annual-daylight-en17037:0.1.23.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -317,7 +317,7 @@ class CreateVsfEn17037(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-display:0.5.3'
+        return 'docker.io/ladybugtools/honeybee-display:0.3.4'
 
     @property
     def image_workdir(self):
@@ -444,7 +444,7 @@ class CreateVsfMetrics(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-display:0.5.3'
+        return 'docker.io/ladybugtools/honeybee-display:0.3.4'
 
     @property
     def image_workdir(self):
@@ -555,7 +555,7 @@ class GridSummaryMetrics(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _AnnualDaylightEN17037PostProcess_d9049334Orchestrator(luigi.WrapperTask):
+class _AnnualDaylightEN17037PostProcess_f30511cdOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

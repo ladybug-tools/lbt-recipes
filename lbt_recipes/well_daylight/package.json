@@ -6,7 +6,7 @@
     "type": "MetaData",
     "annotations": {},
     "name": "well-daylight",
-    "tag": "0.0.21",
+    "tag": "0.0.22",
     "app_version": null,
     "keywords": [
       "honeybee",
@@ -92,13 +92,39 @@
       "type": "DAGFileInput",
       "annotations": {},
       "name": "epw",
-      "description": "EPW file.",
+      "description": "EPW or Wea file. This must be an hourly weather file with annual data.",
       "default": null,
-      "alias": [],
+      "alias": [
+        {
+          "type": "DAGGenericInputAlias",
+          "annotations": {},
+          "name": "wea",
+          "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
+          "platform": [
+            "grasshopper",
+            "rhino",
+            "revit"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.inputs.wea",
+              "function": "epw_or_wea_handler_timestep_annual_check",
+              "index": 0
+            }
+          ],
+          "default": null,
+          "required": true,
+          "spec": null
+        }
+      ],
       "required": true,
       "spec": null,
       "extensions": [
-        "epw"
+        "epw",
+        "wea"
       ]
     },
     {

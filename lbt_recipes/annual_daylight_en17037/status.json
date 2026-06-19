@@ -1,5 +1,5 @@
 {
-  "id": "6499355a-59d4-4fc5-895f-31dc2bc30d6a",
+  "id": "c5591682-a555-4997-a59d-8409c43032d5",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
@@ -24,7 +24,7 @@
       "type": "MetaData",
       "annotations": {},
       "name": "annual-daylight-en17037",
-      "tag": "0.1.22",
+      "tag": "0.1.23",
       "app_version": null,
       "keywords": [
         "honeybee",
@@ -94,13 +94,39 @@
         "type": "DAGFileInput",
         "annotations": {},
         "name": "epw",
-        "description": "EPW file.",
+        "description": "EPW or Wea file. This must be an hourly weather file with annual data.",
         "default": null,
-        "alias": [],
+        "alias": [
+          {
+            "type": "DAGGenericInputAlias",
+            "annotations": {},
+            "name": "wea",
+            "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
+            "platform": [
+              "grasshopper",
+              "rhino",
+              "revit"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.inputs.wea",
+                "function": "epw_or_wea_handler_timestep_annual_check",
+                "index": 0
+              }
+            ],
+            "default": null,
+            "required": true,
+            "spec": null
+          }
+        ],
         "required": true,
         "spec": null,
         "extensions": [
-          "epw"
+          "epw",
+          "wea"
         ]
       },
       {
@@ -925,14 +951,40 @@
         "type": "StepFileInput",
         "annotations": {},
         "name": "epw",
-        "description": "EPW file.",
+        "description": "EPW or Wea file. This must be an hourly weather file with annual data.",
         "default": null,
-        "alias": [],
+        "alias": [
+          {
+            "type": "DAGGenericInputAlias",
+            "annotations": {},
+            "name": "wea",
+            "description": "A Wea object produced from the Wea components that are under the Light Sources tab. This can also be the path to a .wea or a .epw file.",
+            "platform": [
+              "grasshopper",
+              "rhino",
+              "revit"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.inputs.wea",
+                "function": "epw_or_wea_handler_timestep_annual_check",
+                "index": 0
+              }
+            ],
+            "default": null,
+            "required": true,
+            "spec": null
+          }
+        ],
         "required": true,
         "spec": null,
         "path": null,
         "extensions": [
-          "epw"
+          "epw",
+          "wea"
         ],
         "source": {
           "type": "ProjectFolder",
@@ -1427,12 +1479,12 @@
       }
     ],
     "message": null,
-    "started_at": "2026-06-17T13:27:08+00:00",
+    "started_at": "2026-06-18T20:00:07+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "6499355a-59d4-4fc5-895f-31dc2bc30d6a_00",
-    "job_id": "6499355a-59d4-4fc5-895f-31dc2bc30d6a",
+    "id": "c5591682-a555-4997-a59d-8409c43032d5_00",
+    "job_id": "c5591682-a555-4997-a59d-8409c43032d5",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}

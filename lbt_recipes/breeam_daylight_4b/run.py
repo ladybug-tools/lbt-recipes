@@ -1,5 +1,5 @@
 """
-This file is auto-generated from breeam-daylight-4b:1.0.9.
+This file is auto-generated from breeam-daylight-4b:1.0.10.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -23,7 +23,7 @@ from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 from luigi.execution_summary import LuigiStatusCode
 
-import flow.main_d1bca667 as breeam_daylight_4b_workerbee
+import flow.main_0eec764c as breeam_daylight_4b_workerbee
 
 
 _recipe_default_inputs = {   'cpu_count': 50,
@@ -40,7 +40,7 @@ class LetBreeamDaylight4bFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [breeam_daylight_4b_workerbee._Main_d1bca667Orchestrator(_input_params=self._input_params)]
+        yield [breeam_daylight_4b_workerbee._Main_0eec764cOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):

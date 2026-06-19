@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight-en17037:0.1.22.
+This file is auto-generated from annual-daylight-en17037:0.1.23.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -122,7 +122,7 @@ class CreateDirectSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.266'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -221,7 +221,7 @@ class CreateRadFolder(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.266'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -285,7 +285,7 @@ class CreateSkyDome(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.266'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -368,7 +368,7 @@ class CreateStudyInfo(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.266'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -465,7 +465,7 @@ class CreateTotalSky(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.266'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -556,7 +556,7 @@ class GenerateSunpath(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.266'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -632,7 +632,7 @@ class ParseSunUpHours(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.266'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -783,14 +783,14 @@ class PrepareMultiphase(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.266'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
         return '/home/ladybugbot/run'
 
 
-class _TwoPhasePrepareFolder_7fae6d11Orchestrator(luigi.WrapperTask):
+class _TwoPhasePrepareFolder_b46ec90cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

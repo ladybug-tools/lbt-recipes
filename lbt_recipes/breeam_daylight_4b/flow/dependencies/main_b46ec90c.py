@@ -1,5 +1,5 @@
 """
-This file is auto-generated from well-daylight:0.0.21.
+This file is auto-generated from breeam-daylight-4b:1.0.10.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,8 +17,8 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.two_phase_simulation import _TwoPhaseSimulation_b117d182Orchestrator as TwoPhaseSimulation_b117d182Workerbee
-from .dependencies.two_phase_prepare_folder import _TwoPhasePrepareFolder_b117d182Orchestrator as TwoPhasePrepareFolder_b117d182Workerbee
+from .dependencies.two_phase_simulation import _TwoPhaseSimulation_b46ec90cOrchestrator as TwoPhaseSimulation_b46ec90cWorkerbee
+from .dependencies.two_phase_prepare_folder import _TwoPhasePrepareFolder_b46ec90cOrchestrator as TwoPhasePrepareFolder_b46ec90cWorkerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -108,7 +108,7 @@ class PrepareFolderAnnualDaylight(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [TwoPhasePrepareFolder_b117d182Workerbee(_input_params=self.map_dag_inputs)]
+        yield [TwoPhasePrepareFolder_b46ec90cWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -315,7 +315,7 @@ class CalculateTwoPhaseMatrixLoop(luigi.Task):
         return inputs
 
     def run(self):
-        yield [TwoPhaseSimulation_b117d182Workerbee(_input_params=self.map_dag_inputs)]
+        yield [TwoPhaseSimulation_b46ec90cWorkerbee(_input_params=self.map_dag_inputs)]
         done_file = pathlib.Path(self.execution_folder, 'calculate_two_phase_matrix.done')
         done_file.parent.mkdir(parents=True, exist_ok=True)
         done_file.write_text('done!')
@@ -375,7 +375,7 @@ class CalculateTwoPhaseMatrix(luigi.Task):
         }
 
 
-class _Main_b117d182Orchestrator(luigi.WrapperTask):
+class _Main_b46ec90cOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
