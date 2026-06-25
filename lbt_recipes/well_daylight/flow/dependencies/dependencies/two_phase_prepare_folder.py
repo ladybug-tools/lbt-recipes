@@ -85,7 +85,7 @@ class CreateDirectSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance sky mtx sky.epw --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(sun_up_hours=self.sun_up_hours, output_type=self.output_type, output_format=self.output_format, cumulative=self.cumulative, sky_density=self.sky_density, north=self.north, sky_type=self.sky_type)
+        return 'honeybee-radiance sky mtx sky.epw --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(output_type=self.output_type, sun_up_hours=self.sun_up_hours, north=self.north, sky_type=self.sky_type, sky_density=self.sky_density, output_format=self.output_format, cumulative=self.cumulative)
 
     def output(self):
         return {
@@ -336,7 +336,7 @@ class CreateStudyInfo(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance study study-info sky.epw {timestep} --study-type {study_type} --name study_info'.format(study_type=self.study_type, timestep=self.timestep)
+        return 'honeybee-radiance study study-info sky.epw {timestep} --study-type {study_type} --name study_info'.format(timestep=self.timestep, study_type=self.study_type)
 
     def output(self):
         return {
@@ -428,7 +428,7 @@ class CreateTotalSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance sky mtx sky.epw --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(sun_up_hours=self.sun_up_hours, output_type=self.output_type, output_format=self.output_format, cumulative=self.cumulative, sky_density=self.sky_density, north=self.north, sky_type=self.sky_type)
+        return 'honeybee-radiance sky mtx sky.epw --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(output_type=self.output_type, sun_up_hours=self.sun_up_hours, north=self.north, sky_type=self.sky_type, sky_density=self.sky_density, output_format=self.output_format, cumulative=self.cumulative)
 
     def output(self):
         return {
@@ -513,7 +513,7 @@ class GenerateSunpath(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance sunpath radiance sky.epw --name sunpath --{output_type} --north {north}'.format(north=self.north, output_type=self.output_type)
+        return 'honeybee-radiance sunpath radiance sky.epw --name sunpath --{output_type} --north {north}'.format(output_type=self.output_type, north=self.north)
 
     def output(self):
         return {
@@ -710,7 +710,7 @@ class PrepareMultiphase(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance multi-phase prepare-multiphase model {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count} --sun-path sun.path --phase {phase} --octree-folder octree --grid-folder grid --{static}-static --{default_states}-states'.format(cpu_count=self.cpu_count, phase=self.phase, static=self.static, default_states=self.default_states, cpus_per_grid=self.cpus_per_grid, min_sensor_count=self.min_sensor_count)
+        return 'honeybee-radiance multi-phase prepare-multiphase model {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count} --sun-path sun.path --phase {phase} --octree-folder octree --grid-folder grid --{static}-static --{default_states}-states'.format(min_sensor_count=self.min_sensor_count, default_states=self.default_states, static=self.static, cpus_per_grid=self.cpus_per_grid, cpu_count=self.cpu_count, phase=self.phase)
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params), 'GenerateSunpath': GenerateSunpath(_input_params=self._input_params)}

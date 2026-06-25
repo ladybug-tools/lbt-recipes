@@ -311,7 +311,7 @@ class CreateVsf(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-display model-to-vis model.hbjson --color-by {color_by} --{color_visibility}-color-by --{wireframe} --{attr_format}-attr --room-attr "{room_attr}" --face-attr "{face_attr}" --grid-display-mode {grid_display_mode} --{grid_visibility}-grid --grid-data input_data --grid-data-display-mode {grid_data_display_mode} --active-grid-data "{active_grid_data}" --output-format {output_format} --output-file model_vis.{output_format}'.format(face_attr=self.face_attr, grid_display_mode=self.grid_display_mode, active_grid_data=self.active_grid_data, wireframe=self.wireframe, grid_visibility=self.grid_visibility, output_format=self.output_format, attr_format=self.attr_format, grid_data_display_mode=self.grid_data_display_mode, color_visibility=self.color_visibility, color_by=self.color_by, room_attr=self.room_attr)
+        return 'honeybee-display model-to-vis model.hbjson --color-by {color_by} --{color_visibility}-color-by --{wireframe} --{attr_format}-attr --room-attr "{room_attr}" --face-attr "{face_attr}" --grid-display-mode {grid_display_mode} --{grid_visibility}-grid --grid-data input_data --grid-data-display-mode {grid_data_display_mode} --active-grid-data "{active_grid_data}" --output-format {output_format} --output-file model_vis.{output_format}'.format(room_attr=self.room_attr, face_attr=self.face_attr, grid_display_mode=self.grid_display_mode, color_visibility=self.color_visibility, grid_visibility=self.grid_visibility, color_by=self.color_by, wireframe=self.wireframe, output_format=self.output_format, active_grid_data=self.active_grid_data, grid_data_display_mode=self.grid_data_display_mode, attr_format=self.attr_format)
 
     def requires(self):
         return {'CopyL01PassFail': CopyL01PassFail(_input_params=self._input_params), 'CopyL06PassFail': CopyL06PassFail(_input_params=self._input_params), 'CreateVisMetadata': CreateVisMetadata(_input_params=self._input_params)}
@@ -363,7 +363,7 @@ class CreateVsf(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _WellDaylightVisualization_f1842a5fOrchestrator(luigi.WrapperTask):
+class _WellDaylightVisualization_d2488a1eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

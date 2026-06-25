@@ -122,7 +122,7 @@ class DirectSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(output_format=self.output_format, conversion=self.conversion, order_by=self.order_by, fixed_radiance_parameters=self.fixed_radiance_parameters, sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, header=self.header)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(radiance_parameters=self.radiance_parameters, header=self.header, order_by=self.order_by, sensor_count=self.sensor_count, output_format=self.output_format, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion)
 
     def output(self):
         return {
@@ -255,7 +255,7 @@ class DirectSunlight(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(calculate_values=self.calculate_values, output_format=self.output_format, conversion=self.conversion, order_by=self.order_by, fixed_radiance_parameters=self.fixed_radiance_parameters, sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, header=self.header)
+        return 'honeybee-radiance dc scontrib scene.oct grid.pts suns.mod --{calculate_values} --sensor-count {sensor_count} --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --output results.ill --order-by-{order_by} --{header}-header'.format(radiance_parameters=self.radiance_parameters, header=self.header, calculate_values=self.calculate_values, order_by=self.order_by, sensor_count=self.sensor_count, output_format=self.output_format, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion)
 
     def output(self):
         return {
@@ -389,7 +389,7 @@ class TotalSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(output_format=self.output_format, conversion=self.conversion, order_by=self.order_by, fixed_radiance_parameters=self.fixed_radiance_parameters, sensor_count=self.sensor_count, radiance_parameters=self.radiance_parameters, header=self.header)
+        return 'honeybee-radiance dc scoeff scene.oct grid.pts sky.dome sky.mtx --sensor-count {sensor_count} --output results.ill --rad-params "{radiance_parameters}" --rad-params-locked "{fixed_radiance_parameters}" --conversion "{conversion}" --output-format {output_format} --order-by-{order_by} --{header}-header'.format(radiance_parameters=self.radiance_parameters, header=self.header, order_by=self.order_by, sensor_count=self.sensor_count, output_format=self.output_format, fixed_radiance_parameters=self.fixed_radiance_parameters, conversion=self.conversion)
 
     def output(self):
         return {

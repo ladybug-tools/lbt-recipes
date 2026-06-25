@@ -17,7 +17,7 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.well_daylight_visualization import _WellDaylightVisualization_f1842a5fOrchestrator as WellDaylightVisualization_f1842a5fWorkerbee
+from .dependencies.well_daylight_visualization import _WellDaylightVisualization_d2488a1eOrchestrator as WellDaylightVisualization_d2488a1eWorkerbee
 from .dependencies.main_b46ec90c import _Main_b46ec90cOrchestrator as Main_b46ec90cWorkerbee
 
 
@@ -86,7 +86,7 @@ class AddApertureGroupBlinds(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance multi-phase add-aperture-group-blinds model.hbjson --diffuse-transmission {diffuse_transmission} --specular-transmission {specular_transmission} --distance {distance} --scale {scale} --create-groups --output-model model_blinds.hbjson'.format(distance=self.distance, scale=self.scale, diffuse_transmission=self.diffuse_transmission, specular_transmission=self.specular_transmission)
+        return 'honeybee-radiance multi-phase add-aperture-group-blinds model.hbjson --diffuse-transmission {diffuse_transmission} --specular-transmission {specular_transmission} --distance {distance} --scale {scale} --create-groups --output-model model_blinds.hbjson'.format(diffuse_transmission=self.diffuse_transmission, distance=self.distance, scale=self.scale, specular_transmission=self.specular_transmission)
 
     def output(self):
         return {
@@ -475,7 +475,7 @@ class CreateVisualization(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [WellDaylightVisualization_f1842a5fWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [WellDaylightVisualization_d2488a1eWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -503,7 +503,7 @@ class CreateVisualization(QueenbeeTask):
             }]
 
 
-class _Main_f1842a5fOrchestrator(luigi.WrapperTask):
+class _Main_d2488a1eOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
