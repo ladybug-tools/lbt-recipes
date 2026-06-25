@@ -1,5 +1,5 @@
 {
-  "id": "6f030e6b-b835-41d4-a8a7-c49b7be873e2",
+  "id": "cdfbf4b3-1c32-4d22-881e-cbb7b1ca06b5",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
@@ -363,6 +363,39 @@
       }
     ],
     "outputs": [
+      {
+        "type": "DAGFileOutput",
+        "annotations": {},
+        "name": "daylight-hours",
+        "description": "Daylight hours occupancy schedule.",
+        "from_": {
+          "type": "FileReference",
+          "annotations": {},
+          "path": "daylight_hours.json"
+        },
+        "alias": [
+          {
+            "type": "DAGGenericOutputAlias",
+            "annotations": {},
+            "name": "daylight-hours",
+            "description": "JSON file containing a data collection for daylight hours.",
+            "platform": [
+              "grasshopper"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.outputs.daylight",
+                "function": "read_hourly_continuous_collection_from_json",
+                "index": 0
+              }
+            ]
+          }
+        ],
+        "required": true
+      },
       {
         "type": "DAGFileOutput",
         "annotations": {},
@@ -841,6 +874,19 @@
       {
         "type": "StepFileOutput",
         "annotations": {},
+        "name": "daylight-hours",
+        "description": "Daylight hours occupancy schedule.",
+        "path": "",
+        "required": true,
+        "source": {
+          "type": "ProjectFolder",
+          "annotations": {},
+          "path": "daylight_hours.json"
+        }
+      },
+      {
+        "type": "StepFileOutput",
+        "annotations": {},
         "name": "dynamic-schedule",
         "description": "JSON file containing the dynamic schedules.",
         "path": "",
@@ -931,12 +977,12 @@
       }
     ],
     "message": null,
-    "started_at": "2026-06-18T20:20:28+00:00",
+    "started_at": "2026-06-25T17:07:03+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "6f030e6b-b835-41d4-a8a7-c49b7be873e2_00",
-    "job_id": "6f030e6b-b835-41d4-a8a7-c49b7be873e2",
+    "id": "cdfbf4b3-1c32-4d22-881e-cbb7b1ca06b5_00",
+    "job_id": "cdfbf4b3-1c32-4d22-881e-cbb7b1ca06b5",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}

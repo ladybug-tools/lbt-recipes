@@ -348,6 +348,39 @@
     {
       "type": "DAGFileOutput",
       "annotations": {},
+      "name": "daylight-hours",
+      "description": "Daylight hours occupancy schedule.",
+      "from": {
+        "type": "FileReference",
+        "annotations": {},
+        "path": "daylight_hours.json"
+      },
+      "alias": [
+        {
+          "type": "DAGGenericOutputAlias",
+          "annotations": {},
+          "name": "daylight-hours",
+          "description": "JSON file containing a data collection for daylight hours.",
+          "platform": [
+            "grasshopper"
+          ],
+          "handler": [
+            {
+              "type": "IOAliasHandler",
+              "annotations": {},
+              "language": "python",
+              "module": "pollination_handlers.outputs.daylight",
+              "function": "read_hourly_continuous_collection_from_json",
+              "index": 0
+            }
+          ]
+        }
+      ],
+      "required": true
+    },
+    {
+      "type": "DAGFileOutput",
+      "annotations": {},
       "name": "dynamic-schedule",
       "description": "JSON file containing the dynamic schedules.",
       "from": {

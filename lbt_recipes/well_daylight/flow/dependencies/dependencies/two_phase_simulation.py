@@ -293,7 +293,7 @@ class RestructureDirectSunlightResults(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance-postprocess grid merge-folder ./input_folder ./output_folder {extension} --dist-info dist_info.json --output-extension {output_extension} --as-text {as_text} --fmt {fmt} --delimiter {delimiter}'.format(as_text=self.as_text, fmt=self.fmt, extension=self.extension, delimiter=self.delimiter, output_extension=self.output_extension)
+        return 'honeybee-radiance-postprocess grid merge-folder ./input_folder ./output_folder {extension} --dist-info dist_info.json --output-extension {output_extension} --as-text {as_text} --fmt {fmt} --delimiter {delimiter}'.format(fmt=self.fmt, as_text=self.as_text, extension=self.extension, delimiter=self.delimiter, output_extension=self.output_extension)
 
     def requires(self):
         return {'TwoPhaseRaytracing': TwoPhaseRaytracing(_input_params=self._input_params)}
@@ -301,7 +301,7 @@ class RestructureDirectSunlightResults(QueenbeeTask):
     def output(self):
         return {
             'output_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/direct'.format(results_folder=self.results_folder, identifier=self.identifier, light_path=self.light_path)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/direct'.format(light_path=self.light_path, results_folder=self.results_folder, identifier=self.identifier)).resolve().as_posix()
             )
         }
 
@@ -316,7 +316,7 @@ class RestructureDirectSunlightResults(QueenbeeTask):
         return [
             {
                 'name': 'output-folder', 'from': 'output_folder',
-                'to': pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/direct'.format(results_folder=self.results_folder, identifier=self.identifier, light_path=self.light_path)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/direct'.format(light_path=self.light_path, results_folder=self.results_folder, identifier=self.identifier)).resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]
@@ -412,7 +412,7 @@ class RestructureTotalResults(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance-postprocess grid merge-folder ./input_folder ./output_folder {extension} --dist-info dist_info.json --output-extension {output_extension} --as-text {as_text} --fmt {fmt} --delimiter {delimiter}'.format(as_text=self.as_text, fmt=self.fmt, extension=self.extension, delimiter=self.delimiter, output_extension=self.output_extension)
+        return 'honeybee-radiance-postprocess grid merge-folder ./input_folder ./output_folder {extension} --dist-info dist_info.json --output-extension {output_extension} --as-text {as_text} --fmt {fmt} --delimiter {delimiter}'.format(fmt=self.fmt, as_text=self.as_text, extension=self.extension, delimiter=self.delimiter, output_extension=self.output_extension)
 
     def requires(self):
         return {'TwoPhaseRaytracing': TwoPhaseRaytracing(_input_params=self._input_params)}
@@ -420,7 +420,7 @@ class RestructureTotalResults(QueenbeeTask):
     def output(self):
         return {
             'output_folder': luigi.LocalTarget(
-                pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/total'.format(results_folder=self.results_folder, identifier=self.identifier, light_path=self.light_path)).resolve().as_posix()
+                pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/total'.format(light_path=self.light_path, results_folder=self.results_folder, identifier=self.identifier)).resolve().as_posix()
             )
         }
 
@@ -435,7 +435,7 @@ class RestructureTotalResults(QueenbeeTask):
         return [
             {
                 'name': 'output-folder', 'from': 'output_folder',
-                'to': pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/total'.format(results_folder=self.results_folder, identifier=self.identifier, light_path=self.light_path)).resolve().as_posix(),
+                'to': pathlib.Path(self.execution_folder, '{results_folder}/{light_path}/{identifier}/total'.format(light_path=self.light_path, results_folder=self.results_folder, identifier=self.identifier)).resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             }]
