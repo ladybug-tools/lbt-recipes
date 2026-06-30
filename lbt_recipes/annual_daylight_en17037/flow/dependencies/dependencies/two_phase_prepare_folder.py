@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight-en17037:0.1.23.
+This file is auto-generated from annual-daylight-en17037:0.1.24.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -85,7 +85,7 @@ class CreateDirectSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance sky mtx sky.epw --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(sun_up_hours=self.sun_up_hours, output_type=self.output_type, output_format=self.output_format, cumulative=self.cumulative, sky_density=self.sky_density, north=self.north, sky_type=self.sky_type)
+        return 'honeybee-radiance sky mtx sky.epw --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(output_format=self.output_format, sun_up_hours=self.sun_up_hours, output_type=self.output_type, cumulative=self.cumulative, north=self.north, sky_density=self.sky_density, sky_type=self.sky_type)
 
     def output(self):
         return {
@@ -428,7 +428,7 @@ class CreateTotalSky(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance sky mtx sky.epw --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(sun_up_hours=self.sun_up_hours, output_type=self.output_type, output_format=self.output_format, cumulative=self.cumulative, sky_density=self.sky_density, north=self.north, sky_type=self.sky_type)
+        return 'honeybee-radiance sky mtx sky.epw --name sky --north {north} --sky-type {sky_type} --{cumulative} --{sun_up_hours} --{output_type} --output-format {output_format} --sky-density {sky_density}'.format(output_format=self.output_format, sun_up_hours=self.sun_up_hours, output_type=self.output_type, cumulative=self.cumulative, north=self.north, sky_density=self.sky_density, sky_type=self.sky_type)
 
     def output(self):
         return {
@@ -710,7 +710,7 @@ class PrepareMultiphase(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance multi-phase prepare-multiphase model {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count} --sun-path sun.path --phase {phase} --octree-folder octree --grid-folder grid --{static}-static --{default_states}-states'.format(cpu_count=self.cpu_count, phase=self.phase, static=self.static, default_states=self.default_states, cpus_per_grid=self.cpus_per_grid, min_sensor_count=self.min_sensor_count)
+        return 'honeybee-radiance multi-phase prepare-multiphase model {cpu_count} --grid-divisor {cpus_per_grid} --min-sensor-count {min_sensor_count} --sun-path sun.path --phase {phase} --octree-folder octree --grid-folder grid --{static}-static --{default_states}-states'.format(default_states=self.default_states, cpu_count=self.cpu_count, cpus_per_grid=self.cpus_per_grid, phase=self.phase, static=self.static, min_sensor_count=self.min_sensor_count)
 
     def requires(self):
         return {'CreateRadFolder': CreateRadFolder(_input_params=self._input_params), 'GenerateSunpath': GenerateSunpath(_input_params=self._input_params)}
@@ -790,7 +790,7 @@ class PrepareMultiphase(QueenbeeTask):
         return '/home/ladybugbot/run'
 
 
-class _TwoPhasePrepareFolder_b46ec90cOrchestrator(luigi.WrapperTask):
+class _TwoPhasePrepareFolder_98cdfd83Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()
