@@ -1,5 +1,5 @@
 """
-This file is auto-generated from annual-daylight-en17037:0.1.23.
+This file is auto-generated from annual-daylight-en17037:0.1.24.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,8 +17,8 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.annual_daylight_e_n17037_post_process import _AnnualDaylightEN17037PostProcess_f30511cdOrchestrator as AnnualDaylightEN17037PostProcess_f30511cdWorkerbee
-from .dependencies.main_b46ec90c import _Main_b46ec90cOrchestrator as Main_b46ec90cWorkerbee
+from .dependencies.annual_daylight_e_n17037_post_process import _AnnualDaylightEN17037PostProcess_f7730ca9Orchestrator as AnnualDaylightEN17037PostProcess_f7730ca9Workerbee
+from .dependencies.main_98cdfd83 import _Main_98cdfd83Orchestrator as Main_98cdfd83Workerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -211,7 +211,7 @@ class RunTwoPhaseDaylightCoefficient(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [Main_b46ec90cWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [Main_98cdfd83Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -304,7 +304,7 @@ class AnnualMetricsEn17037Postprocess(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [AnnualDaylightEN17037PostProcess_f30511cdWorkerbee(_input_params=self.map_dag_inputs)]
+        yield [AnnualDaylightEN17037PostProcess_f7730ca9Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -317,6 +317,14 @@ class AnnualMetricsEn17037Postprocess(QueenbeeTask):
         return {
             'en17037': luigi.LocalTarget(
                 pathlib.Path(self.execution_folder, 'en17037').resolve().as_posix()
+            ),
+            
+            'en17037_summary': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'en17037/summary.json').resolve().as_posix()
+            ),
+            
+            'en17037_summary_grid': luigi.LocalTarget(
+                pathlib.Path(self.execution_folder, 'en17037/summary_grid.json').resolve().as_posix()
             ),
             
             'metrics': luigi.LocalTarget(
@@ -343,6 +351,20 @@ class AnnualMetricsEn17037Postprocess(QueenbeeTask):
             {
                 'name': 'en17037', 'from': 'en17037',
                 'to': pathlib.Path(self.execution_folder, 'en17037').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
+            },
+                
+            {
+                'name': 'en17037-summary', 'from': 'en17037/summary.json',
+                'to': pathlib.Path(self.execution_folder, 'en17037/summary.json').resolve().as_posix(),
+                'optional': False,
+                'type': 'folder'
+            },
+                
+            {
+                'name': 'en17037-summary-grid', 'from': 'en17037/summary_grid.json',
+                'to': pathlib.Path(self.execution_folder, 'en17037/summary_grid.json').resolve().as_posix(),
                 'optional': False,
                 'type': 'folder'
             },
@@ -376,7 +398,7 @@ class AnnualMetricsEn17037Postprocess(QueenbeeTask):
             }]
 
 
-class _Main_f30511cdOrchestrator(luigi.WrapperTask):
+class _Main_f7730ca9Orchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

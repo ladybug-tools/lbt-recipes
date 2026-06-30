@@ -1,5 +1,5 @@
 {
-  "id": "c5591682-a555-4997-a59d-8409c43032d5",
+  "id": "a999cf9c-456c-47a0-82d1-120ca2760ed3",
   "author": {
     "id": "91d47029-1342-449f-b4ca-a6a7d9bfd9d1",
     "account_type": "user",
@@ -24,7 +24,7 @@
       "type": "MetaData",
       "annotations": {},
       "name": "annual-daylight-en17037",
-      "tag": "0.1.23",
+      "tag": "0.1.24",
       "app_version": null,
       "keywords": [
         "honeybee",
@@ -688,7 +688,40 @@
             "type": "DAGGenericOutputAlias",
             "annotations": {},
             "name": "en17037-summary",
-            "description": "JSON file with summary.",
+            "description": "JSON file with summary of whole model.",
+            "platform": [
+              "grasshopper"
+            ],
+            "handler": [
+              {
+                "type": "IOAliasHandler",
+                "annotations": {},
+                "language": "python",
+                "module": "pollination_handlers.outputs.daylight",
+                "function": "read_json_dict",
+                "index": 0
+              }
+            ]
+          }
+        ],
+        "required": true
+      },
+      {
+        "type": "DAGFileOutput",
+        "annotations": {},
+        "name": "summary-grid",
+        "description": "Annual daylight EN17037 summary of each grid.",
+        "from_": {
+          "type": "FileReference",
+          "annotations": {},
+          "path": "en17037/summary_grid.json"
+        },
+        "alias": [
+          {
+            "type": "DAGGenericOutputAlias",
+            "annotations": {},
+            "name": "en17037-summary-grid",
+            "description": "JSON file with summary per grid.",
             "platform": [
               "grasshopper"
             ],
@@ -1413,6 +1446,19 @@
         }
       },
       {
+        "type": "StepFileOutput",
+        "annotations": {},
+        "name": "summary-grid",
+        "description": "Annual daylight EN17037 summary of each grid.",
+        "path": "",
+        "required": true,
+        "source": {
+          "type": "ProjectFolder",
+          "annotations": {},
+          "path": "en17037/summary_grid.json"
+        }
+      },
+      {
         "type": "StepFolderOutput",
         "annotations": {},
         "name": "udi",
@@ -1479,12 +1525,12 @@
       }
     ],
     "message": null,
-    "started_at": "2026-06-18T20:00:07+00:00",
+    "started_at": "2026-06-30T23:49:44+00:00",
     "finished_at": null,
     "source": null,
     "api_version": "v1beta1",
-    "id": "c5591682-a555-4997-a59d-8409c43032d5_00",
-    "job_id": "c5591682-a555-4997-a59d-8409c43032d5",
+    "id": "a999cf9c-456c-47a0-82d1-120ca2760ed3_00",
+    "job_id": "a999cf9c-456c-47a0-82d1-120ca2760ed3",
     "entrypoint": null,
     "status": "Unknown",
     "steps": {}
