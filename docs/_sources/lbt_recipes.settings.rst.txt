@@ -1,0 +1,7 @@
+lbt\_recipes.settings module
+============================
+
+.. automodule:: lbt_recipes.settings
+   :members:
+   :undoc-members:
+   :show-inheritance:
