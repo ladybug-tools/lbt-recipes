@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lbt_recipes.recipe &#8212; lbt-recipes  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=0bf093e7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=b493dabd" />
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          lbt-recipes</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">CLI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../cli/index.html#commands">Commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../cli/main.html">main</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../cli/main.html#lbt-recipes">lbt-recipes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../cli/main.html#lbt-recipes-run">run</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../cli/main.html#lbt-recipes-viz">viz</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">lbt_recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../lbt_recipes.html">lbt_recipes package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../lbt_recipes.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../lbt_recipes.cli.html">lbt_recipes.cli package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.cli.html#module-lbt_recipes.cli">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../lbt_recipes.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../lbt_recipes.recipe.html">lbt_recipes.recipe module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe"><code class="docutils literal notranslate"><span class="pre">Recipe</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.ToString"><code class="docutils literal notranslate"><span class="pre">ToString()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.error_summary"><code class="docutils literal notranslate"><span class="pre">error_summary()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.failure_message"><code class="docutils literal notranslate"><span class="pre">failure_message()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.handle_inputs"><code class="docutils literal notranslate"><span class="pre">handle_inputs()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.input_value_by_name"><code class="docutils literal notranslate"><span class="pre">input_value_by_name()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.luigi_execution_summary"><code class="docutils literal notranslate"><span class="pre">luigi_execution_summary()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.output_value_by_name"><code class="docutils literal notranslate"><span class="pre">output_value_by_name()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.write_inputs_json"><code class="docutils literal notranslate"><span class="pre">write_inputs_json()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.MODEL_EXTENSIONS"><code class="docutils literal notranslate"><span class="pre">MODEL_EXTENSIONS</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.default_project_folder"><code class="docutils literal notranslate"><span class="pre">default_project_folder</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.input_names"><code class="docutils literal notranslate"><span class="pre">input_names</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.inputs"><code class="docutils literal notranslate"><span class="pre">inputs</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.name"><code class="docutils literal notranslate"><span class="pre">name</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.output_names"><code class="docutils literal notranslate"><span class="pre">output_names</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.outputs"><code class="docutils literal notranslate"><span class="pre">outputs</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.path"><code class="docutils literal notranslate"><span class="pre">path</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.simulation_id"><code class="docutils literal notranslate"><span class="pre">simulation_id</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.tag"><code class="docutils literal notranslate"><span class="pre">tag</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput"><code class="docutils literal notranslate"><span class="pre">RecipeInput</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.handle_value"><code class="docutils literal notranslate"><span class="pre">handle_value()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.INPUT_TYPES"><code class="docutils literal notranslate"><span class="pre">INPUT_TYPES</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.PATH_TYPES"><code class="docutils literal notranslate"><span class="pre">PATH_TYPES</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.default_value"><code class="docutils literal notranslate"><span class="pre">default_value</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.description"><code class="docutils literal notranslate"><span class="pre">description</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.handlers"><code class="docutils literal notranslate"><span class="pre">handlers</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.is_handled"><code class="docutils literal notranslate"><span class="pre">is_handled</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.is_path"><code class="docutils literal notranslate"><span class="pre">is_path</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.is_required"><code class="docutils literal notranslate"><span class="pre">is_required</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.name"><code class="docutils literal notranslate"><span class="pre">name</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.value"><code class="docutils literal notranslate"><span class="pre">value</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput"><code class="docutils literal notranslate"><span class="pre">RecipeOutput</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput.value"><code class="docutils literal notranslate"><span class="pre">value()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput.description"><code class="docutils literal notranslate"><span class="pre">description</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput.handlers"><code class="docutils literal notranslate"><span class="pre">handlers</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput.name"><code class="docutils literal notranslate"><span class="pre">name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../lbt_recipes.settings.html">lbt_recipes.settings module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings"><code class="docutils literal notranslate"><span class="pre">RecipeSettings</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.ToString"><code class="docutils literal notranslate"><span class="pre">ToString()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.duplicate"><code class="docutils literal notranslate"><span class="pre">duplicate()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.from_string"><code class="docutils literal notranslate"><span class="pre">from_string()</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.debug_folder"><code class="docutils literal notranslate"><span class="pre">debug_folder</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.folder"><code class="docutils literal notranslate"><span class="pre">folder</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.reload_old"><code class="docutils literal notranslate"><span class="pre">reload_old</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.report_out"><code class="docutils literal notranslate"><span class="pre">report_out</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../lbt_recipes.settings.html#lbt_recipes.settings.RecipeSettings.workers"><code class="docutils literal notranslate"><span class="pre">workers</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../lbt_recipes.version.html">lbt_recipes.version module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.version.html#lbt_recipes.version.check_energyplus_version"><code class="docutils literal notranslate"><span class="pre">check_energyplus_version()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.version.html#lbt_recipes.version.check_openstudio_version"><code class="docutils literal notranslate"><span class="pre">check_openstudio_version()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../lbt_recipes.version.html#lbt_recipes.version.check_radiance_date"><code class="docutils literal notranslate"><span class="pre">check_radiance_date()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../lbt_recipes.html#module-lbt_recipes">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">CLI</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">lbt_recipes</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cli/index.html">CLI</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">lbt_recipes</a></li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <h1>Source code for lbt_recipes.recipe</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot;Class to handle recipe inputs and outputs.&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ladybug.futil</span><span class="w"> </span><span class="kn">import</span> <span class="n">preparedir</span><span class="p">,</span> <span class="n">nukedir</span><span class="p">,</span> <span class="n">copy_file_tree</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">honeybee.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">folders</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">honeybee_radiance.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">folders</span> <span class="k">as</span> <span class="n">rad_folders</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">honeybee.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Model</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecipeSettings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_radiance_date</span><span class="p">,</span> <span class="n">check_openstudio_version</span><span class="p">,</span> \
+    <span class="n">check_energyplus_version</span>
+
+
+<div class="viewcode-block" id="Recipe">
+<a class="viewcode-back" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Recipe</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recipe class to be used as a base for all Ladybug Tools recipes.</span>
+
+<span class="sd">    Note that this class is only intended for recipes that have a single output</span>
+<span class="sd">    called &quot;results&quot;, which is typically a folder containing all of the</span>
+<span class="sd">    result files of the recipe.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        recipe_name: Text for the name of the recipe folder within this python</span>
+<span class="sd">            package (eg. daylight_factor). This can also be the full path to a</span>
+<span class="sd">            recipe folder (the folder containing the package.json and run.py file).</span>
+<span class="sd">            If the input does not correspond to an installed package or a valid</span>
+<span class="sd">            recipe folder, an exception will be raised.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        * name</span>
+<span class="sd">        * tag</span>
+<span class="sd">        * path</span>
+<span class="sd">        * default_project_folder</span>
+<span class="sd">        * simulation_id</span>
+<span class="sd">        * inputs</span>
+<span class="sd">        * outputs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">MODEL_EXTENSIONS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;.hbjson&#39;</span><span class="p">,</span> <span class="s1">&#39;.hbpkl&#39;</span><span class="p">,</span> <span class="s1">&#39;.dfjson&#39;</span><span class="p">,</span> <span class="s1">&#39;.dfpkl&#39;</span><span class="p">,</span> <span class="s1">&#39;.json&#39;</span><span class="p">,</span> <span class="s1">&#39;.pkl&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recipe_name</span><span class="p">):</span>
+        <span class="c1"># check to be sure that the requested recipe is installed</span>
+        <span class="n">install_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+        <span class="n">recipe_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_folder</span><span class="p">,</span> <span class="n">recipe_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">recipe_folder</span><span class="p">):</span>  <span class="c1"># it&#39;s a recipe in this package</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">recipe_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">recipe_folder</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">recipe_name</span><span class="p">):</span>  <span class="c1"># it&#39;s an externally-installed recipe</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">recipe_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">recipe_name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Recipe &quot;</span><span class="si">{}</span><span class="s1">&quot; is not installed.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">recipe_name</span><span class="p">))</span>
+
+        <span class="c1"># load the package.json file to extract the recipe attributes</span>
+        <span class="n">package_json</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="s1">&#39;package.json&#39;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">package_json</span><span class="p">),</span> \
+            <span class="s1">&#39;Recipe &quot;</span><span class="si">{}</span><span class="s1">&quot; lacks a package.json.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">package_json</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
+            <span class="n">package_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span>
+
+        <span class="c1"># set the recipe attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tag</span> <span class="o">=</span> <span class="n">package_data</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;tag&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_project_folder</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">RecipeInput</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span> <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="n">package_data</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">RecipeOutput</span><span class="p">(</span><span class="n">outp</span><span class="p">)</span> <span class="k">for</span> <span class="n">outp</span> <span class="ow">in</span> <span class="n">package_data</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">]]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get text for recipe name.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get text for recipe tag (aka. its version number).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tag</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the path to the recipe&#39;s folder.</span>
+
+<span class="sd">        This folder contains a package.json with metadata about the recipe as well</span>
+<span class="sd">        as a run.py, which is used to execute the recipe.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default_project_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get or set the directory in which the recipe&#39;s results will be written.</span>
+
+<span class="sd">        If unset, this will be a folder called unnamed_project within the user&#39;s</span>
+<span class="sd">        default simulation folder</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_project_folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_project_folder</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">def_sim</span> <span class="o">=</span> <span class="n">folders</span><span class="o">.</span><span class="n">default_simulation_folder</span>
+            <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;model&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">Model</span><span class="p">):</span>
+                        <span class="n">clean_name</span> <span class="o">=</span> \
+                            <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^.A-Za-z0-9_-]&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="n">inp</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">display_name</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">def_sim</span><span class="p">,</span> <span class="n">clean_name</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">value</span><span class="p">)):</span>
+                        <span class="n">model</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MODEL_EXTENSIONS</span><span class="p">:</span>
+                            <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">def_sim</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">def_sim</span><span class="p">,</span> <span class="s1">&#39;unnamed_project&#39;</span><span class="p">)</span>
+
+    <span class="nd">@default_project_folder</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default_project_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_default_project_folder</span> <span class="o">=</span> <span class="n">path</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">simulation_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get or set text for the simulation ID to use within the project folder.</span>
+
+<span class="sd">        If unset, this will be the same as the name of the recipe.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_id</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@simulation_id</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">simulation_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_id</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a tuple of RecipeInput objects for the recipe&#39;s inputs.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a tuple of RecipeOutput objects for the recipe&#39;s outputs.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_outputs</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">input_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a tuple of text for the recipe&#39;s input names.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a tuple of text for the recipe&#39;s output names.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">otp</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">otp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outputs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Recipe.input_value_by_name">
+<a class="viewcode-back" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.input_value_by_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">input_value_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_name</span><span class="p">,</span> <span class="n">input_value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the value of an input given the input name.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_name: Text for the name of the input to be set. For example,</span>
+<span class="sd">                &#39;radiance-parameters&#39;.</span>
+<span class="sd">            input_value: The value to which the input will be set. Note that</span>
+<span class="sd">                setting a value will ensure it is passed through any of the</span>
+<span class="sd">                input&#39;s handlers and cast to an appropriate data type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">input_name</span><span class="p">:</span>
+                <span class="n">inp</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">input_value</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Input &quot;</span><span class="si">{}</span><span class="s1">&quot; was not found for recipe &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">input_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Recipe.handle_inputs">
+<a class="viewcode-back" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.handle_inputs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the handlers of all inputs to ensure they are ready for simulation.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span><span class="p">:</span>
+            <span class="n">inp</span><span class="o">.</span><span class="n">handle_value</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Recipe.write_inputs_json">
+<a class="viewcode-back" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.write_inputs_json">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_inputs_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">cpu_count</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the inputs.json file that gets passed to queenbee luigi.</span>
+
+<span class="sd">        Note that running this method will automatically handle all of the inputs.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            project_folder: The full path to where the inputs json file will be</span>
+<span class="sd">                written. If None, the default_project_folder on this recipe</span>
+<span class="sd">                will be used.</span>
+<span class="sd">            indent: The indent at which the JSON will be written (Default: 4).</span>
+<span class="sd">            cpu_count: An optional integer to override any inputs that are</span>
+<span class="sd">                named &quot;cpu-count&quot;. This can be used to coordinate such recipe</span>
+<span class="sd">                inputs with the number of workers specified in recipe settings.</span>
+<span class="sd">                If None, no overriding will happen. (Default: None).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># create setup the project folder in which the inputs json will be written</span>
+        <span class="n">p_fold</span> <span class="o">=</span> <span class="n">project_folder</span> <span class="k">if</span> <span class="n">project_folder</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_project_folder</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">p_fold</span><span class="p">):</span>
+            <span class="n">preparedir</span><span class="p">(</span><span class="n">p_fold</span><span class="p">)</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p_fold</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_inputs.json&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_id</span><span class="p">))</span>
+        <span class="c1"># create the inputs dictionary, ensuring all inputs are handled in the process</span>
+        <span class="n">inp_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
+            <span class="n">inp</span><span class="o">.</span><span class="n">handle_value</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">inp</span><span class="o">.</span><span class="n">is_path</span> <span class="ow">and</span> <span class="n">inp</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">inp</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="c1"># copy artifact to project folder</span>
+                <span class="n">path_basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p_fold</span><span class="p">,</span> <span class="n">path_basename</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">shutil</span><span class="o">.</span><span class="n">SameFileError</span><span class="p">:</span>
+                        <span class="k">pass</span>  <span class="c1"># the file is already in the right place; no need to copy</span>
+                <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+                    <span class="n">copy_file_tree</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">inp_dict</span><span class="p">[</span><span class="n">inp</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_basename</span>
+            <span class="k">elif</span> <span class="n">inp</span><span class="o">.</span><span class="n">is_path</span> <span class="ow">and</span> <span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">inp</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+                <span class="c1"># conditional artifact; ignore it</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;cpu-count&#39;</span> <span class="ow">and</span> <span class="n">cpu_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">inp_dict</span><span class="p">[</span><span class="n">inp</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpu_count</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">inp_dict</span><span class="p">[</span><span class="n">inp</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">inp</span><span class="o">.</span><span class="n">value</span>
+        <span class="c1"># write the inputs dictionary to a file</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">inp_dict</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">file_path</span></div>
+
+
+<div class="viewcode-block" id="Recipe.run">
+<a class="viewcode-back" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">radiance_check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">openstudio_check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">energyplus_check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">queenbee_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">debug_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the recipe using the queenbee local run command.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            settings: An optional RecipeSettings object or RecipeSettings string</span>
+<span class="sd">                to dictate the settings of the recipe run (eg. the number of</span>
+<span class="sd">                workers or the project folder). If None, default settings will</span>
+<span class="sd">                be assumed. (Default: None).</span>
+<span class="sd">            radiance_check: Boolean to note whether the installed version of</span>
+<span class="sd">                Radiance should be checked before executing the recipe. If there</span>
+<span class="sd">                is no compatible version installed, an exception will be raised</span>
+<span class="sd">                with a clear error message. (Default: False).</span>
+<span class="sd">            openstudio_check: Boolean to note whether the installed version of</span>
+<span class="sd">                OpenStudio should be checked before executing the recipe. If there</span>
+<span class="sd">                is no compatible version installed, an exception will be raised</span>
+<span class="sd">                with a clear error message. (Default: False).</span>
+<span class="sd">            energyplus_check: Boolean to note whether the installed version of</span>
+<span class="sd">                EnergyPlus should be checked before executing the recipe. If there</span>
+<span class="sd">                is no compatible version installed, an exception will be raised</span>
+<span class="sd">                with a clear error message. (Default: False).</span>
+<span class="sd">            queenbee_path: Optional path to the queenbee executable. If None, the</span>
+<span class="sd">                queenbee within the ladybug_tools Python folder will be used.</span>
+<span class="sd">                Setting this to just &#39;queenbee&#39; will use the system Python.</span>
+<span class="sd">            silent: Boolean to note whether the recipe should be run silently on</span>
+<span class="sd">                Windows (True) or with a command window (False). (Default: False).</span>
+<span class="sd">            debug_folder: An optional path to a debug folder. If debug folder is</span>
+<span class="sd">                provided all the steps of the simulation will be executed inside</span>
+<span class="sd">                the debug folder which can be used for further inspection. Note</span>
+<span class="sd">                that this argument here will override the debug folder specified</span>
+<span class="sd">                in the settings. (Default: None).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Path to the project folder containing the recipe results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># perform any simulation engine checks</span>
+        <span class="k">if</span> <span class="n">radiance_check</span><span class="p">:</span>
+            <span class="n">check_radiance_date</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">openstudio_check</span><span class="p">:</span>
+            <span class="n">check_openstudio_version</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">energyplus_check</span><span class="p">:</span>
+            <span class="n">check_energyplus_version</span><span class="p">()</span>
+
+        <span class="c1"># parse the settings or use default ones</span>
+        <span class="k">if</span> <span class="n">settings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">settings</span> <span class="o">=</span> <span class="n">RecipeSettings</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span> \
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">settings</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">settings</span> <span class="o">=</span> <span class="n">RecipeSettings</span><span class="p">()</span>
+
+        <span class="c1"># get the folder out of which the recipe will be executed</span>
+        <span class="n">folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_project_folder</span> <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">folder</span> <span class="ow">is</span> <span class="kc">None</span> \
+            <span class="k">else</span> <span class="n">settings</span><span class="o">.</span><span class="n">folder</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+            <span class="n">preparedir</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>  <span class="c1"># create the directory if it&#39;s not there</span>
+
+        <span class="c1"># delete any existing result files unless reload_old is True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">reload_old</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">wf_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">wf_folder</span><span class="p">):</span>
+                <span class="n">nukedir</span><span class="p">(</span><span class="n">wf_folder</span><span class="p">,</span> <span class="n">rmdir</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># write the inputs JSON for the recipe and set up the environment variables</span>
+        <span class="n">inputs_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_inputs_json</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">cpu_count</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">workers</span><span class="p">)</span>
+        <span class="n">genv</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">genv</span><span class="p">[</span><span class="s1">&#39;PATH&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rad_folders</span><span class="o">.</span><span class="n">radbin_path</span>
+        <span class="n">genv</span><span class="p">[</span><span class="s1">&#39;RAYPATH&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rad_folders</span><span class="o">.</span><span class="n">radlib_path</span>
+        <span class="n">env_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;--env </span><span class="si">{}</span><span class="s1">=&quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">genv</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+
+        <span class="c1"># create command</span>
+        <span class="n">qb_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folders</span><span class="o">.</span><span class="n">python_scripts_path</span><span class="p">,</span> <span class="s1">&#39;queenbee&#39;</span><span class="p">)</span> \
+            <span class="k">if</span> <span class="n">queenbee_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">queenbee_path</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">{qb_path}</span><span class="s1">&quot; local run &quot;</span><span class="si">{recipe_folder}</span><span class="s1">&quot; &#39;</span> \
+            <span class="s1">&#39;&quot;</span><span class="si">{project_folder}</span><span class="s1">&quot; -i &quot;</span><span class="si">{user_inputs}</span><span class="s1">&quot; --workers </span><span class="si">{workers}</span><span class="s1"> &#39;</span> \
+            <span class="s1">&#39;</span><span class="si">{environment}</span><span class="s1"> --name </span><span class="si">{simulation_name}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">qb_path</span><span class="o">=</span><span class="n">qb_path</span><span class="p">,</span> <span class="n">recipe_folder</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">project_folder</span><span class="o">=</span><span class="n">folder</span><span class="p">,</span>
+                <span class="n">user_inputs</span><span class="o">=</span><span class="n">inputs_json</span><span class="p">,</span> <span class="n">workers</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">workers</span><span class="p">,</span>
+                <span class="n">environment</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">env_args</span><span class="p">),</span>
+                <span class="n">simulation_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_id</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug_folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">command</span> <span class="o">+=</span> <span class="s1">&#39; --debug &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">debug_folder</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">settings</span><span class="o">.</span><span class="n">debug_folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">command</span> <span class="o">+=</span> <span class="s1">&#39; --debug &quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">debug_folder</span><span class="p">)</span>
+
+        <span class="c1"># execute command</span>
+        <span class="n">shell</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">silent</span> <span class="k">else</span> <span class="kc">True</span>
+        <span class="n">custom_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">custom_env</span><span class="p">[</span><span class="s1">&#39;PYTHONHOME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">report_out</span><span class="p">:</span>
+            <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+                <span class="n">command</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="n">shell</span><span class="o">=</span><span class="n">shell</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">custom_env</span>
+            <span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="n">shell</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">custom_env</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>  <span class="c1"># freeze the canvas while running</span>
+        <span class="k">return</span> <span class="n">folder</span></div>
+
+
+<div class="viewcode-block" id="Recipe.output_value_by_name">
+<a class="viewcode-back" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.output_value_by_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_value_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_name</span><span class="p">,</span> <span class="n">project_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the value of an input given the input name.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            output_name: Text for the name of the output to be obtained.</span>
+<span class="sd">            project_folder: The full path to the project folder containing</span>
+<span class="sd">                completed recipe results. If None, the default_project_folder on</span>
+<span class="sd">                this recipe will be assumed. (Default: None).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_project_folder</span> <span class="k">if</span> <span class="n">project_folder</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">project_folder</span>
+        <span class="n">sim_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_id</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">outp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outputs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">outp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">output_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">outp</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">sim_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Output &quot;</span><span class="si">{}</span><span class="s1">&quot; was not found for recipe &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">output_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Recipe.luigi_execution_summary">
+<a class="viewcode-back" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.luigi_execution_summary">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">luigi_execution_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a string of the luigi execution summary after the recipe has run.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            project_folder: The full path to the project folder containing</span>
+<span class="sd">                completed recipe logs. If None, the default_project_folder on</span>
+<span class="sd">                this recipe will be assumed. (Default: None).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># determine the log file path from the project folder</span>
+        <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_project_folder</span> <span class="k">if</span> <span class="n">project_folder</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">project_folder</span>
+        <span class="n">sim_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_id</span><span class="p">)</span>
+        <span class="n">log_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sim_path</span><span class="p">,</span> <span class="s1">&#39;__logs__&#39;</span><span class="p">,</span> <span class="s1">&#39;logs.log&#39;</span><span class="p">)</span>
+        <span class="c1"># open the file and load the summary</span>
+        <span class="n">read_lines</span><span class="p">,</span> <span class="n">summary_lines</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">lf</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lf</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;===== Luigi Execution Summary =====&#39;</span><span class="p">:</span>
+                    <span class="n">read_lines</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">read_lines</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="n">read_lines</span><span class="p">:</span>
+                    <span class="n">summary_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">summary_lines</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Recipe.error_summary">
+<a class="viewcode-back" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.error_summary">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">error_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a string of the error summary after the recipe has run.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            project_folder: The full path to the project folder containing</span>
+<span class="sd">                completed recipe logs. If None, the default_project_folder on</span>
+<span class="sd">                this recipe will be assumed. (Default: None).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># determine the log file path from the project folder</span>
+        <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_project_folder</span> <span class="k">if</span> <span class="n">project_folder</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">project_folder</span>
+        <span class="n">sim_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">proj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_id</span><span class="p">)</span>
+        <span class="n">log_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sim_path</span><span class="p">,</span> <span class="s1">&#39;__logs__&#39;</span><span class="p">,</span> <span class="s1">&#39;err.log&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">log_file</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+        <span class="c1"># open the file and load the summary</span>
+        <span class="n">error_lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">lf</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lf</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">error_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">error_lines</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Recipe.failure_message">
+<a class="viewcode-back" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.failure_message">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">failure_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_folder</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a string of a recipe failure message that gives a summary of failed tasks.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            project_folder: The full path to the project folder containing</span>
+<span class="sd">                completed recipe logs. If None, the default_project_folder on</span>
+<span class="sd">                this recipe will be assumed. (Default: None).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">st_msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">The recipe failed to run with the following error(s):</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="n">st_msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_summary</span><span class="p">(</span><span class="n">project_folder</span><span class="p">),</span>
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Execution Summary&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">luigi_execution_summary</span><span class="p">(</span><span class="n">project_folder</span><span class="p">)</span>
+        <span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="Recipe.ToString">
+<a class="viewcode-back" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.Recipe.ToString">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ToString</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Represent recipe.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">:</span><span class="se">\n</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span> <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">]))</span></div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_RecipeParameter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for managing recipe inputs and outputs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        spec_dict: Dictionary representation of an input or output, taken from the</span>
+<span class="sd">            package.json and following the RecipeInterface schema.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        * name</span>
+<span class="sd">        * description</span>
+<span class="sd">        * handlers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_dict</span><span class="p">):</span>
+        <span class="c1"># set the properties based on the output specification</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">spec_dict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="n">spec_dict</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span>
+
+        <span class="c1"># load any of the handlers if they are specified</span>
+        <span class="n">handlers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s1">&#39;alias&#39;</span> <span class="ow">in</span> <span class="n">spec_dict</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">spec_dict</span><span class="p">[</span><span class="s1">&#39;alias&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="s1">&#39;grasshopper&#39;</span> <span class="ow">in</span> <span class="n">alias</span><span class="p">[</span><span class="s1">&#39;platform&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="s1">&#39;handler&#39;</span> <span class="ow">in</span> <span class="n">alias</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">hand_dict</span> <span class="ow">in</span> <span class="n">alias</span><span class="p">[</span><span class="s1">&#39;handler&#39;</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">hand_dict</span><span class="p">[</span><span class="s1">&#39;language&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;python&#39;</span><span class="p">:</span>
+                            <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">hand_dict</span><span class="p">[</span><span class="s1">&#39;module&#39;</span><span class="p">])</span>
+                            <span class="n">hand_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">hand_dict</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">])</span>
+                            <span class="n">handlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hand_func</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">handlers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">handlers</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get text for the name.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get text for the description.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handlers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an array of handler functions for this object.</span>
+
+<span class="sd">        This will be None if the object has no alias or Grasshopper handler.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;RecipeParameter: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RecipeInput">
+<a class="viewcode-back" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RecipeInput</span><span class="p">(</span><span class="n">_RecipeParameter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Object to represent and manage recipe inputs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_dict: Dictionary representation of an input, taken from the</span>
+<span class="sd">            package.json and following the RecipeInterface schema.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        * name</span>
+<span class="sd">        * description</span>
+<span class="sd">        * value</span>
+<span class="sd">        * default_value</span>
+<span class="sd">        * is_required</span>
+<span class="sd">        * is_handled</span>
+<span class="sd">        * handlers</span>
+<span class="sd">        * is_path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">INPUT_TYPES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;DAGStringInput&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s1">&#39;DAGIntegerInput&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s1">&#39;DAGNumberInput&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="s1">&#39;DAGBooleanInput&#39;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="s1">&#39;DAGFolderInput&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s1">&#39;DAGFileInput&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s1">&#39;DAGPathInput&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s1">&#39;DAGArrayInput&#39;</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span>
+        <span class="s1">&#39;DAGJSONObjectInput&#39;</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="p">}</span>
+    <span class="n">PATH_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;DAGFileInput&#39;</span><span class="p">,</span> <span class="s1">&#39;DAGFolderInput&#39;</span><span class="p">,</span> <span class="s1">&#39;DAGPathInput&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_dict</span><span class="p">):</span>
+        <span class="c1"># check to be sure that we have the right object and initialize basic properties</span>
+        <span class="n">_RecipeParameter</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_dict</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">INPUT_TYPES</span><span class="p">,</span> <span class="s1">&#39;Input specification &quot;</span><span class="si">{}</span><span class="s1">&quot; is &#39;</span> \
+            <span class="s1">&#39;not valid. Must be one of the following:</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">INPUT_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">INPUT_TYPES</span><span class="p">[</span><span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_path</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">PATH_TYPES</span> <span class="k">else</span> <span class="kc">False</span>
+
+        <span class="c1"># set the value to None by default and import any default values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_value</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s1">&#39;default&#39;</span> <span class="ow">in</span> <span class="n">input_dict</span> <span class="ow">and</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_default_value</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;alias&#39;</span> <span class="ow">in</span> <span class="n">input_dict</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">al</span> <span class="ow">in</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;alias&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="s1">&#39;grasshopper&#39;</span> <span class="ow">in</span> <span class="n">al</span><span class="p">[</span><span class="s1">&#39;platform&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="s1">&#39;default&#39;</span> <span class="ow">in</span> <span class="n">al</span> <span class="ow">and</span> <span class="n">al</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">d_val</span> <span class="o">=</span> <span class="n">al</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span><span class="p">:</span>
+                                <span class="n">d_val</span> <span class="o">=</span> <span class="n">handler</span><span class="p">(</span><span class="n">d_val</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_default_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">(</span><span class="n">d_val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_required</span> <span class="o">=</span> <span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_handled</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># will be set to false if a user specifies a value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get or set a value for this input.</span>
+
+<span class="sd">        This will be the default_value if it has not been specified. Note that</span>
+<span class="sd">        setting a value will ensure it is passed through any of the handlers</span>
+<span class="sd">        and cast to an appropriate data type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_value</span>
+
+    <span class="nd">@value</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_is_handled</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># set to false so we can handle it later</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">default_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the default value for this input.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a boolean for whether this input is required to run the recipe.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_required</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_handled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a boolean for whether this input is handled and is ready for simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_handled</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a boolean noting whether this input is a file or folder path.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_path</span>
+
+<div class="viewcode-block" id="RecipeInput.handle_value">
+<a class="viewcode-back" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeInput.handle_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the handlers of this input to yield a correct input for simulation.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_handled</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">handler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Represent recipe input.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="RecipeOutput">
+<a class="viewcode-back" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RecipeOutput</span><span class="p">(</span><span class="n">_RecipeParameter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Object to represent and manage recipe outputs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        output_dict: Dictionary representation of an output, taken from the</span>
+<span class="sd">            package.json and following the RecipeInterface schema.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        * name</span>
+<span class="sd">        * description</span>
+<span class="sd">        * handlers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dict</span><span class="p">):</span>
+        <span class="n">_RecipeParameter</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dict</span><span class="p">)</span>
+
+        <span class="c1"># process properties related to the output type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">output_dict</span><span class="p">[</span><span class="s1">&#39;from&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">output_dict</span><span class="p">[</span><span class="s1">&#39;from&#39;</span><span class="p">][</span><span class="s1">&#39;path&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># not a file or a folder; type of output not yet supported</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="RecipeOutput.value">
+<a class="viewcode-back" href="../../lbt_recipes.recipe.html#lbt_recipes.recipe.RecipeOutput.value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation_folder</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the value of this output given the path to a simulation folder.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            simulation_folder: The path to a simulation folder that has finished</span>
+<span class="sd">                running. This is the path of a project folder joined with</span>
+<span class="sd">                the simulation ID.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;FileReference&#39;</span><span class="p">,</span> <span class="s1">&#39;FolderReference&#39;</span><span class="p">),</span> \
+            <span class="s1">&#39;Parsing output type &quot;</span><span class="si">{}</span><span class="s1">&quot; is not yet supported.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">simulation_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handlers</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">handler</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Represent recipe output.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;Output: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2026, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.0.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
