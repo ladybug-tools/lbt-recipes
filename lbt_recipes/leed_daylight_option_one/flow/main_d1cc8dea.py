@@ -1,5 +1,5 @@
 """
-This file is auto-generated from leed-daylight-option-one:0.1.8.
+This file is auto-generated from leed-daylight-option-one:0.1.9.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -17,8 +17,8 @@ import pathlib
 from queenbee_local import QueenbeeTask
 from queenbee_local import load_input_param as qb_load_input_param
 from . import _queenbee_status_lock_
-from .dependencies.daylight_option_one_visualization import _DaylightOptionOneVisualization_e0b315f8Orchestrator as DaylightOptionOneVisualization_e0b315f8Workerbee
-from .dependencies.main_c3773f23 import _Main_c3773f23Orchestrator as Main_c3773f23Workerbee
+from .dependencies.daylight_option_one_visualization import _DaylightOptionOneVisualization_d1cc8deaOrchestrator as DaylightOptionOneVisualization_d1cc8deaWorkerbee
+from .dependencies.main_52a459c9 import _Main_52a459c9Orchestrator as Main_52a459c9Workerbee
 
 
 _default_inputs = {   'cpu_count': 50,
@@ -86,7 +86,7 @@ class AddApertureGroupBlinds(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance multi-phase add-aperture-group-blinds model.hbjson --diffuse-transmission {diffuse_transmission} --specular-transmission {specular_transmission} --distance {distance} --scale {scale} --create-groups --output-model model_blinds.hbjson'.format(distance=self.distance, diffuse_transmission=self.diffuse_transmission, scale=self.scale, specular_transmission=self.specular_transmission)
+        return 'honeybee-radiance multi-phase add-aperture-group-blinds model.hbjson --diffuse-transmission {diffuse_transmission} --specular-transmission {specular_transmission} --distance {distance} --scale {scale} --create-groups --output-model model_blinds.hbjson'.format(scale=self.scale, specular_transmission=self.specular_transmission, diffuse_transmission=self.diffuse_transmission, distance=self.distance)
 
     def output(self):
         return {
@@ -120,7 +120,7 @@ class AddApertureGroupBlinds(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance:1.66.246'
+        return 'docker.io/ladybugtools/honeybee-radiance:1.66.268'
 
     @property
     def image_workdir(self):
@@ -208,7 +208,7 @@ class RunTwoPhaseDaylightCoefficient(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [Main_c3773f23Workerbee(_input_params=self.map_dag_inputs)]
+        yield [Main_52a459c9Workerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -256,11 +256,11 @@ class LeedDaylightOptionOne(QueenbeeTask):
     @property
     def model(self):
         try:
-            pathlib.Path(self._input_params['model'])
+            pathlib.Path(self.input()['AddApertureGroupBlinds']['output_model'].path)
         except TypeError:
             # optional artifact
             return None
-        value = pathlib.Path(self._input_params['model'])
+        value = pathlib.Path(self.input()['AddApertureGroupBlinds']['output_model'].path)
         return value.as_posix() if value.is_absolute() \
             else pathlib.Path(self.initiation_folder, value).resolve().as_posix()
 
@@ -285,10 +285,10 @@ class LeedDaylightOptionOne(QueenbeeTask):
         return False
 
     def command(self):
-        return 'honeybee-radiance-postprocess post-process leed daylight-option-one results --grids-filter " {grid_filter} " --shade-transmittance {shade_transmittance} --shade-transmittance-file shade_transmittance.json --use-{blind_postprocess} --sub-folder leed_summary'.format(shade_transmittance=self.shade_transmittance, grid_filter=self.grid_filter, blind_postprocess=self.blind_postprocess)
+        return 'honeybee-radiance-postprocess post-process leed daylight-option-one results --grids-filter " {grid_filter} " --shade-transmittance {shade_transmittance} --shade-transmittance-file shade_transmittance.json --use-{blind_postprocess} --sub-folder leed_summary'.format(blind_postprocess=self.blind_postprocess, shade_transmittance=self.shade_transmittance, grid_filter=self.grid_filter)
 
     def requires(self):
-        return {'RunTwoPhaseDaylightCoefficient': RunTwoPhaseDaylightCoefficient(_input_params=self._input_params)}
+        return {'RunTwoPhaseDaylightCoefficient': RunTwoPhaseDaylightCoefficient(_input_params=self._input_params), 'AddApertureGroupBlinds': AddApertureGroupBlinds(_input_params=self._input_params)}
 
     def output(self):
         return {
@@ -322,7 +322,7 @@ class LeedDaylightOptionOne(QueenbeeTask):
 
     @property
     def task_image(self):
-        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.583'
+        return 'docker.io/ladybugtools/honeybee-radiance-postprocess:0.4.654'
 
     @property
     def image_workdir(self):
@@ -378,7 +378,7 @@ class CreateVisualization(QueenbeeTask):
         return inputs
 
     def run(self):
-        yield [DaylightOptionOneVisualization_e0b315f8Workerbee(_input_params=self.map_dag_inputs)]
+        yield [DaylightOptionOneVisualization_d1cc8deaWorkerbee(_input_params=self.map_dag_inputs)]
         pathlib.Path(self.execution_folder).mkdir(parents=True, exist_ok=True)
         self._copy_output_artifacts(self.execution_folder)
         self._copy_output_parameters(self.execution_folder)
@@ -406,7 +406,7 @@ class CreateVisualization(QueenbeeTask):
             }]
 
 
-class _Main_e0b315f8Orchestrator(luigi.WrapperTask):
+class _Main_d1cc8deaOrchestrator(luigi.WrapperTask):
     """Runs all the tasks in this module."""
     # user input for this module
     _input_params = luigi.DictParameter()

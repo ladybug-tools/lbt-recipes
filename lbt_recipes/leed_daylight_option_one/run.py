@@ -1,5 +1,5 @@
 """
-This file is auto-generated from leed-daylight-option-one:0.1.8.
+This file is auto-generated from leed-daylight-option-one:0.1.9.
 It is unlikely that you should be editing this file directly.
 Try to edit the original recipe itself and regenerate the code.
 
@@ -23,7 +23,7 @@ from multiprocessing import freeze_support
 from queenbee_local import local_scheduler, _copy_artifacts, update_params, parse_input_args, LOGS_CONFIG
 from luigi.execution_summary import LuigiStatusCode
 
-import flow.main_e0b315f8 as leed_daylight_option_one_workerbee
+import flow.main_d1cc8dea as leed_daylight_option_one_workerbee
 
 
 _recipe_default_inputs = {   'cpu_count': 50,
@@ -42,7 +42,7 @@ class LetLeedDaylightOptionOneFly(luigi.WrapperTask):
     _input_params = luigi.DictParameter()
 
     def requires(self):
-        yield [leed_daylight_option_one_workerbee._Main_e0b315f8Orchestrator(_input_params=self._input_params)]
+        yield [leed_daylight_option_one_workerbee._Main_d1cc8deaOrchestrator(_input_params=self._input_params)]
 
 
 def start(project_folder, user_values, workers):
