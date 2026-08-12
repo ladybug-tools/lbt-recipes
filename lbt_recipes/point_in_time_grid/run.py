@@ -92,7 +92,7 @@ def start(project_folder, user_values, workers):
         status_file
     )
 
-    now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+    now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     status = json.loads(status_file.read_text())
     # update the input/output values in status
     for inp in status['status']['inputs']:
@@ -124,7 +124,7 @@ def start(project_folder, user_values, workers):
         logging_conf_file=cfg_file.as_posix()
     )
 
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now(datetime.timezone.utc)
     try:
         status = json.loads(status_file.read_text())
     except json.JSONDecodeError:
