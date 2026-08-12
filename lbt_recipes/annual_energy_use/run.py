@@ -89,7 +89,7 @@ def start(project_folder, user_values, workers):
         status_file
     )
 
-    now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+    now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     status = json.loads(status_file.read_text())
     status['status']['started_at'] = now
     status['status']['status'] = 'Running'
@@ -103,7 +103,7 @@ def start(project_folder, user_values, workers):
         logging_conf_file=cfg_file.as_posix()
     )
 
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now(datetime.timezone.utc)
     status = json.loads(status_file.read_text())
     duration = now - datetime.datetime.strptime(
         status['status']['started_at'], '%Y-%m-%dT%H:%M:%SZ'
