@@ -73,7 +73,7 @@ jobs:
         VERSION: ${{ github.event.client_payload.version }}
       run: |
         export CLEAN_VERSION=$(echo $VERSION | sed 's/v//g')
-        sed -i --regexp-extended 's/(lbt-honeybee==).*/lbt-honeybee=='"$CLEAN_VERSION"'/' dev-requirements.txt
+        sed -i --regexp-extended 's/(lbt-honeybee>=).*/lbt-honeybee>='"$CLEAN_VERSION"'/' requirements.txt
     - name: "Commit and Push Changes"
       id: push
       env:
