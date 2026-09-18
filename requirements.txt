@@ -1,4 +1,4 @@
-lbt-honeybee>=0.9.477
+lbt-honeybee>=0.9.478
 queenbee-local==1.0.3;python_version>="3.8"
 queenbee-local==0.6.2;python_version<"3.8"
 pollination-handlers==0.10.17
