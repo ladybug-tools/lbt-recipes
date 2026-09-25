@@ -8,8 +8,8 @@ from honeybee_energy.config import folders as energy_folders
 # These constants set the engine version compatibility across the entire
 # LBT Grasshopper plugin
 RADIANCE_DATE = (2023, 11, 5)
-EP_VERSION = (25, 1, 0)
-OS_VERSION = (3, 10, 0)
+EP_VERSION = (25, 2, 0)
+OS_VERSION = (3, 11, 0)
 COMPATIBILITY_URL = 'https://github.com/ladybug-tools/lbt-grasshopper/wiki/' \
     '1.4-Compatibility-Matrix'
 

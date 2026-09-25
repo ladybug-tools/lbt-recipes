@@ -3,6 +3,7 @@
 from __future__ import division
 
 import os
+import sys
 import json
 import re
 import importlib
@@ -321,8 +322,29 @@ class Recipe(object):
             print(result[0])
             print(result[1])
         else:
-            process = subprocess.Popen(command, shell=shell, env=custom_env)
-            result = process.communicate()  # freeze the canvas while running
+            if shell or sys.version_info > (3, 0):  # run command normally with subprocess
+                process = subprocess.Popen(command, shell=shell, env=custom_env)
+                result = process.communicate()  # freeze the canvas while running
+            else:  # prevent Rhino/Grasshopper from hijacking the streams and taking forever
+                from System.Diagnostics import Process, ProcessStartInfo, ProcessWindowStyle
+                exe_path = qb_path
+                sim_arguments = command.replace('"{}" '.format(qb_path), '')
+                start_info = ProcessStartInfo()
+                start_info.FileName = exe_path
+                start_info.Arguments = sim_arguments
+                for key, value in custom_env.items():
+                    start_info.EnvironmentVariables[key] = value
+                # Disable .NET stream interception so it falls back natively to the console window
+                start_info.RedirectStandardInput = False
+                start_info.RedirectStandardOutput = False
+                start_info.RedirectStandardError = False
+                # Force a brand new, visible console window to appear instantly
+                start_info.UseShellExecute = False    # Equivalent to shell=False
+                start_info.CreateNoWindow = False     # Ensures the window is visible
+                start_info.WindowStyle = ProcessWindowStyle.Normal
+                # Execute the simulation instantly
+                process = Process.Start(start_info)
+                process.WaitForExit()
         return folder
 
     def output_value_by_name(self, output_name, project_folder=None):
