@@ -1,0 +1,28 @@
+lbt\_recipes package
+====================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lbt_recipes.cli
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   lbt_recipes.recipe
+   lbt_recipes.settings
+   lbt_recipes.version
+
+Module contents
+---------------
+
+.. automodule:: lbt_recipes
+   :members:
+   :undoc-members:
+   :show-inheritance:
