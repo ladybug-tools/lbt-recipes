@@ -1,0 +1,7 @@
+lbt_recipes
+===========
+
+.. toctree::
+   :maxdepth: 4
+
+   lbt_recipes
