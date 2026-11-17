@@ -1,0 +1,7 @@
+main
+====
+
+.. click:: lbt_recipes.cli.__init__:main
+   :prog: lbt-recipes
+   :show-nested:
+   :commands: run ,viz
